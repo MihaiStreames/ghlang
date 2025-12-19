@@ -2,52 +2,32 @@ from pathlib import Path
 import sys
 
 import click
-from dotenv import load_dotenv
 from loguru import logger
 
-from github_stats.github_client import GitHubClient
-from github_stats.github_client import load_github_colors
-from github_stats.visualizers import generate_bar
-from github_stats.visualizers import generate_pie
+from ghlang.config import ConfigError
+from ghlang.config import load_config
+from ghlang.github_client import GitHubClient
+from ghlang.github_client import load_github_colors
+from ghlang.visualizers import generate_bar
+from ghlang.visualizers import generate_pie
 
 
 @click.command()
 @click.option(
-    "--token",
-    envvar="GITHUB_TOKEN",
-    required=True,
-    help="GitHub personal access token (or set GITHUB_TOKEN env var)",
-)
-@click.option(
-    "--affiliation",
-    envvar="GH_AFFILIATION",
-    default="owner,collaborator,organization_member",
-    help="Which repos to include",
-)
-@click.option(
-    "--visibility",
-    envvar="GH_VISIBILITY",
-    default="all",
-    type=click.Choice(["all", "public", "private"]),
-    help="Repo visibility filter",
+    "--config",
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to config file (default: ~/.config/ghlang/config.toml)",
 )
 @click.option(
     "--output-dir",
     "-o",
-    default="output",
     type=click.Path(path_type=Path),
-    help="Output directory for generated files",
+    help="Override output directory from config",
 )
 @click.option(
     "--top-n",
-    default=5,
     type=int,
-    help="Number of top languages to show in bar chart",
-)
-@click.option(
-    "--save-data/--no-save-data",
-    default=True,
-    help="Save API responses as JSON files",
+    help="Override number of top languages in bar chart",
 )
 @click.option(
     "--verbose",
@@ -56,18 +36,28 @@ from github_stats.visualizers import generate_pie
     help="Enable verbose logging",
 )
 def main(
-    token: str,
-    affiliation: str,
-    visibility: str,
-    output_dir: Path,
-    top_n: int,
-    save_data: bool,
+    config: Path | None,
+    output_dir: Path | None,
+    top_n: int | None,
     verbose: bool,
 ):
-    """Generate language statistics and visualizations from your GitHub repositories."""
+    """Generate language statistics and visualizations from your GitHub repositories"""
+    try:
+        # Load config with CLI overrides
+        cli_overrides = {
+            "output_dir": output_dir,
+            "top_n_languages": top_n,
+            "verbose": verbose or None,  # Only override if flag is set
+        }
+        cfg = load_config(config_path=config, cli_overrides=cli_overrides)
+
+    except ConfigError as e:
+        logger.error(str(e))
+        sys.exit(1)
+
     # Configure logging
     logger.remove()
-    log_level = "DEBUG" if verbose else "INFO"
+    log_level = "DEBUG" if cfg.verbose else "INFO"
     logger.add(
         sys.stderr,
         format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
@@ -75,12 +65,12 @@ def main(
     )
 
     # Create output directory
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    cfg.output_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Output directory: {cfg.output_dir}")
 
     try:
         # Load GitHub colors
-        colors_file = output_dir / "github_colors.json" if save_data else None
+        colors_file = cfg.output_dir / "github_colors.json" if cfg.save_json else None
         colors = load_github_colors(output_file=colors_file)
 
         if not colors:
@@ -88,26 +78,31 @@ def main(
             sys.exit(1)
 
         # Initialize GitHub client
-        client = GitHubClient(token=token, affiliation=affiliation, visibility=visibility)
+        client = GitHubClient(
+            token=cfg.token,
+            affiliation=cfg.affiliation,
+            visibility=cfg.visibility,
+        )
 
         # Get language statistics
-        output_dir / "repositories.json" if save_data else None
-        stats_file = output_dir / "language_stats.json" if save_data else None
+        repos_file = cfg.output_dir / "repositories.json" if cfg.save_repos else None
+        stats_file = cfg.output_dir / "language_stats.json" if cfg.save_json else None
 
-        language_stats = client.get_all_language_stats(output_file=stats_file)
+        language_stats = client.get_all_language_stats(
+            repos_output=repos_file,
+            stats_output=stats_file,
+        )
 
         if not language_stats:
             logger.error("No language statistics found. Exiting.")
             sys.exit(1)
 
         # Generate visualizations
-        pie_output = output_dir / "language_pie.png"
-        bar_output = output_dir / "language_bar.png"
+        pie_output = cfg.output_dir / "language_pie.png"
+        bar_output = cfg.output_dir / "language_bar.png"
 
         generate_pie(language_stats, colors, pie_output)
-        generate_bar(language_stats, colors, bar_output, top_n=top_n)
-
-        logger.success(f"\nAll done! Check {output_dir} for outputs.")
+        generate_bar(language_stats, colors, bar_output, top_n=cfg.top_n_languages)
 
     except Exception as e:
         logger.exception(f"An error occurred: {e}")
@@ -115,5 +110,4 @@ def main(
 
 
 if __name__ == "__main__":
-    load_dotenv()
     main()

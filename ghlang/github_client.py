@@ -95,9 +95,21 @@ class GitHubClient:
         r = self._get(f"{self.api}/repos/{full_name}/languages")
         return r.json()
 
-    def get_all_language_stats(self, output_file: Path | None = None) -> dict[str, int]:
-        """Get aggregated language statistics across all repos"""
-        repos = self.list_repos()
+    def get_all_language_stats(
+        self,
+        repos_output: Path | None = None,
+        stats_output: Path | None = None,
+    ) -> dict[str, int]:
+        """Get aggregated language statistics across all repos
+
+        Args:
+            repos_output: Optional path to save repository list as JSON
+            stats_output: Optional path to save language stats as JSON
+
+        Returns:
+            Dictionary mapping language names to total byte counts
+        """
+        repos = self.list_repos(output_file=repos_output)
         if not repos:
             logger.warning("No repositories found")
             return {}
@@ -122,11 +134,11 @@ class GitHubClient:
         logger.success(f"Processed {processed} repositories ({skipped} skipped)")
 
         result = dict(totals)
-        if output_file:
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(output_file, "w") as f:
+        if stats_output:
+            stats_output.parent.mkdir(parents=True, exist_ok=True)
+            with open(stats_output, "w") as f:
                 json.dump(result, f, indent=2)
-            logger.debug(f"Saved language statistics to {output_file}")
+            logger.debug(f"Saved language statistics to {stats_output}")
 
         return result
 

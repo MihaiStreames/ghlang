@@ -1,0 +1,29 @@
+[github]
+# Get your token from: https://github.com/settings/tokens
+# Required scopes: 'repo' (for private repos) or 'public_repo' (for public only)
+token = "YOUR_TOKEN_HERE"
+
+# Which repos to include
+# Options: owner, collaborator, organization_member (comma-separated)
+affiliation = "owner,collaborator,organization_member"
+
+# Repo visibility filter
+# Options: all, public, private
+visibility = "all"
+
+[output]
+# Directory where output files will be saved
+directory = "~/Documents/ghlang-stats"
+
+# Save JSON data files (language stats, repos, colors)
+save_json = false
+
+# Save repository list as JSON
+save_repos = false
+
+# Number of top languages to show in bar chart
+top_n_languages = 5
+
+[preferences]
+# Enable verbose logging
+verbose = false
