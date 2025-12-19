@@ -96,11 +96,10 @@ class GitHubClient:
             repos.extend(batch)
             page += 1
 
-        # De-duplicate by full_name
         seen = set()
         unique_repos = []
         for repo in repos:
-            fn = repo["full_name"]
+            fn = repo["full_name"]  # dedup by full_name
             if fn not in seen:
                 seen.add(fn)
                 unique_repos.append(repo)

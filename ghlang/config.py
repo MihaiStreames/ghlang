@@ -87,7 +87,6 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
     if config_path is None:
         config_path = get_config_path()
 
-    # Create default config if it doesn't exist
     if not config_path.exists():
         create_default_config(config_path)
         raise ConfigError(
@@ -95,14 +94,12 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
             "Please edit it and add your GitHub token, then run ghlang again"
         )
 
-    # Load TOML
     try:
         with config_path.open("rb") as f:
             data = tomllib.load(f)
     except tomllib.TOMLDecodeError as e:
         raise ConfigError(f"Invalid TOML in config file: {e}") from e
 
-    # Validate required sections
     if "github" not in data:
         raise ConfigError("Missing [github] section in config")
 
@@ -110,7 +107,6 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
     output = data.get("output", {})
     preferences = data.get("preferences", {})
 
-    # Check token
     token = github.get("token", "")
     if not token or token == "YOUR_TOKEN_HERE":
         raise ConfigError(
@@ -118,7 +114,6 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
             "Get a token from: https://github.com/settings/tokens"
         )
 
-    # Build config with defaults
     config = Config(
         token=token,
         affiliation=github.get("affiliation", Config.affiliation),
@@ -130,7 +125,6 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
         verbose=preferences.get("verbose", False),
     )
 
-    # Apply CLI overrides if provided
     if cli_overrides:
         for key, value in cli_overrides.items():
             if value is not None and hasattr(config, key):

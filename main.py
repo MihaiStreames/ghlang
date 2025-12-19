@@ -50,11 +50,10 @@ def main(
         verbose: Enable verbose logging if True
     """
     try:
-        # Load config with CLI overrides
         cli_overrides = {
             "output_dir": output_dir,
             "top_n_languages": top_n,
-            "verbose": verbose or None,  # Only override if flag is set
+            "verbose": verbose or None,
         }
         cfg = load_config(config_path=config, cli_overrides=cli_overrides)
 
@@ -62,7 +61,6 @@ def main(
         logger.error(str(e))
         sys.exit(1)
 
-    # Configure logging
     logger.remove()
     log_level = "DEBUG" if cfg.verbose else "INFO"
     logger.add(
@@ -71,12 +69,10 @@ def main(
         level=log_level,
     )
 
-    # Create output directory
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
     logger.info(f"Output directory: {cfg.output_dir}")
 
     try:
-        # Load GitHub colors
         colors_file = cfg.output_dir / "github_colors.json" if cfg.save_json else None
         colors = load_github_colors(output_file=colors_file)
 
@@ -84,14 +80,12 @@ def main(
             logger.error("Failed to load GitHub colors. Exiting.")
             sys.exit(1)
 
-        # Initialize GitHub client
         client = GitHubClient(
             token=cfg.token,
             affiliation=cfg.affiliation,
             visibility=cfg.visibility,
         )
 
-        # Get language statistics
         repos_file = cfg.output_dir / "repositories.json" if cfg.save_repos else None
         stats_file = cfg.output_dir / "language_stats.json" if cfg.save_json else None
 
@@ -104,7 +98,6 @@ def main(
             logger.error("No language statistics found. Exiting.")
             sys.exit(1)
 
-        # Generate visualizations
         pie_output = cfg.output_dir / "language_pie.png"
         bar_output = cfg.output_dir / "language_bar.png"
 
