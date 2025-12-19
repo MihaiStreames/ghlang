@@ -1,0 +1,17 @@
+# IDEs
+.vscode/
+
+# Outputs
+output/
+
+# Python
+.venv/
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Env
+.env
