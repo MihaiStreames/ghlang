@@ -17,6 +17,13 @@ class GitHubClient:
         affiliation: str = "owner,collaborator,organization_member",
         visibility: str = "all",
     ):
+        """Initialize GitHub API client
+
+        Args:
+            token: GitHub personal access token
+            affiliation: Comma-separated list of affiliations to filter repos
+            visibility: Repository visibility filter ('all', 'public', or 'private')
+        """
         self.api = "https://api.github.com"
         self.session = requests.Session()
         self.session.headers.update(
@@ -31,7 +38,18 @@ class GitHubClient:
         self.per_page = 100
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
-        """Make a GET request with rate limit handling"""
+        """Make a GET request with rate limit handling
+
+        Args:
+            url: API endpoint URL
+            params: Optional query parameters
+
+        Returns:
+            Response object from the API
+
+        Raises:
+            requests.HTTPError: If the request fails after rate limit handling
+        """
         r = self.session.get(url, params=params)
 
         if r.status_code == 403 and r.headers.get("X-RateLimit-Remaining") == "0":
@@ -45,7 +63,14 @@ class GitHubClient:
         return r
 
     def list_repos(self, output_file: Path | None = None) -> list[dict]:
-        """List all repos accessible to the authenticated user"""
+        """List all repos accessible to the authenticated user
+
+        Args:
+            output_file: Optional path to save repository list as JSON
+
+        Returns:
+            List of repository dictionaries from GitHub API
+        """
         logger.info("Fetching repositories...")
         repos = []
         page = 1
@@ -84,14 +109,21 @@ class GitHubClient:
 
         if output_file:
             output_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(output_file, "w") as f:
+            with output_file.open("w") as f:
                 json.dump(unique_repos, f, indent=2)
             logger.debug(f"Saved repository data to {output_file}")
 
         return unique_repos
 
     def get_repo_languages(self, full_name: str) -> dict[str, int]:
-        """Get language breakdown for a specific repo"""
+        """Get language breakdown for a specific repo
+
+        Args:
+            full_name: Full repository name (owner/repo)
+
+        Returns:
+            Dictionary mapping language names to byte counts
+        """
         r = self._get(f"{self.api}/repos/{full_name}/languages")
         return r.json()
 
@@ -136,7 +168,7 @@ class GitHubClient:
         result = dict(totals)
         if stats_output:
             stats_output.parent.mkdir(parents=True, exist_ok=True)
-            with open(stats_output, "w") as f:
+            with stats_output.open("w") as f:
                 json.dump(result, f, indent=2)
             logger.debug(f"Saved language statistics to {stats_output}")
 
@@ -144,7 +176,14 @@ class GitHubClient:
 
 
 def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
-    """Fetch and parse GitHub's language colors from linguist YAML"""
+    """Fetch and parse GitHub's language colors from linguist YAML
+
+    Args:
+        output_file: Optional path to save color data as JSON
+
+    Returns:
+        Dictionary mapping language names to hex color codes
+    """
     url = "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml"
 
     logger.info("Loading GitHub language colors...")
@@ -162,7 +201,7 @@ def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
 
         if output_file:
             output_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(output_file, "w") as f:
+            with output_file.open("w") as f:
                 json.dump(colors, f, indent=2)
             logger.debug(f"Saved color data to {output_file}")
 

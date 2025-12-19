@@ -1,4 +1,4 @@
-# ghlang - GitHub Language Stats
+# ghlang
 
 Get a breakdown of programming languages across all your GitHub repositories with beautiful visualizations.
 
@@ -46,12 +46,12 @@ Edit the config file and replace `YOUR_TOKEN_HERE` with your actual GitHub token
 [github]
 token = "ghp_your_actual_token_here"
 affiliation = "owner,collaborator,organization_member"
-visibility = "all"  # Options: all, public, private
+visibility = "all"
 
 [output]
 directory = "~/Documents/ghlang-stats"
-save_json = true
-save_repos = true
+save_json = false
+save_repos = false
 top_n_languages = 5
 
 [preferences]
@@ -108,24 +108,30 @@ The tool generates:
 
 ## Configuration
 
-All options can be set in the config file:
+All options can be set in the config file (`config.toml`):
 
 ### GitHub Settings
 
-- `token` - Your GitHub personal access token (required)
-- `affiliation` - Which repos to include (default: `owner,collaborator,organization_member`)
-- `visibility` - Filter by visibility (options: `all`, `public`, `private`)
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `token` | string | **required** | Your GitHub personal access token |
+| `affiliation` | string | `"owner,collaborator,organization_member"` | Which repos to include (comma-separated) |
+| `visibility` | string | `"all"` | Filter by visibility: `all`, `public`, or `private` |
 
 ### Output Settings
 
-- `directory` - Where to save output files
-- `save_json` - Save JSON data files (default: `false`)
-- `save_repos` - Save repository list (default: `false`)
-- `top_n_languages` - Number of languages in bar chart (default: `5`)
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `directory` | string | `"~/Documents/ghlang-stats"` | Where to save output files |
+| `save_json` | boolean | `false` | Save JSON data files (language stats, colors) |
+| `save_repos` | boolean | `false` | Save repository list as JSON |
+| `top_n_languages` | integer | `5` | Number of languages to show in bar chart |
 
 ### Preferences
 
-- `verbose` - Enable detailed logging (default: `false`)
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `verbose` | boolean | `false` | Enable detailed logging |
 
 ## License
 

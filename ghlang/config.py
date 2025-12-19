@@ -28,11 +28,13 @@ class Config:
 class ConfigError(Exception):
     """Raised when config is invalid or missing"""
 
-    pass
-
 
 def get_config_path() -> Path:
-    """Get the path to the config file"""
+    """Get the path to the config file
+
+    Returns:
+        Path to the platform-specific config file location
+    """
     if sys.platform == "win32":
         base = Path.home() / "AppData" / "Local"
     else:
@@ -42,7 +44,11 @@ def get_config_path() -> Path:
 
 
 def create_default_config(config_path: Path) -> None:
-    """Create a default config file with instructions"""
+    """Create a default config file with instructions
+
+    Args:
+        config_path: Path where the config file should be created
+    """
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
     default_content = """
@@ -69,11 +75,11 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
     """Load config from TOML file with optional CLI overrides
 
     Args:
-        config_path: Optional custom config path
+        config_path: Optional custom config path. Defaults to platform-specific location
         cli_overrides: Optional dict of CLI arguments to override config values
 
     Returns:
-        Config object
+        Loaded configuration object
 
     Raises:
         ConfigError: If config doesn't exist or token is invalid
@@ -86,12 +92,12 @@ def load_config(config_path: Path | None = None, cli_overrides: dict | None = No
         create_default_config(config_path)
         raise ConfigError(
             f"Config file created at: {config_path}\n"
-            "Please edit it and add your GitHub token, then run ghlang again."
+            "Please edit it and add your GitHub token, then run ghlang again"
         )
 
     # Load TOML
     try:
-        with open(config_path, "rb") as f:
+        with config_path.open("rb") as f:
             data = tomllib.load(f)
     except tomllib.TOMLDecodeError as e:
         raise ConfigError(f"Invalid TOML in config file: {e}") from e
