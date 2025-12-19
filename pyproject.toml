@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ghlang = "main:main"
+ghlang = "ghlang.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/MihaiStreames/ghlang"
