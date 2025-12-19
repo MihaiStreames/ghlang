@@ -41,14 +41,7 @@ def main(
     top_n: int | None,
     verbose: bool,
 ):
-    """Generate language statistics and visualizations from your GitHub repositories
-
-    Args:
-        config: Optional path to custom config file
-        output_dir: Optional override for output directory
-        top_n: Optional override for number of top languages
-        verbose: Enable verbose logging if True
-    """
+    """Generate language statistics and visualizations from your GitHub repositories"""
     try:
         cli_overrides = {
             "output_dir": output_dir,
