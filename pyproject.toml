@@ -3,7 +3,7 @@ name = "ghlang"
 version = "1.0.0"
 description = "Generate language statistics and visualizations from your GitHub repositories"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
     "click>=8.3.1",
     "loguru>=0.7.3",
