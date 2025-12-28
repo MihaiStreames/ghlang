@@ -49,8 +49,8 @@
 ### Example Output
 
 <div align="center">
-  <img src="assets/example_pie.png" alt="Language Distribution Pie Chart" width="100%">
-  <img src="assets/example_bar.png" alt="Top Languages Bar Chart" width="100%">
+  <img src="assets/example_pie.png" alt="Language Distribution Pie Chart" width="60%">
+  <img src="assets/example_bar.png" alt="Top Languages Bar Chart" width="60%">
   <p><em>My personal language statistics</em></p>
 </div>
 
