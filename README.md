@@ -1,7 +1,14 @@
 <a id="readme-top"></a>
 
+<!-- PROJECT SHIELDS -->
+<div align="center">
+
+![GitHub License](https://img.shields.io/github/license/MihaiStreames/ghlang)
+![GitHub Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang)
+
+</div>
+
 <!-- PROJECT LOGO -->
-<br />
 <div align="center">
   <a href="https://github.com/MihaiStreames/ghlang">
     <h1>ghlang</h1>
