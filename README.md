@@ -3,26 +3,19 @@
 <!-- PROJECT SHIELDS -->
 <div align="center">
 
-![GitHub License](https://img.shields.io/github/license/MihaiStreames/ghlang)
-![GitHub Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang)
+![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang)
+![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)
 
 </div>
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <a href="https://github.com/MihaiStreames/ghlang">
-    <h1>ghlang</h1>
-  </a>
+  <h1>ghlang</h1>
 
   <h3 align="center">GitHub Language Statistics Visualizer</h3>
 
   <p align="center">
     Analyze and visualize programming language distribution across all your GitHub repositories
-    <br />
-    <br />
-    <a href="https://github.com/MihaiStreames/ghlang/issues/new">Report Bug</a>
-    ·
-    <a href="https://github.com/MihaiStreames/ghlang/issues/new">Request Feature</a>
   </p>
 </div>
 
@@ -68,10 +61,10 @@
 ### Built With
 
 * [Python](https://www.python.org/)
-* [Click](https://click.palletsprojects.com/) - CLI framework
-* [Matplotlib](https://matplotlib.org/) - Data visualization
-* [Requests](https://requests.readthedocs.io/) - HTTP library
-* [Loguru](https://github.com/Delgan/loguru) - Logging
+* [Click](https://click.palletsprojects.com/)
+* [Matplotlib](https://matplotlib.org/)
+* [Requests](https://requests.readthedocs.io/)
+* [Loguru](https://github.com/Delgan/loguru)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -251,3 +244,9 @@ All options are configurable via `config.toml`:
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+<div align="center">
+  <p>Made with ❤️</p>
+</div>
