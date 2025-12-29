@@ -247,7 +247,7 @@ Everything lives in `config.toml`:
 <!-- LICENSE -->
 ## License
 
-MIT. Do whatever you want with it.
+MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
