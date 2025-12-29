@@ -1,11 +1,11 @@
 from collections import defaultdict
+import fnmatch
 import json
 from pathlib import Path
 import time
 
 from loguru import logger
 import requests
-import yaml
 
 
 class GitHubClient:
@@ -14,16 +14,10 @@ class GitHubClient:
     def __init__(
         self,
         token: str,
-        affiliation: str = "owner,collaborator,organization_member",
-        visibility: str = "all",
+        affiliation: str,
+        visibility: str,
+        ignored_repos: list[str],
     ):
-        """Initialize GitHub API client
-
-        Args:
-            token: GitHub personal access token
-            affiliation: Comma-separated list of affiliations to filter repos
-            visibility: Repository visibility filter ('all', 'public', or 'private')
-        """
         self.api = "https://api.github.com"
         self.session = requests.Session()
         self.session.headers.update(
@@ -35,48 +29,54 @@ class GitHubClient:
         )
         self.affiliation = affiliation
         self.visibility = visibility
+        self.ignored_repos = ignored_repos
         self.per_page = 100
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
-        """Make a GET request with rate limit handling
-
-        Args:
-            url: API endpoint URL
-            params: Optional query parameters
-
-        Returns:
-            Response object from the API
-
-        Raises:
-            requests.HTTPError: If the request fails after rate limit handling
-        """
+        """Make a GET request with rate limit handling"""
         r = self.session.get(url, params=params)
 
         if r.status_code == 403 and r.headers.get("X-RateLimit-Remaining") == "0":
             reset = int(r.headers.get("X-RateLimit-Reset", "0"))
             sleep_for = max(0, reset - int(time.time()) + 2)
-            logger.warning(f"Rate limited. Sleeping for {sleep_for} seconds...")
+            logger.warning(f"Rate limited, sleeping for {sleep_for}s...")
             time.sleep(sleep_for)
             r = self.session.get(url, params=params)
 
         r.raise_for_status()
         return r
 
+    def _normalize_repo_pattern(self, pattern: str) -> str:
+        """Strip GitHub URL prefix from pattern if present"""
+        prefixes = ["https://github.com/", "http://github.com/", "github.com/"]
+
+        for prefix in prefixes:
+            if pattern.startswith(prefix):
+                return pattern[len(prefix) :].rstrip("/")
+
+        return pattern
+
+    def _should_ignore_repo(self, full_name: str) -> bool:
+        """Check if a repo should be ignored based on ignore patterns"""
+        for pattern in self.ignored_repos:
+            normalized = self._normalize_repo_pattern(pattern)
+
+            if fnmatch.fnmatch(full_name, normalized):
+                return True
+            if fnmatch.fnmatch(full_name.lower(), normalized.lower()):
+                return True
+
+        return False
+
     def list_repos(self, output_file: Path | None = None) -> list[dict]:
-        """List all repos accessible to the authenticated user
-
-        Args:
-            output_file: Optional path to save repository list as JSON
-
-        Returns:
-            List of repository dictionaries from GitHub API
-        """
-        logger.info("Fetching repositories...")
+        """List all repos accessible to the authenticated user"""
+        logger.info("Fetching repos")
         repos = []
         page = 1
 
         while True:
             logger.debug(f"Fetching page {page}...")
+
             r = self._get(
                 f"{self.api}/user/repos",
                 params={
@@ -98,31 +98,37 @@ class GitHubClient:
 
         seen = set()
         unique_repos = []
-        for repo in repos:
-            fn = repo["full_name"]  # dedup by full_name
-            if fn not in seen:
-                seen.add(fn)
-                unique_repos.append(repo)
+        ignored_count = 0
 
-        logger.info(f"Found {len(unique_repos)} unique repositories")
+        for repo in repos:
+            fn = repo["full_name"]
+
+            if fn in seen:
+                continue
+
+            seen.add(fn)
+
+            if self._should_ignore_repo(fn):
+                logger.debug(f"Ignoring repo: {fn}")
+                ignored_count += 1
+                continue
+
+            unique_repos.append(repo)
+
+        logger.info(f"Found {len(unique_repos)} repos ({ignored_count} ignored)")
 
         if output_file:
             output_file.parent.mkdir(parents=True, exist_ok=True)
+
             with output_file.open("w") as f:
                 json.dump(unique_repos, f, indent=2)
+
             logger.debug(f"Saved repository data to {output_file}")
 
         return unique_repos
 
     def get_repo_languages(self, full_name: str) -> dict[str, int]:
-        """Get language breakdown for a specific repo
-
-        Args:
-            full_name: Full repository name (owner/repo)
-
-        Returns:
-            Dictionary mapping language names to byte counts
-        """
+        """Get language breakdown for a specific repo"""
         r = self._get(f"{self.api}/repos/{full_name}/languages")
         return r.json()
 
@@ -131,33 +137,30 @@ class GitHubClient:
         repos_output: Path | None = None,
         stats_output: Path | None = None,
     ) -> dict[str, int]:
-        """Get aggregated language statistics across all repos
-
-        Args:
-            repos_output: Optional path to save repository list as JSON
-            stats_output: Optional path to save language stats as JSON
-
-        Returns:
-            Dictionary mapping language names to total byte counts
-        """
+        """Get aggregated language statistics across all repos"""
         repos = self.list_repos(output_file=repos_output)
         if not repos:
-            logger.warning("No repositories found")
+            logger.warning("No repositories found, nothing to do")
             return {}
 
         totals = defaultdict(int)
         processed = 0
         skipped = 0
 
-        logger.info("Fetching language statistics for each repository...")
+        logger.info("Fetching language stats for each repo")
+
         for repo in repos:
             full_name = repo["full_name"]
+
             try:
                 langs = self.get_repo_languages(full_name)
+
                 for lang, bytes_count in langs.items():
                     totals[lang] += int(bytes_count)
+
                 processed += 1
                 logger.debug(f"Processed {full_name}")
+
             except requests.HTTPError as e:
                 skipped += 1
                 logger.warning(f"Skipped {full_name}: {e}")
@@ -167,45 +170,10 @@ class GitHubClient:
         result = dict(totals)
         if stats_output:
             stats_output.parent.mkdir(parents=True, exist_ok=True)
+
             with stats_output.open("w") as f:
                 json.dump(result, f, indent=2)
+
             logger.debug(f"Saved language statistics to {stats_output}")
 
         return result
-
-
-def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
-    """Fetch and parse GitHub's language colors from linguist YAML
-
-    Args:
-        output_file: Optional path to save color data as JSON
-
-    Returns:
-        Dictionary mapping language names to hex color codes
-    """
-    url = "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml"
-
-    logger.info("Loading GitHub language colors...")
-    try:
-        r = requests.get(url, timeout=10)
-        r.raise_for_status()
-        data = yaml.safe_load(r.text)
-        colors = {}
-
-        for lang, props in data.items():
-            if isinstance(props, dict) and "color" in props:
-                colors[lang] = props["color"]
-
-        logger.success(f"Loaded {len(colors)} language colors")
-
-        if output_file:
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-            with output_file.open("w") as f:
-                json.dump(colors, f, indent=2)
-            logger.debug(f"Saved color data to {output_file}")
-
-        return colors
-
-    except Exception as e:
-        logger.error(f"Could not load GitHub colors: {e}")
-        return {}

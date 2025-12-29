@@ -12,10 +12,10 @@
 <div align="center">
   <h1>ghlang</h1>
 
-  <h3 align="center">GitHub Language Statistics Visualizer</h3>
+  <h3 align="center">See what languages you've been coding in</h3>
 
   <p align="center">
-    Analyze and visualize programming language distribution across all your GitHub repositories
+    Generate pretty charts from your GitHub repos or local files
   </p>
 </div>
 
@@ -46,7 +46,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-**ghlang** is a command-line tool that fetches all your GitHub repositories and generates visualizations showing your programming language distribution.
+Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
+
+- **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
+- **Local mode**: Analyzes files on your machine using [cloc](https://github.com/AlDanial/cloc) (counts lines)
 
 ### Example Output
 
@@ -60,83 +63,76 @@
 
 ### Built With
 
-* [Python](https://www.python.org/)
-* [Click](https://click.palletsprojects.com/)
-* [Matplotlib](https://matplotlib.org/)
-* [Requests](https://requests.readthedocs.io/)
-* [Loguru](https://github.com/Delgan/loguru)
+- [Python](https://www.python.org/)
+- [Click](https://click.palletsprojects.com/)
+- [Matplotlib](https://matplotlib.org/)
+- [Requests](https://requests.readthedocs.io/)
+- [Loguru](https://github.com/Delgan/loguru)
+- [cloc](https://github.com/AlDanial/cloc) (for local analysis)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Get up and running with ghlang in just a few steps.
+Getting this running is pretty straightforward.
 
-### Prerequisites
+### What You'll Need
 
-* Python 3.9 or later
-* A GitHub account with repositories
-* A GitHub personal access token
+- Python 3.10+
+- For GitHub mode: a GitHub token
+- For local mode: [cloc](https://github.com/AlDanial/cloc)
 
 ### Installation
 
-1. Install with **pipx** (recommended):
+```bash
+# with pipx (recommended)
+pipx install git+https://github.com/MihaiStreames/ghlang.git
+
+# or with pip
+pip install git+https://github.com/MihaiStreames/ghlang.git
+```
+
+For local mode, you'll also need cloc:
+
+```bash
+# Arch
+pacman -S cloc
+
+# Ubuntu/Debian
+apt install cloc
+
+# macOS
+brew install cloc
+
+# Windows
+choco install cloc
+```
+
+### Setting Up GitHub Mode
+
+1. **Get a token** from [GitHub Settings](https://github.com/settings/tokens)
+   - Pick `repo` for private repos, or just `public_repo` for public only
+
+2. **Run it once** to create the config file:
 
    ```bash
-   pipx install git+https://github.com/MihaiStreames/ghlang.git
+   ghlang github
    ```
 
-2. Or install with **pip**:
+   Config lives at `~/.config/ghlang/config.toml` (or `%LOCALAPPDATA%\ghlang\config.toml` on Windows)
 
-   ```bash
-   pip install git+https://github.com/MihaiStreames/ghlang.git
-   ```
-
-### Initial Setup
-
-1. **Create a GitHub Token**
-   * Navigate to [GitHub Token Settings](https://github.com/settings/tokens)
-   * Click "Generate new token" (classic)
-   * Select scopes:
-     * `repo` (for private repository access)
-     * OR `public_repo` (for public repositories only)
-   * Copy the generated token
-
-2. **First Run**
-
-   ```bash
-   ghlang
-   ```
-
-   This creates a configuration file at:
-   * **Linux/macOS**: `~/.config/ghlang/config.toml`
-   * **Windows**: `%LOCALAPPDATA%\ghlang\config.toml`
-
-3. **Configure Your Token**
-
-   Edit the config file and add your token:
+3. **Add your token** to the config:
 
    ```toml
    [github]
-   token = "ghp_your_actual_token_here"
-   affiliation = "owner,collaborator,organization_member"
-   visibility = "all"
-
-   [output]
-   directory = "~/Documents/ghlang-stats"
-   save_json = false
-   save_repos = false
-   top_n_languages = 5
-
-   [preferences]
-   verbose = false
+   token = "ghp_your_token_here"
    ```
 
-4. **Generate Your Stats**
+4. **Run it again** and you're good:
 
    ```bash
-   ghlang
+   ghlang github
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -144,104 +140,114 @@ Get up and running with ghlang in just a few steps.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### Basic Usage
-
-Analyze all repositories using your config file:
+### GitHub Mode
 
 ```bash
-ghlang
+# analyze all your repos
+ghlang github
 ```
 
-### Common Options
-
-Override output directory:
+### Local Mode
 
 ```bash
-ghlang -o ~/my-stats
+# analyze current directory
+ghlang local
+
+# analyze a specific path
+ghlang local ~/projects/my-app
 ```
 
-Show top 10 languages in bar chart:
+### Other Options
 
 ```bash
-ghlang --top-n 10
+# more logging
+ghlang [any] -v
+
+# save charts somewhere else
+ghlang [any] -o ~/my-stats
+
+# show top 10 languages instead of 5
+ghlang [any] --top-n 10
+
+# use a different config
+ghlang [any] --config ~/my-config.toml
 ```
 
-Enable verbose logging:
+### All the Flags
 
-```bash
-ghlang -v
 ```
+ghlang github
+  --config PATH      use a different config file
+  -o, --output-dir   where to save the charts
+  --top-n N          how many languages in the bar chart
+  -v, --verbose      show more details
 
-Use a custom config file:
-
-```bash
-ghlang --config ~/my-custom-config.toml
-```
-
-### Complete CLI Reference
-
-```bash
-ghlang [OPTIONS]
-
-Options:
-  -o, --output PATH      Output directory for generated files
-  --top-n INTEGER        Number of languages to show in bar chart
-  -v, --verbose          Enable verbose logging
-  --config PATH          Path to custom config file
-  --help                 Show this message and exit
+ghlang local [PATH]
+  --config PATH      use a different config file
+  -o, --output-dir   where to save the charts
+  --top-n N          how many languages in the bar chart
+  -v, --verbose      show more details
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- OUTPUT -->
-## Output
+## What You Get
 
-ghlang generates the following files in your output directory:
+Charts end up in your output directory:
 
-| File | Description |
-|------|-------------|
-| `language_pie.png` | Pie chart showing percentage distribution of all languages |
-| `language_bar.png` | Horizontal bar chart displaying top N languages |
-| `language_stats.json` | Raw language statistics data (optional) |
-| `repositories.json` | Complete list of analyzed repositories (optional) |
-| `github_colors.json` | GitHub's official language color mappings (optional) |
+| File | What it is |
+|------|------------|
+| `language_pie.png` | pie chart with all languages |
+| `language_bar.png` | bar chart with top N languages |
+| `language_stats.json` | raw stats (if `save_json` is on) |
+| `cloc_stats.json` | detailed cloc output (local mode) |
+| `repositories.json` | list of repos analyzed (GitHub mode) |
+| `github_colors.json` | language colors from GitHub |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONFIGURATION -->
-## Configuration
+## Config Options
 
-All options are configurable via `config.toml`:
+Everything lives in `config.toml`:
 
-### GitHub Settings
+### `[github]`
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `token` | string | **required** | Your GitHub personal access token |
-| `affiliation` | string | `"owner,collaborator,organization_member"` | Comma-separated list of repository affiliations |
-| `visibility` | string | `"all"` | Repository visibility filter: `all`, `public`, or `private` |
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `token` | - | your GitHub token |
+| `affiliation` | `"owner,collaborator,organization_member"` | which repos to include |
+| `visibility` | `"all"` | `all`, `public`, or `private` |
+| `ignored_repos` | `[]` | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`) |
 
-### Output Settings
+### `[cloc]`
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `directory` | string | `"~/Documents/ghlang-stats"` | Output directory for generated files |
-| `save_json` | boolean | `false` | Save language statistics and color data as JSON |
-| `save_repos` | boolean | `false` | Save repository list as JSON |
-| `top_n_languages` | integer | `5` | Number of languages to display in bar chart |
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `ignored_dirs` | `["node_modules", "vendor", ...]` | directories to skip |
 
-### Preferences
+### `[output]`
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `verbose` | boolean | `false` | Enable detailed logging output |
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `directory` | `"~/Documents/ghlang-stats"` | where to save charts |
+| `save_json` | `false` | save raw stats as JSON |
+| `save_repos` | `false` | save repo list as JSON |
+| `top_n_languages` | `5` | how many in the bar chart |
+
+### `[preferences]`
+
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `verbose` | `false` | more logging |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+MIT. Do whatever you want with it.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -1,9 +1,9 @@
 [project]
 name = "ghlang"
-version = "1.0.0"
-description = "Generate language statistics and visualizations from your GitHub repositories"
+version = "2.0.0"
+description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "click>=8.3.1",
     "loguru>=0.7.3",

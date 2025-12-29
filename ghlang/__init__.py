@@ -1,3 +1,3 @@
-"""GitHub language statistics analyzer"""
+"""Language statistics analyzer for GitHub repositories and local files"""
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
