@@ -1,19 +1,19 @@
 [project]
 name = "ghlang"
-version = "2.0.0"
+version = "2.0.1"
 description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "click>=8.3.1",
     "loguru>=0.7.3",
     "matplotlib>=3.10.8",
     "pyyaml>=6.0.3",
     "requests>=2.32.5",
+    "typer>=0.21.0",
 ]
 
 [project.scripts]
-ghlang = "ghlang.cli:main"
+ghlang = "ghlang.cli:app"
 
 [project.urls]
 Homepage = "https://github.com/MihaiStreames/ghlang"
@@ -56,6 +56,8 @@ ignore = [
     "PLR2004", # Magic value comparison
     "RET504",  # Unnecessary assignment before return
     "SIM108",  # Use ternary operator (sometimes reduces readability)
+    "B008",    # Function call in default arg (required for Typer)
+    "B904",    # raise from in except (typer.Exit is a SystemExit)
 ]
 
 fixable = ["ALL"]

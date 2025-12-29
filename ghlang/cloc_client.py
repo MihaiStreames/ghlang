@@ -44,12 +44,12 @@ class ClocClient:
 
         # TODO: handle symlinks
         # cmd.append("--follow-links") (only on unix)
-        
+
         # TODO: handle mixed tree types (git + non-git)
         # will have to figure out how to recursively check each subdir
         # (we can probably skip this for now since most use cases are simple)
         # we'd pass the paths using a temp file and --list-file=<tempfile>
-        
+
         if path.is_dir() and self._is_git_repo(path):
             cmd.append("--vcs=git")
             cmd.append(str(path))

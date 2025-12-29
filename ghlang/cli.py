@@ -1,9 +1,10 @@
 from pathlib import Path
 import sys
 
-import click
 from loguru import logger
+import typer
 
+from ghlang import __version__
 from ghlang.cloc_client import ClocClient
 from ghlang.config import Config
 from ghlang.config import load_config
@@ -14,6 +15,9 @@ from ghlang.visualizers import generate_bar
 from ghlang.visualizers import generate_pie
 from ghlang.visualizers import load_github_colors
 from ghlang.visualizers import normalize_language_stats
+
+
+app = typer.Typer(help="See what languages you've been coding in", add_completion=True)
 
 
 def setup_logging(verbose: bool) -> None:
@@ -39,10 +43,10 @@ def generate_charts(
     if not colors:
         if colors_required:
             logger.error("Couldn't load GitHub colors, can't continue without them")
-            sys.exit(1)
-        else:
-            logger.warning("Couldn't load GitHub colors, charts will be gray")
-            colors = {}
+            raise typer.Exit(1)
+
+        logger.warning("Couldn't load GitHub colors, charts will be gray")
+        colors = {}
 
     pie_output = cfg.output_dir / "language_pie.png"
     bar_output = cfg.output_dir / "language_bar.png"
@@ -51,43 +55,59 @@ def generate_charts(
     generate_bar(language_stats, colors, bar_output, top_n=cfg.top_n_languages)
 
 
-@click.group()
-@click.version_option()
-def cli():
-    """See what languages you've been coding in"""
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"ghlang v{__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        help="Show version and exit",
+        callback=_version_callback,
+        is_eager=True,
+    ),
+) -> None:
     pass
 
 
-@cli.command()
-@click.option(
-    "--config",
-    "config_path",
-    type=click.Path(exists=True, path_type=Path),
-    help="Use a different config file",
-)
-@click.option(
-    "--output-dir",
-    "-o",
-    type=click.Path(path_type=Path),
-    help="Where to save the charts",
-)
-@click.option(
-    "--top-n",
-    type=int,
-    help="How many languages to show in the bar chart",
-)
-@click.option(
-    "--verbose",
-    "-v",
-    is_flag=True,
-    help="Show more details",
-)
+@app.command()
 def github(
-    config_path: Path | None,
-    output_dir: Path | None,
-    top_n: int | None,
-    verbose: bool,
-):
+    config_path: Path | None = typer.Option(
+        None,
+        "--config",
+        help="Use a different config file",
+        exists=True,
+        dir_okay=False,
+        file_okay=True,
+        readable=True,
+        path_type=Path,
+    ),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output-dir",
+        "-o",
+        help="Where to save the charts",
+        file_okay=False,
+        dir_okay=True,
+        writable=True,
+        path_type=Path,
+    ),
+    top_n: int | None = typer.Option(
+        None,
+        "--top-n",
+        help="How many languages to show in the bar chart",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show more details",
+    ),
+) -> None:
     """Analyze your GitHub repos"""
     try:
         cli_overrides = {
@@ -99,7 +119,7 @@ def github(
 
     except ConfigError as e:
         logger.error(str(e))
-        sys.exit(1)
+        raise typer.Exit(1)
 
     setup_logging(cfg.verbose)
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
@@ -114,57 +134,65 @@ def github(
         )
 
         language_stats = client.get_all_language_stats(
-            repos_output=cfg.output_dir / "repositories.json" if cfg.save_repos else None,
-            stats_output=cfg.output_dir / "language_stats.json" if cfg.save_json else None,
+            repos_output=(cfg.output_dir / "repositories.json" if cfg.save_repos else None),
+            stats_output=(cfg.output_dir / "language_stats.json" if cfg.save_json else None),
         )
 
         if not language_stats:
             logger.error("No language statistics found, nothing to visualize")
-            sys.exit(1)
+            raise typer.Exit(1)
 
         generate_charts(language_stats, cfg)
 
+    except typer.Exit:
+        raise
     except Exception as e:
         logger.exception(f"Something went wrong: {e}")
-        sys.exit(1)
+        raise typer.Exit(1)
 
 
-@cli.command()
-@click.argument(
-    "path",
-    type=click.Path(exists=True, path_type=Path),
-    default=".",
-)
-@click.option(
-    "--config",
-    "config_path",
-    type=click.Path(exists=True, path_type=Path),
-    help="Use a different config file",
-)
-@click.option(
-    "--output-dir",
-    "-o",
-    type=click.Path(path_type=Path),
-    help="Where to save the charts",
-)
-@click.option(
-    "--top-n",
-    type=int,
-    help="How many languages to show in the bar chart",
-)
-@click.option(
-    "--verbose",
-    "-v",
-    is_flag=True,
-    help="Show more details",
-)
+@app.command()
 def local(
-    path: Path,
-    config_path: Path | None,
-    output_dir: Path | None,
-    top_n: int | None,
-    verbose: bool,
-):
+    path: Path = typer.Argument(
+        ".",
+        exists=True,
+        file_okay=True,
+        dir_okay=True,
+        readable=True,
+        path_type=Path,
+    ),
+    config_path: Path | None = typer.Option(
+        None,
+        "--config",
+        help="Use a different config file",
+        exists=True,
+        dir_okay=False,
+        file_okay=True,
+        readable=True,
+        path_type=Path,
+    ),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output-dir",
+        "-o",
+        help="Where to save the charts",
+        file_okay=False,
+        dir_okay=True,
+        writable=True,
+        path_type=Path,
+    ),
+    top_n: int | None = typer.Option(
+        None,
+        "--top-n",
+        help="How many languages to show in the bar chart",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Show more details",
+    ),
+) -> None:
     """Analyze local files with cloc"""
     try:
         cli_overrides = {
@@ -176,7 +204,7 @@ def local(
 
     except ConfigError as e:
         logger.error(str(e))
-        sys.exit(1)
+        raise typer.Exit(1)
 
     setup_logging(cfg.verbose)
 
@@ -185,7 +213,7 @@ def local(
 
     except ClocNotFoundError as e:
         logger.error(str(e))
-        sys.exit(1)
+        raise typer.Exit(1)
 
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
     logger.info(f"Saving to {cfg.output_dir}")
@@ -204,23 +232,16 @@ def local(
 
         if not language_stats:
             logger.error("No code found to analyze, nothing to visualize")
-            sys.exit(1)
+            raise typer.Exit(1)
 
-        generate_charts(
-            language_stats,
-            cfg,
-            colors_required=False,
-        )
+        generate_charts(language_stats, cfg, colors_required=False)
 
+    except typer.Exit:
+        raise
     except Exception as e:
         logger.exception(f"Something went wrong: {e}")
-        sys.exit(1)
-
-
-def main():
-    """Entry point for the CLI"""
-    cli()
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    app()

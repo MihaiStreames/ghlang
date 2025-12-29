@@ -37,6 +37,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#shell-completion">Shell Completion</a></li>
     <li><a href="#configuration">Configuration</a></li>
     <li><a href="#output">Output</a></li>
     <li><a href="#license">License</a></li>
@@ -64,7 +65,7 @@ Ever wondered what languages you actually use? **ghlang** makes pretty charts to
 ### Built With
 
 - [Python](https://www.python.org/)
-- [Click](https://click.palletsprojects.com/)
+- [Typer](https://typer.tiangolo.com/)
 - [Matplotlib](https://matplotlib.org/)
 - [Requests](https://requests.readthedocs.io/)
 - [Loguru](https://github.com/Delgan/loguru)
@@ -188,6 +189,23 @@ ghlang local [PATH]
   --top-n N          how many languages in the bar chart
   -v, --verbose      show more details
 ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- SHELL COMPLETION -->
+## Shell Completion
+
+ghlang has built-in shell completion. To enable it:
+
+```bash
+# install completion for your shell
+ghlang --install-completion
+
+# or just view the completion script
+ghlang --show-completion
+```
+
+After installing, restart your shell or source your config file.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
