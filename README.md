@@ -54,14 +54,6 @@ Ever wondered what languages you actually use? **ghlang** makes pretty charts to
 - **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
 - **Local mode**: Analyzes files on your machine using [cloc](https://github.com/AlDanial/cloc) (counts lines)
 
-### Example Output
-
-<div align="center">
-  <img src="assets/example_pie.png" alt="Language Distribution Pie Chart" width="60%">
-  <img src="assets/example_bar.png" alt="Top Languages Bar Chart" width="60%">
-  <p><em>My personal language statistics</em></p>
-</div>
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
