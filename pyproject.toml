@@ -33,7 +33,7 @@ where = ["."]
 include = ["ghlang*"]
 
 [tool.setuptools.package-data]
-ghlang = ["static/*.json", "static/*.toml"]
+ghlang = ["static/*.toml"]
 
 [tool.ruff]
 line-length = 100
