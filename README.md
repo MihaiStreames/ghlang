@@ -41,6 +41,7 @@
     <li><a href="#shell-completion">Shell Completion</a></li>
     <li><a href="#configuration">Configuration</a></li>
     <li><a href="#output">Output</a></li>
+    <li><a href="#themes">Themes</a></li>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
@@ -205,6 +206,8 @@ Both `github` and `local` commands share the same options:
 | `--output` | `-o` | custom output filename (creates `_pie` and `_bar` variants) |
 | `--title` | `-t` | custom chart title |
 | `--top-n` | | how many languages in the bar chart |
+| `--theme` | | chart color theme (default: light) |
+| `--format` | `-f` | output format, overrides `--output` extension (png or svg) |
 | `--json-only` | | output JSON only, skip chart generation |
 | `--stdout` | | output stats to stdout (implies `--json-only --quiet`) |
 | `--quiet` | `-q` | suppress log output (only show errors) |
@@ -246,7 +249,7 @@ After installing, restart your shell or source your config file.
 <!-- OUTPUT -->
 ## What You Get
 
-Charts end up in your output directory:
+Charts end up in your output directory (`.png` by default, or `.svg` with `--format svg`):
 
 | File | What it is |
 |------|------------|
@@ -293,6 +296,28 @@ Everything lives in `config.toml`:
 | Option | Default | What it does |
 |--------|---------|--------------|
 | `verbose` | `false` | more logging |
+| `theme` | `"light"` | chart color theme |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- THEMES -->
+## Themes
+
+ghlang comes with built-in themes for your charts:
+
+| Theme | Preview | Author |
+|-------|---------|--------|
+| `light` | ![light](assets/themes/light.png) | built-in |
+| `dark` | ![dark](assets/themes/dark.png) | built-in |
+
+```bash
+# use dark theme
+ghlang github --theme dark
+
+# or set it in config.toml
+# [preferences]
+# theme = "dark"
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

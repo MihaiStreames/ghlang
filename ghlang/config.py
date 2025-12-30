@@ -36,6 +36,7 @@ class Config:
 
     # Preferences
     verbose: bool = False
+    theme: str = "light"
 
 
 def get_config_path() -> Path:
@@ -103,6 +104,7 @@ def load_config(
         save_repos=output.get("save_repos", Config.save_repos),
         top_n_languages=output.get("top_n_languages", Config.top_n_languages),
         verbose=preferences.get("verbose", Config.verbose),
+        theme=preferences.get("theme", Config.theme),
     )
 
     if cli_overrides:

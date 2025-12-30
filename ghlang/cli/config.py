@@ -99,6 +99,7 @@ def _print_config_table(config_path: Path) -> None:
 
     console.print("[bold yellow]Preferences[/bold yellow]")
     table.add_row("verbose", _format_value(cfg.verbose))
+    table.add_row("theme", cfg.theme)
     console.print(table)
     console.print()
 

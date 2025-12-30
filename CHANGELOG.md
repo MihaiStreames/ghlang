@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v210--themes--svg-export">v2.1.0</a></li>
     <li><a href="#v205--reliability--symlinks">v2.0.5</a></li>
     <li><a href="#v204--config-command">v2.0.4</a></li>
     <li><a href="#v203--pipeline-friendly">v2.0.3</a></li>
@@ -19,6 +20,35 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.1.0 — Themes & SVG export
+
+Theme support and SVG output for better customization.
+
+**New stuff:**
+
+- `--theme` flag to choose chart color schemes
+  - Built-in themes: `light` (default), `dark`
+  - Configurable via `preferences.theme` in config
+- `--format` / `-f` flag for output format
+  - Support for PNG (default) and SVG
+  - Priority: `--format` > `--output` extension > default png
+- Rounded corners on PNG charts
+- Theme-aware fallback colors for languages without GitHub linguist equivalents
+
+**Changed:**
+
+- Pillow used for adding rounded corners to PNGs
+- Refactored static data: `lang_mapping.py` now uses Python dicts instead of JSON
+- All chart styling constants moved to top of `visualizers.py` for easy customization
+- Language normalization: languages without linguist mapping now use original name with fallback color instead of being excluded
+
+**Improved:**
+
+- Cleaner constant organization for maintainability
+- User-friendly warnings for invalid themes and unsupported formats
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.5 — Reliability & symlinks
 

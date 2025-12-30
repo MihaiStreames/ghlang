@@ -35,7 +35,7 @@ def github(
         None,
         "--output",
         "-o",
-        help="Custom output path/filename (creates _pie and _bar variants)",
+        help="Custom output path/filename",
         path_type=Path,
     ),
     title: str | None = typer.Option(
@@ -57,7 +57,7 @@ def github(
     stdout: bool = typer.Option(
         False,
         "--stdout",
-        help="Output stats to stdout instead of files",
+        help="Output stats to stdout instead of files (implies --json-only --quiet)",
     ),
     quiet: bool = typer.Option(
         False,
@@ -71,9 +71,19 @@ def github(
         "-v",
         help="Show more details",
     ),
+    theme: str | None = typer.Option(
+        None,
+        "--theme",
+        help="Chart theme (default: light)",
+    ),
+    fmt: str | None = typer.Option(
+        None,
+        "--format",
+        "-f",
+        help="Output format, overrides --output extension (png or svg)",
+    ),
 ) -> None:
     """Analyze your GitHub repos"""
-    # stdout implies quiet and json_only
     if stdout:
         quiet = True
         json_only = True
@@ -83,6 +93,7 @@ def github(
             "output_dir": output_dir,
             "top_n_languages": top_n,
             "verbose": verbose or None,
+            "theme": theme,
         }
         cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=True)
 
@@ -128,7 +139,7 @@ def github(
             logger.success(f"Saved stats to {stats_file}")
         else:
             chart_title = title if title else "GitHub Language Stats"
-            generate_charts(language_stats, cfg, title=chart_title, output=output)
+            generate_charts(language_stats, cfg, title=chart_title, output=output, fmt=fmt)
 
     except typer.Exit:
         raise

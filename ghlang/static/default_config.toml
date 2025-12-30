@@ -2,12 +2,21 @@
 token = "YOUR_TOKEN_HERE"
 affiliation = "owner,collaborator,organization_member"
 visibility = "all"
-# Repos to ignore (globs like "org/*" or URLs like "https://github.com/user/repo")
+# globs like "org/*" or URLs like "https://github.com/user/repo"
 ignored_repos = []
 
 [cloc]
-# Directories to ignore
-ignored_dirs = ["node_modules", "vendor", ".git", "dist", "build", "__pycache__", ".venv", "venv"]
+# patterns to ignore directories
+ignored_dirs = [
+    "node_modules",
+    "vendor",
+    ".git",
+    "dist",
+    "build",
+    "__pycache__",
+    ".venv",
+    "venv",
+]
 
 [output]
 directory = "~/Documents/ghlang-stats"
@@ -17,3 +26,4 @@ top_n_languages = 5
 
 [preferences]
 verbose = false
+theme = "light" # built-in: "light", "dark"

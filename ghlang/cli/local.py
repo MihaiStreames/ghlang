@@ -46,7 +46,7 @@ def local(
         None,
         "--output",
         "-o",
-        help="Custom output path/filename (creates _pie and _bar variants)",
+        help="Custom output path/filename",
         path_type=Path,
     ),
     title: str | None = typer.Option(
@@ -68,7 +68,7 @@ def local(
     stdout: bool = typer.Option(
         False,
         "--stdout",
-        help="Output stats to stdout instead of files",
+        help="Output stats to stdout instead of files (implies --json-only --quiet)",
     ),
     quiet: bool = typer.Option(
         False,
@@ -87,9 +87,19 @@ def local(
         "--follow-links",
         help="Follow symlinks when analyzing (unix only)",
     ),
+    theme: str | None = typer.Option(
+        None,
+        "--theme",
+        help="Chart theme (default: light)",
+    ),
+    fmt: str | None = typer.Option(
+        None,
+        "--format",
+        "-f",
+        help="Output format, overrides --output extension (png or svg)",
+    ),
 ) -> None:
     """Analyze local files with cloc"""
-    # stdout implies quiet and json_only
     if stdout:
         quiet = True
         json_only = True
@@ -99,6 +109,7 @@ def local(
             "output_dir": output_dir,
             "top_n_languages": top_n,
             "verbose": verbose or None,
+            "theme": theme,
         }
         cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=False)
 
@@ -163,6 +174,7 @@ def local(
                 colors_required=False,
                 title=chart_title,
                 output=output,
+                fmt=fmt,
             )
 
     except typer.Exit:

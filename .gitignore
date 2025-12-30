@@ -6,12 +6,16 @@
 output/
 
 # Python
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+
 .venv/
 venv/
-__pycache__/
-*.py[oc]
+
 build/
 dist/
+*.py[oc]
 wheels/
 *.egg-info
 
