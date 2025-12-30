@@ -3,9 +3,12 @@
 <!-- PROJECT SHIELDS -->
 <div align="center">
 
-![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang)
-![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)
-![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)
+[![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
+[![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
+[![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
+[![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
+[![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)](https://github.com/MihaiStreames/ghlang/issues)
 
 </div>
 
@@ -82,9 +85,12 @@ Getting this running is pretty straightforward.
 
 ```bash
 # with pipx (recommended)
-pipx install git+https://github.com/MihaiStreames/ghlang.git
+pipx install ghlang
 
 # or with pip
+pip install ghlang
+
+# or install from source
 pip install git+https://github.com/MihaiStreames/ghlang.git
 ```
 
@@ -327,5 +333,13 @@ MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
 ---
 
 <div align="center">
-  <p>Made with ❤️</p>
+
+### 🌟 Found this cool?
+
+If you like ghlang, consider giving it a star! It helps others discover the tool.
+
+[![Star on GitHub](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
+
+<p>Made with ❤️</p>
+
 </div>

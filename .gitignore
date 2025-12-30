@@ -24,4 +24,5 @@ config.toml
 .env
 
 # Claude
+.claude/
 CLAUDE.md
