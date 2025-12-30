@@ -14,6 +14,7 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
+  <img src="assets/logo.png" alt="ghlang logo" width="120" />
   <h1>ghlang</h1>
 
   <h3 align="center">See what languages you've been coding in</h3>
@@ -54,8 +55,29 @@
 
 Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
 
+<div align="center">
+  <img src="assets/example_pie.png" alt="Pie chart example" width="60%" />
+  <img src="assets/example_bar.png" alt="Bar chart example" width="60%" />
+  <p><i>my actual language stats across all repos</i></p>
+</div>
+
 - **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
 - **Local mode**: Analyzes files on your machine using [cloc](https://github.com/AlDanial/cloc) (counts lines)
+
+### Why ghlang?
+
+Unlike tools like [github-readme-stats](https://github.com/anuraghazra/github-readme-stats) (which generate SVG cards for your README), ghlang is a **CLI tool** that:
+
+- Runs locally on your machine (Python-based)
+- Analyzes local files, not just GitHub repos
+- Generates downloadable charts (PNG/SVG) you can use anywhere
+- Exports raw JSON data for further analysis
+- Works offline for local analysis
+- Gives you full control over the data
+
+If you want embedded GitHub stats for your README, use github-readme-stats. If you want to analyze your actual codebase and generate charts you can save, share, or customize, use ghlang.
+
+(that said, ghlang does support SVG output with `--format svg`, so you can totally embed your charts in READMEs too - would be cool to see people do that!)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -64,6 +86,7 @@ Ever wondered what languages you actually use? **ghlang** makes pretty charts to
 - [Python](https://www.python.org/)
 - [Typer](https://typer.tiangolo.com/)
 - [Matplotlib](https://matplotlib.org/)
+- [Pillow](https://python-pillow.org/)
 - [Requests](https://requests.readthedocs.io/)
 - [Rich](https://github.com/Textualize/rich)
 - [cloc](https://github.com/AlDanial/cloc) (for local analysis)
@@ -336,10 +359,8 @@ MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
 
 ### 🌟 Found this cool?
 
-If you like ghlang, consider giving it a star! It helps others discover the tool.
+If you like ghlang, consider giving it a star :) It helps others discover the tool.
 
-[![Star on GitHub](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
-
-<p>Made with ❤️</p>
+Made with ❤️
 
 </div>
