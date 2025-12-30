@@ -159,20 +159,39 @@ ghlang local
 ghlang local ~/projects/my-app
 ```
 
+### Config Management
+
+```bash
+# open config in your editor
+ghlang config
+
+# show config as formatted table
+ghlang config --show
+
+# print config file path
+ghlang config --path
+
+# print raw TOML contents
+ghlang config --raw
+```
+
 ### Other Options
 
 ```bash
 # more logging
-ghlang [any] -v
+ghlang github -v
 
 # save charts somewhere else
-ghlang [any] -o ~/my-stats
+ghlang github -o ~/my-stats
 
 # show top 10 languages instead of 5
-ghlang [any] --top-n 10
+ghlang local --top-n 10
 
-# use a different config
-ghlang [any] --config ~/my-config.toml
+# pipe to jq
+ghlang local ~/project --stdout | jq '.Python'
+
+# get the top language
+ghlang github --stdout | jq -r 'to_entries | sort_by(-.value) | .[0].key'
 ```
 
 ### All the Flags
@@ -193,15 +212,13 @@ Both `github` and `local` commands share the same options:
 
 The `local` command also takes an optional `[PATH]` argument (defaults to `.`).
 
-#### Pipeline examples
+The `config` command has its own options:
 
-```bash
-# pipe to jq
-ghlang local ~/project --stdout | jq '.Python'
-
-# get the top language
-ghlang github --stdout | jq -r 'to_entries | sort_by(-.value) | .[0].key'
-```
+| Flag | What it does |
+|------|--------------|
+| `--show` | print config as formatted table |
+| `--path` | print config file path |
+| `--raw` | print raw TOML contents |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

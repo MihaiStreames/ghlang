@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v204--config-command">v2.0.4</a></li>
     <li><a href="#v203--pipeline-friendly">v2.0.3</a></li>
     <li><a href="#v202--custom-titles--output">v2.0.2</a></li>
     <li><a href="#v201--typer-swap">v2.0.1</a></li>
@@ -17,6 +18,23 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.4 — Config command
+
+New `ghlang config` command for managing your config file.
+
+**New stuff:**
+
+- `ghlang config` opens config in your default editor
+- `ghlang config --show` prints config as a formatted table
+- `ghlang config --path` prints the config file path
+- `ghlang config --raw` prints raw TOML contents
+
+**Changed:**
+
+- CLI refactored into `ghlang/cli/` package for better organization
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.3 — Pipeline friendly
 
