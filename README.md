@@ -186,9 +186,22 @@ Both `github` and `local` commands share the same options:
 | `--output` | `-o` | custom output filename (creates `_pie` and `_bar` variants) |
 | `--title` | `-t` | custom chart title |
 | `--top-n` | | how many languages in the bar chart |
+| `--json-only` | | output JSON only, skip chart generation |
+| `--stdout` | | output stats to stdout (implies `--json-only --quiet`) |
+| `--quiet` | `-q` | suppress log output (only show errors) |
 | `--verbose` | `-v` | show more details |
 
 The `local` command also takes an optional `[PATH]` argument (defaults to `.`).
+
+#### Pipeline examples
+
+```bash
+# pipe to jq
+ghlang local ~/project --stdout | jq '.Python'
+
+# get the top language
+ghlang github --stdout | jq -r 'to_entries | sort_by(-.value) | .[0].key'
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

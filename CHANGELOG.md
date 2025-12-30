@@ -10,12 +10,30 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v203--pipeline-friendly">v2.0.3</a></li>
     <li><a href="#v202--custom-titles--output">v2.0.2</a></li>
     <li><a href="#v201--typer-swap">v2.0.1</a></li>
     <li><a href="#v200--local-mode--big-refactor">v2.0.0</a></li>
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.3 — Pipeline friendly
+
+New flags for scripting and CI/CD workflows.
+
+**New stuff:**
+
+- `--json-only` flag to skip chart generation and just output JSON
+- `--stdout` flag to output stats to stdout (perfect for piping to jq)
+- `--quiet` / `-q` flag to suppress log output
+
+**Notes:**
+
+- `--stdout` implies both `--json-only` and `--quiet`
+- Great for CI pipelines, scripts, and custom visualizations
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.2 — Custom titles & output
 
