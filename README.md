@@ -177,19 +177,18 @@ ghlang [any] --config ~/my-config.toml
 
 ### All the Flags
 
-```
-ghlang github
-  --config PATH      use a different config file
-  -o, --output-dir   where to save the charts
-  --top-n N          how many languages in the bar chart
-  -v, --verbose      show more details
+Both `github` and `local` commands share the same options:
 
-ghlang local [PATH]
-  --config PATH      use a different config file
-  -o, --output-dir   where to save the charts
-  --top-n N          how many languages in the bar chart
-  -v, --verbose      show more details
-```
+| Flag | Short | What it does |
+|------|-------|--------------|
+| `--config` | | use a different config file |
+| `--output-dir` | | where to save the charts (directory) |
+| `--output` | `-o` | custom output filename (creates `_pie` and `_bar` variants) |
+| `--title` | `-t` | custom chart title |
+| `--top-n` | | how many languages in the bar chart |
+| `--verbose` | `-v` | show more details |
+
+The `local` command also takes an optional `[PATH]` argument (defaults to `.`).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

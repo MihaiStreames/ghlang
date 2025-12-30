@@ -10,11 +10,28 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v202--custom-titles--output">v2.0.2</a></li>
     <li><a href="#v201--typer-swap">v2.0.1</a></li>
     <li><a href="#v200--local-mode--big-refactor">v2.0.0</a></li>
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.2 — Custom titles & output
+
+New CLI flags for more control over your charts.
+
+**New stuff:**
+
+- `--title` / `-t` flag to set a custom chart title
+- `--output` / `-o` flag to specify custom output filename (creates `_pie` and `_bar` variants)
+- Dynamic chart titles: GitHub mode shows "GitHub Language Stats", local mode shows "Local: {folder}"
+
+**Changed:**
+
+- `--output-dir` no longer has `-o` shorthand (now used by `--output`)
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.1 — Typer swap
 

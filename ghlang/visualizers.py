@@ -79,9 +79,11 @@ def generate_pie(
     language_stats: dict[str, int],
     colors: dict[str, str],
     output: Path,
+    title: str | None = None,
     min_percentage: float = 1.5,
 ) -> None:
     """Generate a pie chart showing language distribution"""
+    title = title if title else "Language Distribution"
     logger.debug(f"Generating pie chart with {len(language_stats)} languages...")
 
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
@@ -118,7 +120,7 @@ def generate_pie(
     )
 
     ax.set_title(
-        "Language Distribution",
+        title,
         fontsize=16,
         weight="bold",
         pad=20,
@@ -137,9 +139,11 @@ def generate_bar(
     colors: dict[str, str],
     output: Path,
     top_n: int = 5,
+    title: str | None = None,
     min_label_width: float = 0.05,
 ) -> None:
     """Generate a horizontal segmented bar chart showing top N languages"""
+    title = title if title else f"Top {top_n} Languages"
     logger.debug(f"Generating segmented bar chart (top {top_n} languages)...")
 
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
@@ -205,7 +209,7 @@ def generate_bar(
     ax.axis("off")
 
     ax.set_title(
-        f"Top {top_n} Languages",
+        title,
         fontsize=14,
         weight="bold",
         pad=15,

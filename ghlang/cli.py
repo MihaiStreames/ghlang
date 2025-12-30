@@ -35,6 +35,8 @@ def generate_charts(
     language_stats: dict[str, int],
     cfg: Config,
     colors_required: bool = True,
+    title: str | None = None,
+    output: Path | None = None,
 ) -> None:
     """Load colors and generate pie/bar charts"""
     colors_file = cfg.output_dir / "github_colors.json" if cfg.save_json else None
@@ -48,11 +50,25 @@ def generate_charts(
         logger.warning("Couldn't load GitHub colors, charts will be gray")
         colors = {}
 
-    pie_output = cfg.output_dir / "language_pie.png"
-    bar_output = cfg.output_dir / "language_bar.png"
+    if output:
+        if output.is_absolute():
+            parent = output.parent
+        elif str(output.parent) != ".":
+            parent = cfg.output_dir / output.parent
+        else:
+            parent = cfg.output_dir
 
-    generate_pie(language_stats, colors, pie_output)
-    generate_bar(language_stats, colors, bar_output, top_n=cfg.top_n_languages)
+        stem = output.stem
+        suffix = output.suffix if output.suffix else ".png"
+
+        pie_output = parent / f"{stem}_pie{suffix}"
+        bar_output = parent / f"{stem}_bar{suffix}"
+    else:
+        pie_output = cfg.output_dir / "language_pie.png"
+        bar_output = cfg.output_dir / "language_bar.png"
+
+    generate_pie(language_stats, colors, pie_output, title=title)
+    generate_bar(language_stats, colors, bar_output, top_n=cfg.top_n_languages, title=title)
 
 
 def _version_callback(value: bool) -> None:
@@ -89,12 +105,24 @@ def github(
     output_dir: Path | None = typer.Option(
         None,
         "--output-dir",
-        "-o",
         help="Where to save the charts",
         file_okay=False,
         dir_okay=True,
         writable=True,
         path_type=Path,
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Custom output path/filename (creates _pie and _bar variants)",
+        path_type=Path,
+    ),
+    title: str | None = typer.Option(
+        None,
+        "--title",
+        "-t",
+        help="Custom chart title",
     ),
     top_n: int | None = typer.Option(
         None,
@@ -142,7 +170,8 @@ def github(
             logger.error("No language statistics found, nothing to visualize")
             raise typer.Exit(1)
 
-        generate_charts(language_stats, cfg)
+        chart_title = title if title else "GitHub Language Stats"
+        generate_charts(language_stats, cfg, title=chart_title, output=output)
 
     except typer.Exit:
         raise
@@ -174,12 +203,24 @@ def local(
     output_dir: Path | None = typer.Option(
         None,
         "--output-dir",
-        "-o",
         help="Where to save the charts",
         file_okay=False,
         dir_okay=True,
         writable=True,
         path_type=Path,
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Custom output path/filename (creates _pie and _bar variants)",
+        path_type=Path,
+    ),
+    title: str | None = typer.Option(
+        None,
+        "--title",
+        "-t",
+        help="Custom chart title",
     ),
     top_n: int | None = typer.Option(
         None,
@@ -234,7 +275,13 @@ def local(
             logger.error("No code found to analyze, nothing to visualize")
             raise typer.Exit(1)
 
-        generate_charts(language_stats, cfg, colors_required=False)
+        if title:
+            chart_title = title
+        else:
+            resolved = path.expanduser().resolve()
+            chart_title = f"Local: {resolved.name}"
+
+        generate_charts(language_stats, cfg, colors_required=False, title=chart_title, output=output)
 
     except typer.Exit:
         raise
