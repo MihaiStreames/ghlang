@@ -28,6 +28,9 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["ghlang*"]
 
+[tool.setuptools.package-data]
+ghlang = ["static/*.json", "static/*.toml"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py313"
