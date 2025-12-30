@@ -87,9 +87,6 @@ def _print_config_table(config_path: Path) -> None:
 
     console.print("[bold yellow]Output[/bold yellow]")
     table.add_row("directory", str(cfg.output_dir))
-    table.add_row("save_json", _format_value(cfg.save_json))
-    table.add_row("save_repos", _format_value(cfg.save_repos))
-    table.add_row("top_n_languages", str(cfg.top_n_languages))
     console.print(table)
     console.print()
 

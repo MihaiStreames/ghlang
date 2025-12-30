@@ -1,0 +1,75 @@
+from datetime import datetime
+from datetime import timedelta
+import json
+from pathlib import Path
+from typing import cast
+
+import requests
+
+from ghlang.logging import logger
+from ghlang.static.themes import THEMES
+
+
+THEME_MANIFEST_URL: str = (
+    "https://raw.githubusercontent.com/MihaiStreames/ghlang/master/themes/manifest.json"
+)
+CACHE_TTL: timedelta = timedelta(days=1)
+
+
+def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dict[str, str]]:
+    """Fetch community themes from manifest"""
+    cache_meta = cache_path.with_suffix(".json.meta")
+
+    if not force and cache_path.exists() and cache_meta.exists():
+        try:
+            meta = json.loads(cache_meta.read_text())
+            cached_time = datetime.fromisoformat(meta["timestamp"])
+
+            if datetime.now() - cached_time < CACHE_TTL:
+                return cast(dict[str, dict[str, str]], json.loads(cache_path.read_text()))
+
+        except Exception:
+            pass
+
+    try:
+        r = requests.get(THEME_MANIFEST_URL, timeout=10)
+        r.raise_for_status()
+        themes = cast(dict[str, dict[str, str]], r.json())
+
+        cache_path.write_text(json.dumps(themes, indent=2))
+        cache_meta.write_text(
+            json.dumps(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "url": THEME_MANIFEST_URL,
+                }
+            )
+        )
+
+        return themes
+
+    except Exception as e:
+        logger.warning(f"Couldn't fetch remote themes: {e}")
+        return {}
+
+
+def load_all_themes(
+    config_dir: Path, force_refresh: bool = False
+) -> dict[str, dict[str, str]]:
+    """Load: built-in + remote + custom"""
+    themes = THEMES.copy()
+
+    remote_path = config_dir / "themes.json"
+    remote = _fetch_remote_themes(remote_path, force=force_refresh)
+    themes.update(remote)
+
+    custom_path = config_dir / "custom_themes.json"
+    if custom_path.exists():
+        try:
+            custom = json.loads(custom_path.read_text())
+            themes.update(custom)
+
+        except Exception as e:
+            logger.warning(f"Couldn't load custom themes: {e}")
+
+    return themes

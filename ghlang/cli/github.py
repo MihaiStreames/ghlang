@@ -3,7 +3,9 @@ from pathlib import Path
 
 import typer
 
+from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import themes_autocomplete
 from ghlang.config import load_config
 from ghlang.exceptions import ConfigError
 from ghlang.github_client import GitHubClient
@@ -80,12 +82,14 @@ def github(
         None,
         "--theme",
         help="Chart theme (default: light)",
+        autocompletion=themes_autocomplete,
     ),
     fmt: str | None = typer.Option(
         None,
         "--format",
         "-f",
         help="Output format, overrides --output extension (png or svg)",
+        autocompletion=format_autocomplete,
     ),
 ) -> None:
     """Analyze your GitHub repos"""

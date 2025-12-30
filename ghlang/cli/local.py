@@ -4,7 +4,9 @@ import sys
 
 import typer
 
+from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import themes_autocomplete
 from ghlang.cloc_client import ClocClient
 from ghlang.config import load_config
 from ghlang.exceptions import ClocNotFoundError
@@ -97,12 +99,14 @@ def local(
         None,
         "--theme",
         help="Chart theme (default: light)",
+        autocompletion=themes_autocomplete,
     ),
     fmt: str | None = typer.Option(
         None,
         "--format",
         "-f",
         help="Output format, overrides --output extension (png or svg)",
+        autocompletion=format_autocomplete,
     ),
 ) -> None:
     """Analyze local files with cloc"""
@@ -142,9 +146,7 @@ def local(
     try:
         detailed_stats = cloc.get_language_stats(
             path,
-            stats_output=(
-                cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None
-            ),
+            stats_output=(cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None),
         )
         raw_stats = {
             lang: data["code"]

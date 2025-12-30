@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v231--bugfix--theme-support">v2.3.1</a></li>
     <li><a href="#v230--pypi--simplified-config">v2.3.0</a></li>
     <li><a href="#v220--rich-logging--config-validation">v2.2.0</a></li>
     <li><a href="#v210--themes--svg-export">v2.1.0</a></li>
@@ -22,6 +23,22 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.3.1 — Bugfix & theme support
+
+Critical bugfix for `ghlang config show` and basic *community* theme system support.
+
+**Fixed:**
+
+- **Critical:** Removed references to deleted config fields (`save_json`, `save_repos`, `top_n_languages`) in `config show` command that would cause errors
+
+**New stuff:**
+
+- Theme autocomplete in CLI
+- Community theme manifest support (auto-cached, 1-day TTL)
+- Custom themes via `~/.config/ghlang/custom_themes.json`
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.3.0 — PyPI & simplified config
 

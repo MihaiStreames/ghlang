@@ -1,9 +1,12 @@
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import typer
 
+from ghlang.config import get_config_path
 from ghlang.logging import logger
+from ghlang.static.themes import THEMES
 from ghlang.visualizers import generate_bar
 from ghlang.visualizers import generate_pie
 from ghlang.visualizers import load_github_colors
@@ -11,6 +14,30 @@ from ghlang.visualizers import load_github_colors
 
 if TYPE_CHECKING:
     from ghlang.config import Config
+
+
+def format_autocomplete(incomplete: str) -> list[str]:
+    """Callback for output formats"""
+    return [f for f in ["png", "svg"] if f.startswith(incomplete)]
+
+
+def themes_autocomplete(incomplete: str) -> list[str]:
+    """Callback for theme autocompletion"""
+    themes = list(THEMES.keys())
+
+    config_path = get_config_path()
+    remote_path = config_path.parent / "themes.json"
+    if remote_path.exists():
+        try:
+            with remote_path.open() as f:
+                remote = json.load(f)
+
+            themes.extend(remote.keys())
+
+        except Exception:
+            pass
+
+    return [t for t in themes if t.startswith(incomplete)]
 
 
 def generate_charts(
