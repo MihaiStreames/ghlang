@@ -62,7 +62,7 @@ Ever wondered what languages you actually use? **ghlang** makes pretty charts to
 - [Typer](https://typer.tiangolo.com/)
 - [Matplotlib](https://matplotlib.org/)
 - [Requests](https://requests.readthedocs.io/)
-- [Loguru](https://github.com/Delgan/loguru)
+- [Rich](https://github.com/Textualize/rich)
 - [cloc](https://github.com/AlDanial/cloc) (for local analysis)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -301,6 +301,7 @@ ghlang comes with built-in themes for your charts:
 |-------|---------|--------|
 | `light` | ![light](assets/themes/light.png) | built-in |
 | `dark` | ![dark](assets/themes/dark.png) | built-in |
+| `monokai` | ![monokai](assets/themes/monokai.png) | built-in |
 
 ```bash
 # use dark theme

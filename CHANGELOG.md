@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v220--rich-logging--config-validation">v2.2.0</a></li>
     <li><a href="#v210--themes--svg-export">v2.1.0</a></li>
     <li><a href="#v205--reliability--symlinks">v2.0.5</a></li>
     <li><a href="#v204--config-command">v2.0.4</a></li>
@@ -20,6 +21,34 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.2.0 — Rich logging & config validation
+
+Replaced loguru with [Rich](https://github.com/Textualize/rich) for better progress bars and unified console output. Added config validation with helpful suggestions for typos.
+
+**New stuff:**
+
+- Progress bars for GitHub repo fetching and processing
+- Spinner for cloc analysis
+- Progress bar for chart generation
+- Config validation warns about unknown keys with fuzzy matching ("did you mean...?")
+- `monokai` chart theme
+- Syntax highlighting for `ghlang config --raw`
+
+**Changed:**
+
+- Replaced loguru with Rich for all logging and progress display
+- Logging now uses text-only style with colored level labels (INFO, SUCCESS, WARNING, ERROR)
+- `--quiet` suppresses all output except errors
+- `--stdout` outputs clean JSON only (no progress bars)
+- `-v` enables debug messages
+
+**Improved:**
+
+- Better visual feedback during long-running operations
+- Friendlier config error messages with typo suggestions
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.1.0 — Themes & SVG export
 

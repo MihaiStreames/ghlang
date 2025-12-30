@@ -1,14 +1,13 @@
 import json
 from pathlib import Path
 
-from loguru import logger
 import typer
 
 from ghlang.cli.utils import generate_charts
-from ghlang.cli.utils import setup_logging
 from ghlang.config import load_config
 from ghlang.exceptions import ConfigError
 from ghlang.github_client import GitHubClient
+from ghlang.logging import logger
 
 
 def github(
@@ -88,6 +87,8 @@ def github(
         quiet = True
         json_only = True
 
+    logger.configure(verbose, quiet=quiet)
+
     try:
         cli_overrides = {
             "output_dir": output_dir,
@@ -100,8 +101,6 @@ def github(
     except ConfigError as e:
         logger.error(str(e))
         raise typer.Exit(1)
-
-    setup_logging(cfg.verbose, quiet=quiet)
 
     if not stdout:
         cfg.output_dir.mkdir(parents=True, exist_ok=True)

@@ -2,15 +2,14 @@ import json
 from pathlib import Path
 import sys
 
-from loguru import logger
 import typer
 
 from ghlang.cli.utils import generate_charts
-from ghlang.cli.utils import setup_logging
 from ghlang.cloc_client import ClocClient
 from ghlang.config import load_config
 from ghlang.exceptions import ClocNotFoundError
 from ghlang.exceptions import ConfigError
+from ghlang.logging import logger
 from ghlang.visualizers import normalize_language_stats
 
 
@@ -104,6 +103,8 @@ def local(
         quiet = True
         json_only = True
 
+    logger.configure(verbose, quiet=quiet)
+
     try:
         cli_overrides = {
             "output_dir": output_dir,
@@ -116,8 +117,6 @@ def local(
     except ConfigError as e:
         logger.error(str(e))
         raise typer.Exit(1)
-
-    setup_logging(cfg.verbose, quiet=quiet)
 
     if follow_links and sys.platform == "win32":
         logger.warning("--follow-links is not supported on Windows, ignoring")

@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 import time
 
-from loguru import logger
 import requests
+
+from ghlang.logging import logger
 
 
 class GitHubClient:
@@ -98,27 +99,30 @@ class GitHubClient:
         repos = []
         page = 1
 
-        while True:
-            logger.debug(f"Fetching page {page}...")
+        with logger.spinner() as progress:
+            task = progress.add_task("Fetching repos...", total=None)
 
-            r = self._get(
-                f"{self._api}/user/repos",
-                params={
-                    "per_page": self._per_page,
-                    "page": page,
-                    "affiliation": self._affiliation,
-                    "visibility": self._visibility,
-                    "sort": "pushed",
-                    "direction": "desc",
-                },
-            )
+            while True:
+                progress.update(task, description=f"Fetching repos (page {page})...")
 
-            batch = r.json()
-            if not batch:
-                break
+                r = self._get(
+                    f"{self._api}/user/repos",
+                    params={
+                        "per_page": self._per_page,
+                        "page": page,
+                        "affiliation": self._affiliation,
+                        "visibility": self._visibility,
+                        "sort": "pushed",
+                        "direction": "desc",
+                    },
+                )
 
-            repos.extend(batch)
-            page += 1
+                batch = r.json()
+                if not batch:
+                    break
+
+                repos.extend(batch)
+                page += 1
 
         seen = set()
         unique_repos = []
@@ -171,23 +175,27 @@ class GitHubClient:
         processed = 0
         skipped = 0
 
-        logger.info("Fetching language stats for each repo")
+        with logger.progress() as progress:
+            task = progress.add_task("Processing repos", total=len(repos))
 
-        for repo in repos:
-            full_name = repo["full_name"]
+            for repo in repos:
+                full_name = repo["full_name"]
+                progress.update(task, description=f"Processing {full_name}")
 
-            try:
-                langs = self._get_repo_languages(full_name)
+                try:
+                    langs = self._get_repo_languages(full_name)
 
-                for lang, bytes_count in langs.items():
-                    totals[lang] += int(bytes_count)
+                    for lang, bytes_count in langs.items():
+                        totals[lang] += int(bytes_count)
 
-                processed += 1
-                logger.debug(f"Processed {full_name}")
+                    processed += 1
+                    logger.debug(f"Processed {full_name}")
 
-            except requests.HTTPError as e:
-                skipped += 1
-                logger.warning(f"Skipped {full_name}: {e}")
+                except requests.HTTPError as e:
+                    skipped += 1
+                    logger.warning(f"Skipped {full_name}: {e}")
+
+                progress.advance(task)
 
         logger.success(f"Processed {processed} repositories ({skipped} skipped)")
 

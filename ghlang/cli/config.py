@@ -4,6 +4,7 @@ import platform
 import subprocess
 
 from rich.console import Console
+from rich.syntax import Syntax
 from rich.table import Table
 import typer
 
@@ -133,7 +134,9 @@ def config(
             typer.echo(f"Config file doesn't exist yet: {config_path}")
             raise typer.Exit(1)
 
-        print(config_path.read_text())
+        console = Console()
+        syntax = Syntax(config_path.read_text(), "toml", theme="ansi_dark", line_numbers=True)
+        console.print(syntax)
         return
 
     if show:

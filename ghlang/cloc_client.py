@@ -3,9 +3,8 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from loguru import logger
-
 from ghlang.exceptions import ClocNotFoundError
+from ghlang.logging import logger
 
 
 class ClocClient:
@@ -64,13 +63,14 @@ class ClocClient:
         cmd = self._build_cloc_command(path)
         logger.debug(f"Running: {' '.join(cmd)}")
 
-        result = subprocess.run(
-            cmd,
-            check=False,
-            capture_output=True,
-            text=True,
-            cwd=path if path.is_dir() else path.parent,
-        )
+        with logger.console.status(f"[bold]Analyzing {path}..."):
+            result = subprocess.run(
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                cwd=path if path.is_dir() else path.parent,
+            )
 
         if result.returncode != 0:
             logger.debug(f"cloc stderr: {result.stderr}")

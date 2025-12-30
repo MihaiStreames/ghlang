@@ -1,15 +1,15 @@
 [project]
 name = "ghlang"
-version = "2.1.0"
+version = "2.2.0"
 description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "loguru>=0.7.3",
+    "requests>=2.32.5",
     "matplotlib>=3.10.8",
     "pillow>=12.0.0",
     "pyyaml>=6.0.3",
-    "requests>=2.32.5",
+    "rich>=13.0.0",
     "typer>=0.21.0",
 ]
 

@@ -2,7 +2,6 @@ import io
 import json
 from pathlib import Path
 
-from loguru import logger
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -10,20 +9,18 @@ from PIL import ImageDraw
 import requests
 import yaml
 
+from ghlang.logging import logger
 from ghlang.static.lang_mapping import CLOC_TO_LINGUIST
 from ghlang.static.themes import THEMES
 
 
-# URL to GitHub linguist languages YAML
 LINGUIST_LANGUAGES_URL: str = (
     "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml"
 )
 
-# Chart styling
 ROUNDED_CORNER_RADIUS: int = 40
 PNG_DPI: int = 200
 
-# Pie chart
 PIE_FIGSIZE: tuple[int, int] = (14, 10)
 PIE_TITLE_FONTSIZE: int = 24
 PIE_TITLE_PAD: int = 20
@@ -32,7 +29,6 @@ PIE_PCT_FONTSIZE: int = 9
 PIE_LEGEND_FONTSIZE: int = 9
 PIE_LEGEND_TITLE_FONTSIZE: int = 11
 
-# Bar chart
 BAR_FIGSIZE: tuple[int, int] = (12, 3)
 BAR_HEIGHT: float = 0.5
 BAR_TITLE_FONTSIZE: int = 20
@@ -201,8 +197,8 @@ def generate_pie(
         buf.seek(0)
 
         img = Image.open(buf)
-        img = _add_rounded_corners(img)
-        img.save(output)
+        rounded = _add_rounded_corners(img)
+        rounded.save(output)
 
     logger.success(f"Saved pie chart to {output}")
 
@@ -319,7 +315,7 @@ def generate_bar(
         buf.seek(0)
 
         img = Image.open(buf)
-        img = _add_rounded_corners(img)
-        img.save(output)
+        rounded = _add_rounded_corners(img)
+        rounded.save(output)
 
     logger.success(f"Saved segmented bar chart to {output}")

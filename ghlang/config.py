@@ -1,18 +1,33 @@
 from dataclasses import dataclass
 from dataclasses import field
+from difflib import get_close_matches
 from importlib import resources
 from pathlib import Path
 import sys
 import tomllib
 
-from loguru import logger
-
 from ghlang.exceptions import ConfigError
 from ghlang.exceptions import MissingTokenError
+from ghlang.logging import logger
 
 
-DEFAULT_IGNORED_DIRS = ["node_modules", "vendor", ".git", "dist", "build", "__pycache__"]
+DEFAULT_IGNORED_DIRS = [
+    "node_modules",
+    "vendor",
+    ".git",
+    "dist",
+    "build",
+    "__pycache__",
+]
+
 DEFAULT_OUTPUT_DIR = "~/Documents/ghlang-stats"
+
+VALID_KEYS: dict[str, set[str]] = {
+    "github": {"token", "affiliation", "visibility", "ignored_repos"},
+    "cloc": {"ignored_dirs"},
+    "output": {"directory", "save_json", "save_repos", "top_n_languages"},
+    "preferences": {"verbose", "theme"},
+}
 
 
 @dataclass
@@ -59,6 +74,36 @@ def create_default_config(config_path: Path) -> None:
     logger.debug(f"Created default config at: {config_path}")
 
 
+def _validate_config(data: dict) -> None:
+    """Warn about unknown config keys with fuzzy suggestions"""
+    for section, keys in data.items():
+        if section not in VALID_KEYS:
+            suggestions = get_close_matches(section, VALID_KEYS.keys(), n=1, cutoff=0.6)
+
+            if suggestions:
+                logger.warning(
+                    f"Unknown config section '{section}' - did you mean '{suggestions[0]}'?"
+                )
+            else:
+                logger.warning(f"Unknown config section '{section}'")
+            continue
+
+        if not isinstance(keys, dict):
+            continue
+
+        valid = VALID_KEYS[section]
+        for key in keys:
+            if key not in valid:
+                suggestions = get_close_matches(key, valid, n=1, cutoff=0.6)
+
+                if suggestions:
+                    logger.warning(
+                        f"Unknown key '{section}.{key}' - did you mean '{suggestions[0]}'?"
+                    )
+                else:
+                    logger.warning(f"Unknown config key '{section}.{key}'")
+
+
 def load_config(
     config_path: Path | None = None,
     cli_overrides: dict | None = None,
@@ -82,6 +127,8 @@ def load_config(
 
     except tomllib.TOMLDecodeError as e:
         raise ConfigError(f"Invalid TOML in config file: {e}") from e
+
+    _validate_config(data)
 
     github = data.get("github", {})
     cloc = data.get("cloc", {})

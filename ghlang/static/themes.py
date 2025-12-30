@@ -15,4 +15,11 @@ THEMES: dict[str, dict[str, str]] = {
         "legend_bg": "#2a2a2a",
         "fallback": "#555555",
     },
+    "monokai": {
+        "background": "#272822",
+        "text": "#f8f8f2",
+        "secondary": "#75715e",
+        "legend_bg": "#3e3d32",
+        "fallback": "#49483e",
+    },
 }
