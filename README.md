@@ -313,10 +313,13 @@ ghlang comes with built-in themes for your charts:
 ```bash
 # use dark theme
 ghlang github --theme dark
+```
 
-# or set it in config.toml
-# [preferences]
-# theme = "dark"
+or set it in `config.toml`:
+
+```toml
+[preferences]
+theme = "dark"
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
