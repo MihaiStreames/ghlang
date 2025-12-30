@@ -25,7 +25,7 @@ DEFAULT_OUTPUT_DIR = "~/Documents/ghlang-stats"
 VALID_KEYS: dict[str, set[str]] = {
     "github": {"token", "affiliation", "visibility", "ignored_repos"},
     "cloc": {"ignored_dirs"},
-    "output": {"directory", "save_json", "save_repos", "top_n_languages"},
+    "output": {"directory"},
     "preferences": {"verbose", "theme"},
 }
 
@@ -45,9 +45,6 @@ class Config:
 
     # Output settings
     output_dir: Path = field(default_factory=lambda: Path(DEFAULT_OUTPUT_DIR))
-    save_json: bool = True
-    save_repos: bool = True
-    top_n_languages: int = 5
 
     # Preferences
     verbose: bool = False
@@ -147,9 +144,6 @@ def load_config(
         ignored_repos=github.get("ignored_repos", []),
         ignored_dirs=cloc.get("ignored_dirs", DEFAULT_IGNORED_DIRS.copy()),
         output_dir=Path(output.get("directory", DEFAULT_OUTPUT_DIR)).expanduser(),
-        save_json=output.get("save_json", Config.save_json),
-        save_repos=output.get("save_repos", Config.save_repos),
-        top_n_languages=output.get("top_n_languages", Config.top_n_languages),
         verbose=preferences.get("verbose", Config.verbose),
         theme=preferences.get("theme", Config.theme),
     )

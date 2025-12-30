@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v230--pypi--simplified-config">v2.3.0</a></li>
     <li><a href="#v220--rich-logging--config-validation">v2.2.0</a></li>
     <li><a href="#v210--themes--svg-export">v2.1.0</a></li>
     <li><a href="#v205--reliability--symlinks">v2.0.5</a></li>
@@ -21,6 +22,31 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.3.0 — PyPI & simplified config
+
+Now available on [PyPI](https://pypi.org/project/ghlang/)! Install with `pipx install ghlang` or `pip install ghlang`. Simplified config and added GitHub automation.
+
+**New stuff:**
+
+- Published to PyPI, no more installing from source
+- `--save-json` flag to control JSON file generation (replaces config options)
+- GitHub Actions workflow for automated PyPI releases on tags
+- GitHub issue templates for bug reports and feature requests
+
+**Changed:**
+
+- Removed `save_json`, `save_repos`, and `top_n_languages` from config file
+- These settings are now CLI flags only (`--save-json`, `--top-n`)
+- Simplified config structure
+- Clean script now removes `dist/` directory
+
+**Improved:**
+
+- Easier installation experience via package managers
+- More flexible per-command control vs global config
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.2.0 — Rich logging & config validation
 

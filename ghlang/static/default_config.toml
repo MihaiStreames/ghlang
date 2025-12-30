@@ -20,9 +20,6 @@ ignored_dirs = [
 
 [output]
 directory = "~/Documents/ghlang-stats"
-save_json = false
-save_repos = false
-top_n_languages = 5
 
 [preferences]
 verbose = false

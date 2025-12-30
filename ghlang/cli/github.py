@@ -11,6 +11,7 @@ from ghlang.logging import logger
 
 
 def github(
+    # TODO (#9): Add --exclude flag to filter patterns from CLI
     config_path: Path | None = typer.Option(
         None,
         "--config",
@@ -43,10 +44,15 @@ def github(
         "-t",
         help="Custom chart title",
     ),
-    top_n: int | None = typer.Option(
-        None,
+    top_n: int = typer.Option(
+        5,
         "--top-n",
         help="How many languages to show in the bar chart",
+    ),
+    save_json: bool = typer.Option(
+        False,
+        "--save-json",
+        help="Save raw stats as JSON files",
     ),
     json_only: bool = typer.Option(
         False,
@@ -92,7 +98,6 @@ def github(
     try:
         cli_overrides = {
             "output_dir": output_dir,
-            "top_n_languages": top_n,
             "verbose": verbose or None,
             "theme": theme,
         }
@@ -116,10 +121,10 @@ def github(
 
         language_stats = client.get_all_language_stats(
             repos_output=(
-                cfg.output_dir / "repositories.json" if cfg.save_repos and not stdout else None
+                cfg.output_dir / "repositories.json" if save_json and not stdout else None
             ),
             stats_output=(
-                cfg.output_dir / "language_stats.json" if cfg.save_json and not stdout else None
+                cfg.output_dir / "language_stats.json" if save_json and not stdout else None
             ),
         )
 
@@ -138,7 +143,15 @@ def github(
             logger.success(f"Saved stats to {stats_file}")
         else:
             chart_title = title if title else "GitHub Language Stats"
-            generate_charts(language_stats, cfg, title=chart_title, output=output, fmt=fmt)
+            generate_charts(
+                language_stats,
+                cfg,
+                title=chart_title,
+                output=output,
+                fmt=fmt,
+                top_n=top_n,
+                save_json=save_json,
+            )
 
     except typer.Exit:
         raise

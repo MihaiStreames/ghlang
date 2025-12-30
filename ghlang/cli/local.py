@@ -14,6 +14,8 @@ from ghlang.visualizers import normalize_language_stats
 
 
 def local(
+    # TODO (#8): Add support for multiple paths in one command
+    # TODO (#7): Handle mixed git/non-git directory trees better
     path: Path = typer.Argument(
         ".",
         exists=True,
@@ -54,10 +56,15 @@ def local(
         "-t",
         help="Custom chart title",
     ),
-    top_n: int | None = typer.Option(
-        None,
+    top_n: int = typer.Option(
+        5,
         "--top-n",
         help="How many languages to show in the bar chart",
+    ),
+    save_json: bool = typer.Option(
+        False,
+        "--save-json",
+        help="Save raw stats as JSON files",
     ),
     json_only: bool = typer.Option(
         False,
@@ -108,7 +115,6 @@ def local(
     try:
         cli_overrides = {
             "output_dir": output_dir,
-            "top_n_languages": top_n,
             "verbose": verbose or None,
             "theme": theme,
         }
@@ -137,7 +143,7 @@ def local(
         detailed_stats = cloc.get_language_stats(
             path,
             stats_output=(
-                cfg.output_dir / "cloc_stats.json" if cfg.save_json and not stdout else None
+                cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None
             ),
         )
         raw_stats = {
@@ -174,6 +180,8 @@ def local(
                 title=chart_title,
                 output=output,
                 fmt=fmt,
+                top_n=top_n,
+                save_json=save_json,
             )
 
     except typer.Exit:

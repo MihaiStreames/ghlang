@@ -164,58 +164,6 @@ choco install cloc
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### GitHub Mode
-
-```bash
-# analyze all your repos
-ghlang github
-```
-
-### Local Mode
-
-```bash
-# analyze current directory
-ghlang local
-
-# analyze a specific path
-ghlang local ~/projects/my-app
-```
-
-### Config Management
-
-```bash
-# open config in your editor
-ghlang config
-
-# show config as formatted table
-ghlang config --show
-
-# print config file path
-ghlang config --path
-
-# print raw TOML contents
-ghlang config --raw
-```
-
-### Other Options
-
-```bash
-# more logging
-ghlang github -v
-
-# save charts somewhere else
-ghlang github -o ~/my-stats
-
-# show top 10 languages instead of 5
-ghlang local --top-n 10
-
-# pipe to jq
-ghlang local ~/project --stdout | jq '.Python'
-
-# get the top language
-ghlang github --stdout | jq -r 'to_entries | sort_by(-.value) | .[0].key'
-```
-
 ### All the Flags
 
 Both `github` and `local` commands share the same options:
@@ -226,7 +174,8 @@ Both `github` and `local` commands share the same options:
 | `--output-dir` | | where to save the charts (directory) |
 | `--output` | `-o` | custom output filename (creates `_pie` and `_bar` variants) |
 | `--title` | `-t` | custom chart title |
-| `--top-n` | | how many languages in the bar chart |
+| `--top-n` | | how many languages in the bar chart (default: 5) |
+| `--save-json` | | save raw stats as JSON files |
 | `--theme` | | chart color theme (default: light) |
 | `--format` | `-f` | output format, overrides `--output` extension (png or svg) |
 | `--json-only` | | output JSON only, skip chart generation |
@@ -276,10 +225,10 @@ Charts end up in your output directory (`.png` by default, or `.svg` with `--for
 |------|------------|
 | `language_pie.png` | pie chart with all languages |
 | `language_bar.png` | bar chart with top N languages |
-| `language_stats.json` | raw stats (if `save_json` is on) |
-| `cloc_stats.json` | detailed cloc output (local mode) |
-| `repositories.json` | list of repos analyzed (GitHub mode) |
-| `github_colors.json` | language colors from GitHub |
+| `language_stats.json` | raw stats (with `--save-json`) |
+| `cloc_stats.json` | detailed cloc output (local mode, with `--save-json`) |
+| `repositories.json` | list of repos analyzed (GitHub mode, with `--save-json`) |
+| `github_colors.json` | language colors from GitHub (with `--save-json`) |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -308,9 +257,6 @@ Everything lives in `config.toml`:
 | Option | Default | What it does |
 |--------|---------|--------------|
 | `directory` | `"~/Documents/ghlang-stats"` | where to save charts |
-| `save_json` | `false` | save raw stats as JSON |
-| `save_repos` | `false` | save repo list as JSON |
-| `top_n_languages` | `5` | how many in the bar chart |
 
 ### `[preferences]`
 
@@ -324,20 +270,26 @@ Everything lives in `config.toml`:
 <!-- THEMES -->
 ## Themes
 
-ghlang comes with built-in themes for your charts:
+ghlang comes with built-in themes and *will support community themes **(soon)***:
 
-| Theme | Preview | Author |
-|-------|---------|--------|
-| `light` | ![light](assets/themes/light.png) | built-in |
-| `dark` | ![dark](assets/themes/dark.png) | built-in |
-| `monokai` | ![monokai](assets/themes/monokai.png) | built-in |
+<!-- THEMES_TABLE_START -->
+
+| Theme | Preview | Author | Description |
+|-------|---------|--------|-------------|
+| `light` | ![light](assets/themes/light.png) | built-in | Clean light theme |
+| `dark` | ![dark](assets/themes/dark.png) | built-in | Dark theme |
+| `monokai` | ![monokai](assets/themes/monokai.png) | built-in | Monokai color scheme |
+
+<!-- THEMES_TABLE_END -->
+
+**Using themes:**
 
 ```bash
-# use dark theme
+# use a theme
 ghlang github --theme dark
 ```
 
-or set it in `config.toml`:
+**Set default in `config.toml`:**
 
 ```toml
 [preferences]

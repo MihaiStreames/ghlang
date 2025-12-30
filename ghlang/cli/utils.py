@@ -20,13 +20,15 @@ def generate_charts(
     title: str | None = None,
     output: Path | None = None,
     fmt: str | None = None,
+    top_n: int = 5,
+    save_json: bool = False,
 ) -> None:
     """Load colors and generate pie/bar charts with progress"""
     with logger.progress() as progress:
         task = progress.add_task("Generating charts", total=3)
 
         progress.update(task, description="Loading language colors...")
-        colors_file = cfg.output_dir / "github_colors.json" if cfg.save_json else None
+        colors_file = cfg.output_dir / "github_colors.json" if save_json else None
         colors = load_github_colors(output_file=colors_file)
         progress.advance(task)
 
@@ -75,7 +77,7 @@ def generate_charts(
             language_stats,
             colors,
             bar_output,
-            top_n=cfg.top_n_languages,
+            top_n=top_n,
             title=title,
             theme=cfg.theme,
         )
