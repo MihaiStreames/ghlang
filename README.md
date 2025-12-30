@@ -15,7 +15,7 @@
 <!-- PROJECT LOGO -->
 <div align="center">
   <h1>
-    <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/logo-text.svg" alt="ghlang logo" width="190" />
+    <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/logo-text.svg" alt="ghlang logo" width="256" />
   </h1>
 
   <h3 align="center">See what languages you've been coding in</h3>
