@@ -18,30 +18,54 @@ class GitHubClient:
         visibility: str,
         ignored_repos: list[str],
     ):
-        self.api = "https://api.github.com"
-        self.session = requests.Session()
-        self.session.headers.update(
+        self._api = "https://api.github.com"
+        self._session = requests.Session()
+        self._session.headers.update(
             {
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/vnd.github+json",
                 "X-GitHub-Api-Version": "2022-11-28",
             }
         )
-        self.affiliation = affiliation
-        self.visibility = visibility
-        self.ignored_repos = ignored_repos
-        self.per_page = 100
+        self._affiliation = affiliation
+        self._visibility = visibility
+        self._ignored_repos = ignored_repos
+        self._per_page = 100
+        self._max_retries = 5
+        self._base_delay = 1.0
+
+    def _log_rate_limit(self, response: requests.Response) -> None:
+        """Log rate limit info"""
+        remaining = response.headers.get("X-RateLimit-Remaining")
+        limit = response.headers.get("X-RateLimit-Limit")
+
+        if remaining and limit:
+            logger.debug(f"Rate limit: {remaining}/{limit} remaining")
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
-        """Make a GET request with rate limit handling"""
-        r = self.session.get(url, params=params)
+        """Make a GET request with rate limit handling and exponential backoff"""
+        for attempt in range(self._max_retries):
+            r = self._session.get(url, params=params)
+            self._log_rate_limit(r)
 
-        if r.status_code == 403 and r.headers.get("X-RateLimit-Remaining") == "0":
-            reset = int(r.headers.get("X-RateLimit-Reset", "0"))
-            sleep_for = max(0, reset - int(time.time()) + 2)
-            logger.warning(f"Rate limited, sleeping for {sleep_for}s...")
-            time.sleep(sleep_for)
-            r = self.session.get(url, params=params)
+            if r.status_code == 403 and r.headers.get("X-RateLimit-Remaining") == "0":
+                reset = int(r.headers.get("X-RateLimit-Reset", "0"))
+                sleep_for = max(0, reset - int(time.time()) + 2)
+                logger.warning(f"Rate limit hit, waiting {sleep_for}s until reset...")
+                time.sleep(sleep_for)
+                continue
+
+            if r.status_code in (429, 500, 502, 503, 504):
+                delay = self._base_delay * (2**attempt)
+                logger.warning(
+                    f"Got {r.status_code}, retrying in {delay:.1f}s "
+                    f"(attempt {attempt + 1}/{self._max_retries})..."
+                )
+                time.sleep(delay)
+                continue
+
+            r.raise_for_status()
+            return r
 
         r.raise_for_status()
         return r
@@ -58,7 +82,7 @@ class GitHubClient:
 
     def _should_ignore_repo(self, full_name: str) -> bool:
         """Check if a repo should be ignored based on ignore patterns"""
-        for pattern in self.ignored_repos:
+        for pattern in self._ignored_repos:
             normalized = self._normalize_repo_pattern(pattern)
 
             if fnmatch.fnmatch(full_name, normalized):
@@ -68,7 +92,7 @@ class GitHubClient:
 
         return False
 
-    def list_repos(self, output_file: Path | None = None) -> list[dict]:
+    def _list_repos(self, output_file: Path | None = None) -> list[dict]:
         """List all repos accessible to the authenticated user"""
         logger.info("Fetching repos")
         repos = []
@@ -78,12 +102,12 @@ class GitHubClient:
             logger.debug(f"Fetching page {page}...")
 
             r = self._get(
-                f"{self.api}/user/repos",
+                f"{self._api}/user/repos",
                 params={
-                    "per_page": self.per_page,
+                    "per_page": self._per_page,
                     "page": page,
-                    "affiliation": self.affiliation,
-                    "visibility": self.visibility,
+                    "affiliation": self._affiliation,
+                    "visibility": self._visibility,
                     "sort": "pushed",
                     "direction": "desc",
                 },
@@ -127,10 +151,10 @@ class GitHubClient:
 
         return unique_repos
 
-    def get_repo_languages(self, full_name: str) -> dict[str, int]:
+    def _get_repo_languages(self, full_name: str) -> dict[str, int]:
         """Get language breakdown for a specific repo"""
-        r = self._get(f"{self.api}/repos/{full_name}/languages")
-        return r.json()
+        r = self._get(f"{self._api}/repos/{full_name}/languages")
+        return dict(r.json())
 
     def get_all_language_stats(
         self,
@@ -138,12 +162,12 @@ class GitHubClient:
         stats_output: Path | None = None,
     ) -> dict[str, int]:
         """Get aggregated language statistics across all repos"""
-        repos = self.list_repos(output_file=repos_output)
+        repos = self._list_repos(output_file=repos_output)
         if not repos:
             logger.warning("No repositories found, nothing to do")
             return {}
 
-        totals = defaultdict(int)
+        totals: defaultdict[str, int] = defaultdict(int)
         processed = 0
         skipped = 0
 
@@ -153,7 +177,7 @@ class GitHubClient:
             full_name = repo["full_name"]
 
             try:
-                langs = self.get_repo_languages(full_name)
+                langs = self._get_repo_languages(full_name)
 
                 for lang, bytes_count in langs.items():
                     totals[lang] += int(bytes_count)

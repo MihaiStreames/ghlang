@@ -16,8 +16,9 @@ class ClocClient:
         if shutil.which("cloc") is None:
             raise ClocNotFoundError()
 
-    def __init__(self, ignored_dirs: list[str]):
-        self.ignored_dirs = ignored_dirs
+    def __init__(self, ignored_dirs: list[str], follow_links: bool = False):
+        self._ignored_dirs = ignored_dirs
+        self._follow_links = follow_links
         self._check_cloc_installed()
 
     def _is_git_repo(self, path: Path) -> bool:
@@ -39,8 +40,11 @@ class ClocClient:
         """Build the cloc command with appropriate flags"""
         cmd = ["cloc", "--json"]
 
-        if self.ignored_dirs:
-            cmd.append(f"--exclude-dir={','.join(self.ignored_dirs)}")
+        if self._ignored_dirs:
+            cmd.append(f"--exclude-dir={','.join(self._ignored_dirs)}")
+
+        if self._follow_links:
+            cmd.append("--follow-links")
 
         if path.is_dir() and self._is_git_repo(path):
             cmd.append("--vcs=git")
@@ -50,7 +54,7 @@ class ClocClient:
 
         return cmd
 
-    def analyze_path(self, path: Path) -> dict:
+    def _analyze_path(self, path: Path) -> dict:
         """Run cloc on a file or directory and return raw JSON output"""
         path = path.resolve()
 
@@ -75,7 +79,7 @@ class ClocClient:
             )
 
         try:
-            return json.loads(result.stdout)
+            return dict(json.loads(result.stdout))
 
         except json.JSONDecodeError as e:
             logger.debug(f"Failed to parse cloc output: {result.stdout[:500]}")
@@ -89,7 +93,7 @@ class ClocClient:
         """Get language statistics for a path"""
         logger.info(f"Analyzing {path}")
 
-        raw_output = self.analyze_path(path)
+        raw_output = self._analyze_path(path)
 
         if stats_output:
             stats_output.parent.mkdir(parents=True, exist_ok=True)

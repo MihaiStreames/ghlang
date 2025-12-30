@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v205--reliability--symlinks">v2.0.5</a></li>
     <li><a href="#v204--config-command">v2.0.4</a></li>
     <li><a href="#v203--pipeline-friendly">v2.0.3</a></li>
     <li><a href="#v202--custom-titles--output">v2.0.2</a></li>
@@ -18,6 +19,28 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.5 — Reliability & symlinks
+
+Better rate limit handling and symlink support for local mode.
+
+**New stuff:**
+
+- `--follow-links` flag for local mode to follow symlinks (unix only)
+- Rate limit info shown in verbose mode (`Rate limit: X/Y remaining`)
+- Dev dependencies for type checking (`types-requests`, `types-PyYAML`)
+
+**Improved:**
+
+- GitHub API rate limiting now uses exponential backoff for 429/5xx errors
+- Retries up to 5 times with increasing delays before failing
+- Internal code cleanup: private attributes/methods where appropriate
+
+**Fixed:**
+
+- Various mypy type errors resolved
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.4 — Config command
 

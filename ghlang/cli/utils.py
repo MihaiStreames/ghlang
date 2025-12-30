@@ -1,13 +1,17 @@
 from pathlib import Path
 import sys
+from typing import TYPE_CHECKING
 
 from loguru import logger
 import typer
 
-from ghlang.config import Config
 from ghlang.visualizers import generate_bar
 from ghlang.visualizers import generate_pie
 from ghlang.visualizers import load_github_colors
+
+
+if TYPE_CHECKING:
+    from ghlang.config import Config
 
 
 def setup_logging(verbose: bool, quiet: bool = False) -> None:
@@ -26,7 +30,7 @@ def setup_logging(verbose: bool, quiet: bool = False) -> None:
 
 def generate_charts(
     language_stats: dict[str, int],
-    cfg: Config,
+    cfg: "Config",
     colors_required: bool = True,
     title: str | None = None,
     output: Path | None = None,
@@ -61,6 +65,4 @@ def generate_charts(
         bar_output = cfg.output_dir / "language_bar.png"
 
     generate_pie(language_stats, colors, pie_output, title=title)
-    generate_bar(
-        language_stats, colors, bar_output, top_n=cfg.top_n_languages, title=title
-    )
+    generate_bar(language_stats, colors, bar_output, top_n=cfg.top_n_languages, title=title)

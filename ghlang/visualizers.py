@@ -16,7 +16,7 @@ LINGUIST_LANGUAGES_URL = (
 
 def _load_cloc_mapping() -> dict[str, str | None]:
     content = resources.files("ghlang.static").joinpath("lang_mapping.json").read_text()
-    return json.loads(content)
+    return dict(json.loads(content))
 
 
 CLOC_TO_LINGUIST: dict[str, str | None] = _load_cloc_mapping()
@@ -95,7 +95,7 @@ def generate_pie(
 
     fig, ax = plt.subplots(figsize=(14, 10))
 
-    wedges, texts, autotexts = ax.pie(
+    wedges, texts, autotexts = ax.pie(  # type: ignore[misc]
         sizes,
         colors=chart_colors,
         autopct=lambda p: f"{p:.1f}%" if p >= min_percentage else "",
@@ -106,7 +106,7 @@ def generate_pie(
     for autotext in autotexts:
         autotext.set_color("white")
         autotext.set_fontsize(9)
-        autotext.set_weight("bold")
+        autotext.set_weight("bold")  # type: ignore[union-attr]
 
     legend_labels = [f"{lang} ({count / total * 100:.1f}%)" for lang, count in items]
     ax.legend(
@@ -156,7 +156,7 @@ def generate_bar(
 
     fig, ax = plt.subplots(figsize=(12, 4))
 
-    left = 0
+    left = 0.0
     bar_height = 0.6
 
     for lang, count in segments:

@@ -84,9 +84,7 @@ def github(
             "top_n_languages": top_n,
             "verbose": verbose or None,
         }
-        cfg = load_config(
-            config_path=config_path, cli_overrides=cli_overrides, require_token=True
-        )
+        cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=True)
 
     except ConfigError as e:
         logger.error(str(e))
@@ -108,14 +106,10 @@ def github(
 
         language_stats = client.get_all_language_stats(
             repos_output=(
-                cfg.output_dir / "repositories.json"
-                if cfg.save_repos and not stdout
-                else None
+                cfg.output_dir / "repositories.json" if cfg.save_repos and not stdout else None
             ),
             stats_output=(
-                cfg.output_dir / "language_stats.json"
-                if cfg.save_json and not stdout
-                else None
+                cfg.output_dir / "language_stats.json" if cfg.save_json and not stdout else None
             ),
         )
 

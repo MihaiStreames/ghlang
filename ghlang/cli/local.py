@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import sys
 
 from loguru import logger
 import typer
@@ -81,6 +82,11 @@ def local(
         "-v",
         help="Show more details",
     ),
+    follow_links: bool = typer.Option(
+        False,
+        "--follow-links",
+        help="Follow symlinks when analyzing (unix only)",
+    ),
 ) -> None:
     """Analyze local files with cloc"""
     # stdout implies quiet and json_only
@@ -94,9 +100,7 @@ def local(
             "top_n_languages": top_n,
             "verbose": verbose or None,
         }
-        cfg = load_config(
-            config_path=config_path, cli_overrides=cli_overrides, require_token=False
-        )
+        cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=False)
 
     except ConfigError as e:
         logger.error(str(e))
@@ -104,8 +108,12 @@ def local(
 
     setup_logging(cfg.verbose, quiet=quiet)
 
+    if follow_links and sys.platform == "win32":
+        logger.warning("--follow-links is not supported on Windows, ignoring")
+        follow_links = False
+
     try:
-        cloc = ClocClient(ignored_dirs=cfg.ignored_dirs)
+        cloc = ClocClient(ignored_dirs=cfg.ignored_dirs, follow_links=follow_links)
 
     except ClocNotFoundError as e:
         logger.error(str(e))
@@ -119,9 +127,7 @@ def local(
         detailed_stats = cloc.get_language_stats(
             path,
             stats_output=(
-                cfg.output_dir / "cloc_stats.json"
-                if cfg.save_json and not stdout
-                else None
+                cfg.output_dir / "cloc_stats.json" if cfg.save_json and not stdout else None
             ),
         )
         raw_stats = {

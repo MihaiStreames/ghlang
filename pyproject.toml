@@ -1,6 +1,6 @@
 [project]
 name = "ghlang"
-version = "2.0.4"
+version = "2.0.5"
 description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -11,6 +11,9 @@ dependencies = [
     "requests>=2.32.5",
     "typer>=0.21.0",
 ]
+
+[project.optional-dependencies]
+dev = ["types-requests>=2.32.4", "types-PyYAML>=6.0.12"]
 
 [project.scripts]
 ghlang = "ghlang.cli:app"
@@ -110,3 +113,7 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["ghlang.cli.local", "ghlang.cli.github"]
+disable_error_code = ["arg-type"]                  # typer stubs incorrectly type path_type

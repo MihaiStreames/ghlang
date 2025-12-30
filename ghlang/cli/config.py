@@ -21,7 +21,7 @@ def _open_in_editor(path: Path) -> None:
     elif platform.system() == "Darwin":
         subprocess.run(["open", str(path)], check=False)
     elif platform.system() == "Windows":
-        os.startfile(str(path))
+        os.startfile(str(path))  # type: ignore[attr-defined]
     else:
         subprocess.run(["xdg-open", str(path)], check=False)
 

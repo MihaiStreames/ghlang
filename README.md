@@ -210,7 +210,11 @@ Both `github` and `local` commands share the same options:
 | `--quiet` | `-q` | suppress log output (only show errors) |
 | `--verbose` | `-v` | show more details |
 
-The `local` command also takes an optional `[PATH]` argument (defaults to `.`).
+The `local` command also takes an optional `[PATH]` argument (defaults to `.`) and has one extra flag:
+
+| Flag             | What it does                              |
+|------------------|-------------------------------------------|
+| `--follow-links` | follow symlinks when analyzing (unix only) |
 
 The `config` command has its own options:
 
