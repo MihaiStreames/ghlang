@@ -5,6 +5,7 @@
 
 ![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang)
 ![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)
+![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)
 
 </div>
 
