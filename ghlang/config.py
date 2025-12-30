@@ -52,7 +52,7 @@ def create_default_config(config_path: Path) -> None:
     """Create a default config file from template"""
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
-    default_content = resources.files("ghlang").joinpath("default_config.toml").read_text()
+    default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
 
     config_path.write_text(default_content)
     logger.debug(f"Created default config at: {config_path}")
