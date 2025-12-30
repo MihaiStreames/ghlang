@@ -271,15 +271,15 @@ Everything lives in `config.toml`:
 <!-- THEMES -->
 ## Themes
 
-ghlang comes with built-in themes and *will support community themes **(soon)***:
+ghlang comes with built-in themes and supports community themes:
 
 <!-- THEMES_TABLE_START -->
 
-| Theme | Preview | Author | Description |
-|-------|---------|--------|-------------|
-| `light` | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png) | built-in | Clean light theme |
-| `dark` | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png) | built-in | Dark theme |
-| `monokai` | ![monokai](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/monokai.png) | built-in | Monokai color scheme |
+| Theme | Preview | Source |
+|-------|---------|--------|
+| `light` | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png) | built-in |
+| `dark` | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png) | built-in |
+| `monokai` | ![monokai](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/monokai.png) | community |
 
 <!-- THEMES_TABLE_END -->
 

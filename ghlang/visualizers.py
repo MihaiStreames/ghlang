@@ -9,9 +9,11 @@ from PIL import ImageDraw
 import requests
 import yaml
 
+from ghlang.config import get_config_path
 from ghlang.logging import logger
 from ghlang.static.lang_mapping import CLOC_TO_LINGUIST
 from ghlang.static.themes import THEMES
+from ghlang.themes import load_all_themes
 
 
 LINGUIST_LANGUAGES_URL: str = (
@@ -103,11 +105,15 @@ def _add_rounded_corners(img: Image.Image, radius: int = ROUNDED_CORNER_RADIUS) 
 
 
 def _get_theme(theme: str) -> dict[str, str]:
-    """Get theme colors, defaulting to light if invalid"""
-    if theme not in THEMES:
+    """Get theme colors (built-in + remote + custom), defaulting to light if invalid"""
+    config_dir = get_config_path().parent
+    all_themes = load_all_themes(config_dir)
+
+    if theme not in all_themes:
         logger.warning(f"No '{theme}' theme exists, using light instead")
         return THEMES["light"]
-    return THEMES[theme]
+
+    return all_themes[theme]
 
 
 def generate_pie(

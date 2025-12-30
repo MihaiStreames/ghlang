@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v232--community-themes">v2.3.2</a></li>
     <li><a href="#v231--bugfix--theme-support">v2.3.1</a></li>
     <li><a href="#v230--pypi--simplified-config">v2.3.0</a></li>
     <li><a href="#v220--rich-logging--config-validation">v2.2.0</a></li>
@@ -23,6 +24,29 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.3.2 — Community themes
+
+Community theme system is now fully functional. Monokai moved from built-in to community theme.
+
+**Changed:**
+
+- Moved `monokai` theme from built-in to community (fetched from GitHub manifest)
+- Charts now automatically load built-in + remote + custom themes
+- Only `light` and `dark` remain as built-in themes
+
+**New stuff:**
+
+- Created `themes/manifest.json` for community themes
+- Community themes auto-fetch with 1-day cache
+- Added contribution guide in `themes/README.md`
+
+**Improved:**
+
+- Simplified theme system architecture
+- Themes can now be added without releasing new versions
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.3.1 — Bugfix & theme support
 

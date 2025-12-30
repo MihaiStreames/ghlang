@@ -13,6 +13,7 @@ from ghlang.static.themes import THEMES
 THEME_MANIFEST_URL: str = (
     "https://raw.githubusercontent.com/MihaiStreames/ghlang/master/themes/manifest.json"
 )
+
 CACHE_TTL: timedelta = timedelta(days=1)
 
 
@@ -53,9 +54,7 @@ def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dic
         return {}
 
 
-def load_all_themes(
-    config_dir: Path, force_refresh: bool = False
-) -> dict[str, dict[str, str]]:
+def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, dict[str, str]]:
     """Load: built-in + remote + custom"""
     themes = THEMES.copy()
 
