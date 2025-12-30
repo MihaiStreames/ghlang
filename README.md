@@ -14,7 +14,7 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <img src="assets/logo.png" alt="ghlang logo" width="120" />
+  <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/logo-text.svg" alt="ghlang logo" width="156" />
   <h1>ghlang</h1>
 
   <h3 align="center">See what languages you've been coding in</h3>
@@ -56,8 +56,8 @@
 Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
 
 <div align="center">
-  <img src="assets/example_pie.png" alt="Pie chart example" width="60%" />
-  <img src="assets/example_bar.png" alt="Bar chart example" width="60%" />
+  <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/example_pie.png" alt="Pie chart example" width="60%" />
+  <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/example_bar.png" alt="Bar chart example" width="60%" />
   <p><i>my actual language stats across all repos</i></p>
 </div>
 
@@ -276,9 +276,9 @@ ghlang comes with built-in themes and *will support community themes **(soon)***
 
 | Theme | Preview | Author | Description |
 |-------|---------|--------|-------------|
-| `light` | ![light](assets/themes/light.png) | built-in | Clean light theme |
-| `dark` | ![dark](assets/themes/dark.png) | built-in | Dark theme |
-| `monokai` | ![monokai](assets/themes/monokai.png) | built-in | Monokai color scheme |
+| `light` | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png) | built-in | Clean light theme |
+| `dark` | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png) | built-in | Dark theme |
+| `monokai` | ![monokai](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/monokai.png) | built-in | Monokai color scheme |
 
 <!-- THEMES_TABLE_END -->
 
