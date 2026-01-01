@@ -1,0 +1,26 @@
+name: Welcome
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Hey, thanks for opening your first issue!
+
+            I'll take a look soon. Just make sure you've included the info in the template (OS, version, steps to reproduce).
+          pr-message: |
+            Hey, thanks for your first PR!
+
+            I'll review it soon. Just make sure you've run `uv run ruff check` and `uv run mypy`.
