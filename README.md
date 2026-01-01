@@ -3,10 +3,10 @@
 <!-- PROJECT SHIELDS -->
 <div align="center">
 
+[![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
 [![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
 [![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
 [![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
-[![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
 [![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)](https://github.com/MihaiStreames/ghlang/issues)
 

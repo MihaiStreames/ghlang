@@ -11,7 +11,7 @@ This is where community-contributed themes live. Anyone can add a theme here and
 
 Themes are just JSON with 5 color values:
 
-```json
+```jsonc
 "your_theme_name": {
   "background": "#ffffff",  // chart background
   "text": "#1a1a1a",        // main text color
