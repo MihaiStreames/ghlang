@@ -310,10 +310,6 @@ MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
 
 <div align="center">
 
-### 🌟 Found this cool?
-
-If you like ghlang, consider giving it a star :) It helps others discover the tool.
-
 Made with ❤️
 
 </div>
