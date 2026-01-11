@@ -1,12 +1,12 @@
-name: Publish to PyPI
+name: Publish to PyPI and AUR
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
-  publish:
+  pypi-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Build package
         run: uv build
@@ -32,3 +32,47 @@ jobs:
         run: uv publish
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+
+  aur-publish:
+    runs-on: ubuntu-latest
+    needs: pypi-publish
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set version
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          ./.github/workflows/scripts/update-version.sh "$VERSION"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Update sha256
+        run: ./.github/workflows/scripts/update-sha256.sh
+
+      - name: Generate SRCINFO
+        run: |
+          sudo pacman -Sy --noconfirm base-devel
+          ./.github/workflows/scripts/generate-srcinfo.sh
+
+      - name: Push to AUR
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+          AUR_REPO: "ssh://aur@aur.archlinux.org/python-ghlang.git"
+        run: |
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          cat >> ~/.ssh/config <<EOF
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/aur
+            User aur
+            StrictHostKeyChecking no
+          EOF
+
+          git clone "$AUR_REPO" aur
+          cp PKGBUILD .SRCINFO aur/
+          cd aur
+          git add PKGBUILD .SRCINFO
+          git commit -m "release $VERSION" || true
+          git push

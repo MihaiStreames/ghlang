@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--fixes--security-audit">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
     <li><a href="#v231--bugfix--theme-support">v2.3.1</a></li>
@@ -25,6 +26,16 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.3.4 — Faster GitHub processing
+
+GitHub language data now fetches way faster using concurrent requests.
+
+**Improved:**
+
+- Added concurrent processing for GitHub repository language data (~10x speedup using `ThreadPoolExecutor` with 10 workers)
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.3.3 — Fixes & security audit
 

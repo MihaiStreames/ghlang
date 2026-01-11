@@ -17,7 +17,7 @@ jobs:
       - name: Extract release notes from changelog
         run: |
           VERSION="${GITHUB_REF#refs/tags/}"
-          bash scripts/extract-changelog.sh "$VERSION" > release_notes.md
+          bash .github/workflows/scripts/extract-changelog.sh "$VERSION" > release_notes.md
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2

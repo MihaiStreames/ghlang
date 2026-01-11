@@ -1,4 +1,6 @@
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 import fnmatch
 import json
 from pathlib import Path
@@ -232,27 +234,40 @@ class GitHubClient:
         processed = 0
         skipped = 0
 
-        with logger.progress() as progress:
-            task = progress.add_task("Processing repos", total=len(repos))
+        # 10x speedup, no need for more
+        # could be made configurable later if needed
+        num_workers = min(10, len(repos))
+        logger.debug(f"Using {num_workers} concurrent workers for {len(repos)} repos")
 
-            for repo in repos:
-                full_name = repo["full_name"]
-                progress.update(task, description=f"Processing {full_name}")
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            future_to_repo = {
+                executor.submit(self._get_repo_languages, repo["full_name"]): repo for repo in repos
+            }
 
-                try:
-                    langs = self._get_repo_languages(full_name)
+            with logger.progress() as progress:
+                task = progress.add_task("Processing repos", total=len(repos))
 
-                    for lang, bytes_count in langs.items():
-                        totals[lang] += int(bytes_count)
+                for future in as_completed(future_to_repo):
+                    repo = future_to_repo[future]
+                    full_name = repo["full_name"]
 
-                    processed += 1
-                    logger.debug(f"Processed {full_name}")
+                    try:
+                        langs = future.result()
 
-                except requests.HTTPError as e:
-                    skipped += 1
-                    logger.warning(f"Skipped {full_name}: {e}")
+                        for lang, bytes_count in langs.items():
+                            totals[lang] += int(bytes_count)
 
-                progress.advance(task)
+                        processed += 1
+                        logger.debug(f"Processed {full_name}")
+
+                    except requests.HTTPError as e:
+                        skipped += 1
+                        logger.warning(f"Skipped {full_name}: {e}")
+                    except Exception as e:
+                        skipped += 1
+                        logger.warning(f"Skipped {full_name}: {e}")
+
+                    progress.advance(task)
 
         logger.success(f"Processed {processed} repositories ({skipped} skipped)")
 
