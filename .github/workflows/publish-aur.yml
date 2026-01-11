@@ -29,7 +29,10 @@ jobs:
         run: bash ./.github/workflows/scripts/update-sha256.sh
 
       - name: Generate SRCINFO
-        run: bash ./.github/workflows/scripts/generate-srcinfo.sh
+        run: |
+          useradd -m builder
+          chown -R builder:builder .
+          sudo -u builder bash ./.github/workflows/scripts/generate-srcinfo.sh
 
       - name: Push to AUR
         env:
