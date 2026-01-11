@@ -11,7 +11,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
-    <li><a href="#v233--fixes--security-audit">v2.3.3</a></li>
+    <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
     <li><a href="#v231--bugfix--theme-support">v2.3.1</a></li>
     <li><a href="#v230--pypi--simplified-config">v2.3.0</a></li>
@@ -27,6 +27,15 @@
   </ol>
 </details>
 
+## v2.3.5 — Refactoring & deduplicating
+
+**Improved:**
+
+- Refactored parts of the `cli` package
+- Extracted duplicated code out of `github` / `local`
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+
 ## v2.3.4 — Faster GitHub processing
 
 GitHub language data now fetches way faster using concurrent requests.
@@ -37,7 +46,7 @@ GitHub language data now fetches way faster using concurrent requests.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.3 — Fixes & security audit
+## v2.3.3 — Small fixes
 
 **Fixed:**
 

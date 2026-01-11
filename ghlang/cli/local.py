@@ -6,6 +6,7 @@ import typer
 
 from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import save_json_stats
 from ghlang.cli.utils import themes_autocomplete
 from ghlang.cloc_client import ClocClient
 from ghlang.config import load_config
@@ -43,16 +44,6 @@ def _get_chart_title(paths: list[Path], custom_title: str | None) -> str:
         resolved = paths[0].expanduser().resolve()
         return f"Local: {resolved.name}"
     return f"Local: {len(paths)} paths"
-
-
-def _save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
-    """Save language stats as JSON file"""
-    stats_file = output_dir / "language_stats.json"
-
-    with stats_file.open("w") as f:
-        json.dump(language_stats, f, indent=2)
-
-    logger.success(f"Saved stats to {stats_file}")
 
 
 def local(
@@ -217,7 +208,7 @@ def local(
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            _save_json_stats(language_stats, cfg.output_dir)
+            save_json_stats(language_stats, cfg.output_dir)
         else:
             generate_charts(
                 language_stats,

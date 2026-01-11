@@ -110,7 +110,6 @@ class GitHubClient:
 
     def _list_repos(self, output_file: Path | None = None) -> list[dict]:
         """List all repos accessible to the authenticated user"""
-        # TODO (#12): Add support for analyzing GitHub organizations
         logger.info("Fetching repos")
         repos = []
         page = 1

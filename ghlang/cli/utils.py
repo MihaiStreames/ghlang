@@ -40,6 +40,16 @@ def themes_autocomplete(incomplete: str) -> list[str]:
     return [t for t in themes if t.startswith(incomplete)]
 
 
+def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
+    """Save language stats as JSON file"""
+    stats_file = output_dir / "language_stats.json"
+
+    with stats_file.open("w") as f:
+        json.dump(language_stats, f, indent=2)
+
+    logger.success(f"Saved stats to {stats_file}")
+
+
 def generate_charts(
     language_stats: dict[str, int],
     cfg: "Config",

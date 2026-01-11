@@ -5,11 +5,23 @@ import typer
 
 from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import save_json_stats
 from ghlang.cli.utils import themes_autocomplete
 from ghlang.config import load_config
 from ghlang.exceptions import ConfigError
 from ghlang.github_client import GitHubClient
 from ghlang.logging import logger
+
+
+def _get_chart_title(repos: list[str] | None, custom_title: str | None) -> str:
+    """Generate chart title based on repos or custom title"""
+    if custom_title:
+        return custom_title
+    if repos and len(repos) == 1:
+        return f"GitHub: {repos[0]}"
+    if repos:
+        return f"GitHub: {len(repos)} repos"
+    return "GitHub Language Stats"
 
 
 def github(
@@ -143,26 +155,12 @@ def github(
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            stats_file = cfg.output_dir / "language_stats.json"
-
-            with stats_file.open("w") as f:
-                json.dump(language_stats, f, indent=2)
-
-            logger.success(f"Saved stats to {stats_file}")
+            save_json_stats(language_stats, cfg.output_dir)
         else:
-            if title:
-                chart_title = title
-            elif repos and len(repos) == 1:
-                chart_title = f"GitHub: {repos[0]}"
-            elif repos:
-                chart_title = f"GitHub: {len(repos)} repos"
-            else:
-                chart_title = "GitHub Language Stats"
-
             generate_charts(
                 language_stats,
                 cfg,
-                title=chart_title,
+                title=_get_chart_title(repos, title),
                 output=output,
                 fmt=fmt,
                 top_n=top_n,
