@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -16,8 +17,7 @@ jobs:
 
       - name: Set version
         run: |
-          VERSION="${{ github.ref_name }}"
-          VERSION="${VERSION#v}"
+          VERSION=$(grep -E '^version = ' pyproject.toml | cut -d'"' -f2)
           ./.github/workflows/scripts/update-version.sh "$VERSION"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
