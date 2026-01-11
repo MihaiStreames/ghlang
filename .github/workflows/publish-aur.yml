@@ -9,10 +9,14 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    container: archlinux:latest
     permissions:
       contents: read
 
     steps:
+      - name: Install dependencies
+        run: pacman -Sy --noconfirm base-devel git openssh curl
+
       - uses: actions/checkout@v6
 
       - name: Set version
@@ -25,9 +29,7 @@ jobs:
         run: bash ./.github/workflows/scripts/update-sha256.sh
 
       - name: Generate SRCINFO
-        run: |
-          sudo pacman -Sy --noconfirm base-devel
-          bash ./.github/workflows/scripts/generate-srcinfo.sh
+        run: bash ./.github/workflows/scripts/generate-srcinfo.sh
 
       - name: Push to AUR
         env:
