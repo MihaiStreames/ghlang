@@ -5,6 +5,7 @@
 
 [![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
 [![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
+[![AUR Version](https://img.shields.io/aur/version/python-ghlang?label=AUR)](https://aur.archlinux.org/packages/python-ghlang)
 [![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
 [![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
 [![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
@@ -113,6 +114,11 @@ pipx install ghlang
 
 # or with pip
 pip install ghlang
+
+# Arch Linux (AUR)
+yay -S python-ghlang
+# or
+paru -S python-ghlang
 
 # or install from source
 pip install git+https://github.com/MihaiStreames/ghlang.git
