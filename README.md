@@ -53,6 +53,7 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
@@ -96,6 +97,7 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 Getting this running is pretty straightforward.
@@ -115,9 +117,10 @@ pipx install ghlang
 # or with pip
 pip install ghlang
 
-# Arch Linux (AUR)
+# or with yay (AUR)
 yay -S python-ghlang
-# or
+
+# or with paru (AUR)
 paru -S python-ghlang
 
 # or install from source
@@ -143,6 +146,7 @@ choco install cloc
 ### Setting Up GitHub Mode
 
 1. **Get a token** from [GitHub Settings](https://github.com/settings/tokens)
+
    - Pick `repo` for private repos, or just `public_repo` for public only
 
 2. **Run it once** to create the config file:
@@ -169,44 +173,46 @@ choco install cloc
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
 ### All the Flags
 
 Both `github` and `local` commands share the same options:
 
-| Flag | Short | What it does |
-|------|-------|--------------|
-| `--config` | | use a different config file |
-| `--output-dir` | | where to save the charts (directory) |
-| `--output` | `-o` | custom output filename (creates `_pie` and `_bar` variants) |
-| `--title` | `-t` | custom chart title |
-| `--top-n` | | how many languages in the bar chart (default: 5) |
-| `--save-json` | | save raw stats as JSON files |
-| `--theme` | | chart color theme (default: light) |
-| `--format` | `-f` | output format, overrides `--output` extension (png or svg) |
-| `--json-only` | | output JSON only, skip chart generation |
-| `--stdout` | | output stats to stdout (implies `--json-only --quiet`) |
-| `--quiet` | `-q` | suppress log output (only show errors) |
-| `--verbose` | `-v` | show more details |
+| Flag           | Short | What it does                                                |
+| -------------- | ----- | ----------------------------------------------------------- |
+| `--config`     |       | use a different config file                                 |
+| `--output-dir` |       | where to save the charts (directory)                        |
+| `--output`     | `-o`  | custom output filename (creates `_pie` and `_bar` variants) |
+| `--title`      | `-t`  | custom chart title                                          |
+| `--top-n`      |       | how many languages in the bar chart (default: 5)            |
+| `--save-json`  |       | save raw stats as JSON files                                |
+| `--theme`      |       | chart color theme (default: light)                          |
+| `--format`     | `-f`  | output format, overrides `--output` extension (png or svg)  |
+| `--json-only`  |       | output JSON only, skip chart generation                     |
+| `--stdout`     |       | output stats to stdout (implies `--json-only --quiet`)      |
+| `--quiet`      | `-q`  | suppress log output (only show errors)                      |
+| `--verbose`    | `-v`  | show more details                                           |
 
 The `local` command also takes an optional `[PATH]` argument (defaults to `.`) and has one extra flag:
 
-| Flag             | What it does                              |
-|------------------|-------------------------------------------|
+| Flag             | What it does                               |
+| ---------------- | ------------------------------------------ |
 | `--follow-links` | follow symlinks when analyzing (unix only) |
 
 The `config` command has its own options:
 
-| Flag | What it does |
-|------|--------------|
+| Flag     | What it does                    |
+| -------- | ------------------------------- |
 | `--show` | print config as formatted table |
-| `--path` | print config file path |
-| `--raw` | print raw TOML contents |
+| `--path` | print config file path          |
+| `--raw`  | print raw TOML contents         |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- SHELL COMPLETION -->
+
 ## Shell Completion
 
 ghlang has built-in shell completion. To enable it:
@@ -224,67 +230,70 @@ After installing, restart your shell or source your config file.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- OUTPUT -->
+
 ## What You Get
 
 Charts end up in your output directory (`.png` by default, or `.svg` with `--format svg`):
 
-| File | What it is |
-|------|------------|
-| `language_pie.png` | pie chart with all languages |
-| `language_bar.png` | bar chart with top N languages |
-| `language_stats.json` | raw stats (with `--save-json`) |
-| `cloc_stats.json` | detailed cloc output (local mode, with `--save-json`) |
-| `repositories.json` | list of repos analyzed (GitHub mode, with `--save-json`) |
-| `github_colors.json` | language colors from GitHub (with `--save-json`) |
+| File                  | What it is                                               |
+| --------------------- | -------------------------------------------------------- |
+| `language_pie.png`    | pie chart with all languages                             |
+| `language_bar.png`    | bar chart with top N languages                           |
+| `language_stats.json` | raw stats (with `--save-json`)                           |
+| `cloc_stats.json`     | detailed cloc output (local mode, with `--save-json`)    |
+| `repositories.json`   | list of repos analyzed (GitHub mode, with `--save-json`) |
+| `github_colors.json`  | language colors from GitHub (with `--save-json`)         |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONFIGURATION -->
+
 ## Config Options
 
 Everything lives in `config.toml`:
 
 ### `[github]`
 
-| Option | Default | What it does |
-|--------|---------|--------------|
-| `token` | - | your GitHub token |
-| `affiliation` | `"owner,collaborator,organization_member"` | which repos to include |
-| `visibility` | `"all"` | `all`, `public`, or `private` |
-| `ignored_repos` | `[]` | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`) |
+| Option          | Default                                    | What it does                                                     |
+| --------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| `token`         | -                                          | your GitHub token                                                |
+| `affiliation`   | `"owner,collaborator,organization_member"` | which repos to include                                           |
+| `visibility`    | `"all"`                                    | `all`, `public`, or `private`                                    |
+| `ignored_repos` | `[]`                                       | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`) |
 
 ### `[cloc]`
 
-| Option | Default | What it does |
-|--------|---------|--------------|
+| Option         | Default                           | What it does        |
+| -------------- | --------------------------------- | ------------------- |
 | `ignored_dirs` | `["node_modules", "vendor", ...]` | directories to skip |
 
 ### `[output]`
 
-| Option | Default | What it does |
-|--------|---------|--------------|
+| Option      | Default                      | What it does         |
+| ----------- | ---------------------------- | -------------------- |
 | `directory` | `"~/Documents/ghlang-stats"` | where to save charts |
 
 ### `[preferences]`
 
-| Option | Default | What it does |
-|--------|---------|--------------|
-| `verbose` | `false` | more logging |
-| `theme` | `"light"` | chart color theme |
+| Option    | Default   | What it does      |
+| --------- | --------- | ----------------- |
+| `verbose` | `false`   | more logging      |
+| `theme`   | `"light"` | chart color theme |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- THEMES -->
+
 ## Themes
 
 ghlang comes with built-in themes and supports community themes:
 
 <!-- THEMES_TABLE_START -->
 
-| Theme | Preview | Source |
-|-------|---------|--------|
-| `light` | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png) | built-in |
-| `dark` | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png) | built-in |
+| Theme     | Preview                                                                                             | Source    |
+| --------- | --------------------------------------------------------------------------------------------------- | --------- |
+| `light`   | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png)     | built-in  |
+| `dark`    | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png)       | built-in  |
 | `monokai` | ![monokai](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/monokai.png) | community |
 
 <!-- THEMES_TABLE_END -->
@@ -306,6 +315,7 @@ theme = "dark"
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
+
 ## License
 
 MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
