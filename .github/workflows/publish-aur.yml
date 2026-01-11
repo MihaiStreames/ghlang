@@ -18,16 +18,16 @@ jobs:
       - name: Set version
         run: |
           VERSION=$(grep -E '^version = ' pyproject.toml | cut -d'"' -f2)
-          ./.github/workflows/scripts/update-version.sh "$VERSION"
+          bash ./.github/workflows/scripts/update-version.sh "$VERSION"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Update sha256
-        run: ./.github/workflows/scripts/update-sha256.sh
+        run: bash ./.github/workflows/scripts/update-sha256.sh
 
       - name: Generate SRCINFO
         run: |
           sudo pacman -Sy --noconfirm base-devel
-          ./.github/workflows/scripts/generate-srcinfo.sh
+          bash ./.github/workflows/scripts/generate-srcinfo.sh
 
       - name: Push to AUR
         env:
