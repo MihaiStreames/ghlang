@@ -2,6 +2,7 @@ from collections import defaultdict
 import fnmatch
 import json
 from pathlib import Path
+import re
 import time
 
 import requests
@@ -81,6 +82,11 @@ class GitHubClient:
 
         return pattern
 
+    def _validate_repo_name(self, repo_name: str) -> bool:
+        """Validate repo name follows owner/repo format"""
+        pattern = r"^[\w\-\.]+/[\w\-\.]+$"
+        return bool(re.match(pattern, repo_name)) and len(repo_name) <= 100
+
     def _should_ignore_repo(self, full_name: str) -> bool:
         """Check if a repo should be ignored based on ignore patterns"""
         for pattern in self._ignored_repos:
@@ -93,9 +99,15 @@ class GitHubClient:
 
         return False
 
+    def _get_repo_info(self, full_name: str) -> dict:
+        """Get repo info for a specific repo by full name (owner/repo)"""
+        if not self._validate_repo_name(full_name):
+            raise ValueError(f"Invalid repository name format: {full_name}")
+        r = self._get(f"{self._api}/repos/{full_name}")
+        return dict(r.json())
+
     def _list_repos(self, output_file: Path | None = None) -> list[dict]:
         """List all repos accessible to the authenticated user"""
-        # TODO (#11): Add --repos flag to analyze specific repos only
         # TODO (#12): Add support for analyzing GitHub organizations
         logger.info("Fetching repos")
         repos = []
@@ -162,13 +174,56 @@ class GitHubClient:
         r = self._get(f"{self._api}/repos/{full_name}/languages")
         return dict(r.json())
 
+    def _fetch_specific_repos(self, specific_repos: list[str]) -> list[dict]:
+        """Fetch repo info for a list of specific repo names"""
+        repos = []
+
+        for repo_name in specific_repos:
+            normalized = self._normalize_repo_pattern(repo_name)
+
+            try:
+                repo = self._get_repo_info(normalized)
+                repos.append(repo)
+                logger.debug(f"Found repo: {normalized}")
+
+            except ValueError as e:
+                logger.warning(str(e))
+            except requests.HTTPError as e:
+                status_code = e.response.status_code if e.response else None
+
+                if status_code == 404:
+                    logger.warning(f"Repository not found: {normalized}")
+                elif status_code == 403:
+                    logger.warning(f"Access denied to {normalized} (check permissions)")
+                else:
+                    logger.warning(f"Failed to fetch {normalized}: {e}")
+
+            except requests.RequestException as e:
+                logger.warning(f"Network error fetching {normalized}: {e}")
+
+        return repos
+
     def get_all_language_stats(
         self,
         repos_output: Path | None = None,
         stats_output: Path | None = None,
+        specific_repos: list[str] | None = None,
     ) -> dict[str, int]:
-        """Get aggregated language statistics across all repos"""
-        repos = self._list_repos(output_file=repos_output)
+        """Get aggregated language statistics across all repos or specific ones"""
+        if specific_repos:
+            logger.info(f"Fetching {len(specific_repos)} specific repos")
+            repos = self._fetch_specific_repos(specific_repos)
+
+            if repos_output:
+                repos_output.parent.mkdir(parents=True, exist_ok=True)
+
+                with repos_output.open("w") as f:
+                    json.dump(repos, f, indent=2)
+
+                logger.debug(f"Saved repository data to {repos_output}")
+        else:
+            repos = self._list_repos(output_file=repos_output)
+
         if not repos:
             logger.warning("No repositories found, nothing to do")
             return {}

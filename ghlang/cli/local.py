@@ -15,16 +15,56 @@ from ghlang.logging import logger
 from ghlang.visualizers import normalize_language_stats
 
 
+def _merge_cloc_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
+    """Merge multiple cloc stats dictionaries into one"""
+    merged: dict[str, dict] = {}
+
+    for stats in all_stats:
+        for lang, data in stats.items():
+            if lang == "_summary":
+                continue
+
+            if lang not in merged:
+                merged[lang] = {"files": 0, "blank": 0, "comment": 0, "code": 0}
+
+            merged[lang]["files"] += data.get("files", 0)
+            merged[lang]["blank"] += data.get("blank", 0)
+            merged[lang]["comment"] += data.get("comment", 0)
+            merged[lang]["code"] += data.get("code", 0)
+
+    return merged
+
+
+def _get_chart_title(paths: list[Path], custom_title: str | None) -> str:
+    """Generate chart title based on paths or custom title"""
+    if custom_title:
+        return custom_title
+    if len(paths) == 1:
+        resolved = paths[0].expanduser().resolve()
+        return f"Local: {resolved.name}"
+    return f"Local: {len(paths)} paths"
+
+
+def _save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
+    """Save language stats as JSON file"""
+    stats_file = output_dir / "language_stats.json"
+
+    with stats_file.open("w") as f:
+        json.dump(language_stats, f, indent=2)
+
+    logger.success(f"Saved stats to {stats_file}")
+
+
 def local(
-    # TODO (#8): Add support for multiple paths in one command
     # TODO (#7): Handle mixed git/non-git directory trees better
-    path: Path = typer.Argument(
-        ".",
+    paths: list[Path] | None = typer.Argument(
+        None,
         exists=True,
         file_okay=True,
         dir_okay=True,
         readable=True,
         path_type=Path,
+        help="Paths to analyze (defaults to current directory)",
     ),
     config_path: Path | None = typer.Option(
         None,
@@ -110,19 +150,22 @@ def local(
     ),
 ) -> None:
     """Analyze local files with cloc"""
+    if paths is None:
+        paths = [Path()]
+
     if stdout:
         quiet = True
         json_only = True
 
-    logger.configure(verbose, quiet=quiet)
-
     try:
+        logger.configure(verbose, quiet=quiet)
         cli_overrides = {
             "output_dir": output_dir,
             "verbose": verbose or None,
             "theme": theme,
         }
         cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=False)
+        logger.configure(cfg.verbose, quiet=quiet)
 
     except ConfigError as e:
         logger.error(str(e))
@@ -144,13 +187,25 @@ def local(
         logger.info(f"Saving to {cfg.output_dir}")
 
     try:
-        detailed_stats = cloc.get_language_stats(
-            path,
-            stats_output=(cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None),
-        )
+        all_stats: list[dict[str, dict]] = []
+
+        for i, path in enumerate(paths, start=1):
+            path_name = path.name or path.expanduser().resolve().name or "current"
+            detailed_stats = cloc.get_language_stats(
+                path,
+                stats_output=(
+                    cfg.output_dir / f"cloc_stats_{i:02d}_{path_name}.json"
+                    if save_json and not stdout and len(paths) > 1
+                    else (cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None)
+                ),
+            )
+            all_stats.append(detailed_stats)
+
+        merged_stats = _merge_cloc_stats(all_stats) if len(paths) > 1 else all_stats[0]
+
         raw_stats = {
             lang: data["code"]
-            for lang, data in detailed_stats.items()
+            for lang, data in merged_stats.items()
             if lang != "_summary" and data["code"] > 0
         }
         language_stats = normalize_language_stats(raw_stats)
@@ -162,24 +217,13 @@ def local(
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            stats_file = cfg.output_dir / "language_stats.json"
-
-            with stats_file.open("w") as f:
-                json.dump(language_stats, f, indent=2)
-
-            logger.success(f"Saved stats to {stats_file}")
+            _save_json_stats(language_stats, cfg.output_dir)
         else:
-            if title:
-                chart_title = title
-            else:
-                resolved = path.expanduser().resolve()
-                chart_title = f"Local: {resolved.name}"
-
             generate_charts(
                 language_stats,
                 cfg,
                 colors_required=False,
-                title=chart_title,
+                title=_get_chart_title(paths, title),
                 output=output,
                 fmt=fmt,
                 top_n=top_n,

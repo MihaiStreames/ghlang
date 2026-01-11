@@ -13,7 +13,10 @@ from ghlang.logging import logger
 
 
 def github(
-    # TODO (#9): Add --exclude flag to filter patterns from CLI
+    repos: list[str] | None = typer.Argument(
+        None,
+        help="Specific repos to analyze (owner/repo format, defaults to all your repos)",
+    ),
     config_path: Path | None = typer.Option(
         None,
         "--config",
@@ -97,15 +100,15 @@ def github(
         quiet = True
         json_only = True
 
-    logger.configure(verbose, quiet=quiet)
-
     try:
+        logger.configure(verbose, quiet=quiet)
         cli_overrides = {
             "output_dir": output_dir,
             "verbose": verbose or None,
             "theme": theme,
         }
         cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=True)
+        logger.configure(cfg.verbose, quiet=quiet)
 
     except ConfigError as e:
         logger.error(str(e))
@@ -130,6 +133,7 @@ def github(
             stats_output=(
                 cfg.output_dir / "language_stats.json" if save_json and not stdout else None
             ),
+            specific_repos=repos,
         )
 
         if not language_stats:
@@ -146,7 +150,15 @@ def github(
 
             logger.success(f"Saved stats to {stats_file}")
         else:
-            chart_title = title if title else "GitHub Language Stats"
+            if title:
+                chart_title = title
+            elif repos and len(repos) == 1:
+                chart_title = f"GitHub: {repos[0]}"
+            elif repos:
+                chart_title = f"GitHub: {len(repos)} repos"
+            else:
+                chart_title = "GitHub Language Stats"
+
             generate_charts(
                 language_stats,
                 cfg,

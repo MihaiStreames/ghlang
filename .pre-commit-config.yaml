@@ -1,19 +1,16 @@
 repos:
-  # Ruff linting + formatting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    rev: v0.14.11
     hooks:
       - id: ruff
         args: [--fix, --unsafe-fixes]
       - id: ruff-format
 
-  # Import sorting
   - repo: https://github.com/bwhmather/ssort
-    rev: 0.13.0
+    rev: 0.16.0
     hooks:
       - id: ssort
 
-  # Type checking
   - repo: local
     hooks:
       - id: mypy
@@ -23,9 +20,8 @@ repos:
         types: [python]
         pass_filenames: false
 
-  # General checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer

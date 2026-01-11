@@ -8,6 +8,7 @@ output/
 # Python
 .ruff_cache/
 .mypy_cache/
+.pytest_cache/
 __pycache__/
 
 .venv/

@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v233--fixes--security-audit">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
     <li><a href="#v231--bugfix--theme-support">v2.3.1</a></li>
     <li><a href="#v230--pypi--simplified-config">v2.3.0</a></li>
@@ -24,6 +25,31 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.3.3 — Fixes & security audit
+
+**Fixed:**
+
+- Skip cloc `_summary` entries when merging multi-path stats
+- Avoid malformed or colliding JSON filenames for local multi-path output
+- Configure logging before config load so config messages aren't lost
+- Validate repo names and improve GitHub API error handling
+
+**New stuff:**
+
+- Analyze specific GitHub repos by passing `owner/repo` arguments (#12 and #11)
+- Analyze multiple local paths in a single command (#8)
+
+**Improved:**
+
+- Reduced chart saving duplication with a shared save helper
+- Refactored `local()` and `get_all_language_stats()` to reduce complexity
+
+**Changed:**
+
+- Dependency updates: `pillow`, `rich`, `typer`
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.3.2 — Community themes
 

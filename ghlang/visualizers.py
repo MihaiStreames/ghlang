@@ -116,6 +116,24 @@ def _get_theme(theme: str) -> dict[str, str]:
     return all_themes[theme]
 
 
+def _save_chart(output: Path, background_color: str) -> None:
+    """Save chart to file (also apply rounded corners)"""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    is_svg = output.suffix.lower() == ".svg"
+
+    if is_svg:
+        plt.savefig(output, format="svg", bbox_inches="tight", facecolor=background_color)
+        plt.close()
+    else:
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", dpi=PNG_DPI, bbox_inches="tight", facecolor=background_color)
+        plt.close()
+        buf.seek(0)
+        img = Image.open(buf)
+        rounded = _add_rounded_corners(img)
+        rounded.save(output)
+
+
 def generate_pie(
     language_stats: dict[str, int],
     colors: dict[str, str],
@@ -128,8 +146,6 @@ def generate_pie(
     logger.debug(f"Generating pie chart with {len(language_stats)} languages...")
 
     theme_colors = _get_theme(theme)
-    is_svg = output.suffix.lower() == ".svg"
-
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
     total = sum(language_stats.values()) or 1
 
@@ -180,32 +196,7 @@ def generate_pie(
         pad=PIE_TITLE_PAD,
     )
 
-    output.parent.mkdir(parents=True, exist_ok=True)
-
-    if is_svg:
-        plt.savefig(
-            output,
-            format="svg",
-            bbox_inches="tight",
-            facecolor=theme_colors["background"],
-        )
-        plt.close()
-    else:
-        buf = io.BytesIO()
-        plt.savefig(
-            buf,
-            format="png",
-            dpi=PNG_DPI,
-            bbox_inches="tight",
-            facecolor=theme_colors["background"],
-        )
-        plt.close()
-        buf.seek(0)
-
-        img = Image.open(buf)
-        rounded = _add_rounded_corners(img)
-        rounded.save(output)
-
+    _save_chart(output, theme_colors["background"])
     logger.success(f"Saved pie chart to {output}")
 
 
@@ -222,8 +213,6 @@ def generate_bar(
     logger.debug(f"Generating segmented bar chart (top {top_n} languages)...")
 
     theme_colors = _get_theme(theme)
-    is_svg = output.suffix.lower() == ".svg"
-
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
     total = sum(language_stats.values()) or 1
 
@@ -298,30 +287,5 @@ def generate_bar(
         pad=BAR_TITLE_PAD,
     )
 
-    output.parent.mkdir(parents=True, exist_ok=True)
-
-    if is_svg:
-        plt.savefig(
-            output,
-            format="svg",
-            bbox_inches="tight",
-            facecolor=theme_colors["background"],
-        )
-        plt.close()
-    else:
-        buf = io.BytesIO()
-        plt.savefig(
-            buf,
-            format="png",
-            dpi=PNG_DPI,
-            bbox_inches="tight",
-            facecolor=theme_colors["background"],
-        )
-        plt.close()
-        buf.seek(0)
-
-        img = Image.open(buf)
-        rounded = _add_rounded_corners(img)
-        rounded.save(output)
-
+    _save_chart(output, theme_colors["background"])
     logger.success(f"Saved segmented bar chart to {output}")
