@@ -5,23 +5,15 @@ import typer
 
 from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import get_chart_title
+from ghlang.cli.utils import get_output_path
+from ghlang.cli.utils import handle_cli_errors
 from ghlang.cli.utils import save_json_stats
+from ghlang.cli.utils import setup_cli_environment
 from ghlang.cli.utils import themes_autocomplete
-from ghlang.config import load_config
 from ghlang.exceptions import ConfigError
 from ghlang.github_client import GitHubClient
 from ghlang.logging import logger
-
-
-def _get_chart_title(repos: list[str] | None, custom_title: str | None) -> str:
-    """Generate chart title based on repos or custom title"""
-    if custom_title:
-        return custom_title
-    if repos and len(repos) == 1:
-        return f"GitHub: {repos[0]}"
-    if repos:
-        return f"GitHub: {len(repos)} repos"
-    return "GitHub Language Stats"
 
 
 def github(
@@ -108,29 +100,22 @@ def github(
     ),
 ) -> None:
     """Analyze your GitHub repos"""
-    if stdout:
-        quiet = True
-        json_only = True
-
     try:
-        logger.configure(verbose, quiet=quiet)
-        cli_overrides = {
-            "output_dir": output_dir,
-            "verbose": verbose or None,
-            "theme": theme,
-        }
-        cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=True)
-        logger.configure(cfg.verbose, quiet=quiet)
+        cfg, quiet, json_only = setup_cli_environment(
+            config_path=config_path,
+            output_dir=output_dir,
+            verbose=verbose,
+            theme=theme,
+            stdout=stdout,
+            quiet=quiet,
+            require_token=True,
+        )
 
     except ConfigError as e:
         logger.error(str(e))
         raise typer.Exit(1)
 
-    if not stdout:
-        cfg.output_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Saving to {cfg.output_dir}")
-
-    try:
+    with handle_cli_errors():
         client = GitHubClient(
             token=cfg.token,
             affiliation=cfg.affiliation,
@@ -139,12 +124,8 @@ def github(
         )
 
         language_stats = client.get_all_language_stats(
-            repos_output=(
-                cfg.output_dir / "repositories.json" if save_json and not stdout else None
-            ),
-            stats_output=(
-                cfg.output_dir / "language_stats.json" if save_json and not stdout else None
-            ),
+            repos_output=get_output_path(cfg.output_dir, "repositories.json", save_json, stdout),
+            stats_output=get_output_path(cfg.output_dir, "language_stats.json", save_json, stdout),
             specific_repos=repos,
         )
 
@@ -160,15 +141,9 @@ def github(
             generate_charts(
                 language_stats,
                 cfg,
-                title=_get_chart_title(repos, title),
+                title=get_chart_title(repos, title, "GitHub"),
                 output=output,
                 fmt=fmt,
                 top_n=top_n,
                 save_json=save_json,
             )
-
-    except typer.Exit:
-        raise
-    except Exception as e:
-        logger.exception(f"Something went wrong: {e}")
-        raise typer.Exit(1)

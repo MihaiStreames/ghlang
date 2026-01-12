@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -5,6 +6,7 @@ from typing import TYPE_CHECKING
 import typer
 
 from ghlang.config import get_config_path
+from ghlang.config import load_config
 from ghlang.logging import logger
 from ghlang.static.themes import THEMES
 from ghlang.visualizers import generate_bar
@@ -14,6 +16,25 @@ from ghlang.visualizers import load_github_colors
 
 if TYPE_CHECKING:
     from ghlang.config import Config
+
+
+def get_chart_title(items: list | None, custom_title: str | None, source: str) -> str:
+    """Generate chart title based on items or custom title"""
+    if custom_title:
+        return custom_title
+
+    if items and len(items) == 1:
+        if source == "GitHub":
+            return f"GitHub: {items[0]}"
+
+        resolved = items[0].expanduser().resolve()
+        return f"Local: {resolved.name}"
+
+    if items:
+        item_type = "repos" if source == "GitHub" else "paths"
+        return f"{source}: {len(items)} {item_type}"
+
+    return f"{source} Language Stats"
 
 
 def format_autocomplete(incomplete: str) -> list[str]:
@@ -119,3 +140,62 @@ def generate_charts(
             theme=cfg.theme,
         )
         progress.advance(task)
+
+
+def get_output_path(output_dir: Path, filename: str, save_json: bool, stdout: bool) -> Path | None:
+    """Get output path for JSON files or None if not saving"""
+    if not save_json or stdout:
+        return None
+    return output_dir / filename
+
+
+def setup_cli_environment(
+    config_path: Path | None,
+    output_dir: Path | None,
+    verbose: bool,
+    theme: str | None,
+    stdout: bool,
+    quiet: bool,
+    require_token: bool,
+) -> tuple["Config", bool, bool]:
+    """Common CLI setup tasks"""
+    if stdout:
+        quiet = True
+        json_only = True
+    else:
+        json_only = False
+
+    logger.configure(verbose, quiet=quiet)
+
+    cli_overrides = {
+        "output_dir": output_dir,
+        "verbose": verbose or None,
+        "theme": theme,
+    }
+
+    cfg = load_config(
+        config_path=config_path,
+        cli_overrides=cli_overrides,
+        require_token=require_token,
+    )
+
+    logger.configure(cfg.verbose, quiet=quiet)
+
+    if not stdout:
+        cfg.output_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Saving to {cfg.output_dir}")
+
+    return cfg, quiet, json_only
+
+
+@contextmanager
+def handle_cli_errors():
+    """Context manager for handling CLI exceptions"""
+    try:
+        yield
+
+    except typer.Exit:
+        raise
+    except Exception as e:
+        logger.exception(f"Something went wrong: {e}")
+        raise typer.Exit(1)

@@ -12,6 +12,12 @@ import requests
 from ghlang.logging import logger
 
 
+DEFAULT_PER_PAGE = 100
+DEFAULT_MAX_RETRIES = 5
+DEFAULT_BASE_DELAY = 1.0
+DEFAULT_MAX_WORKERS = 10
+
+
 class GitHubClient:
     """Client for interacting with GitHub API"""
 
@@ -34,9 +40,9 @@ class GitHubClient:
         self._affiliation = affiliation
         self._visibility = visibility
         self._ignored_repos = ignored_repos
-        self._per_page = 100
-        self._max_retries = 5
-        self._base_delay = 1.0
+        self._per_page = DEFAULT_PER_PAGE
+        self._max_retries = DEFAULT_MAX_RETRIES
+        self._base_delay = DEFAULT_BASE_DELAY
 
     def _log_rate_limit(self, response: requests.Response) -> None:
         """Log rate limit info"""
@@ -48,6 +54,7 @@ class GitHubClient:
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
         """Make a GET request with rate limit handling and exponential backoff"""
+        r = None
         for attempt in range(self._max_retries):
             r = self._session.get(url, params=params)
             self._log_rate_limit(r)
@@ -71,8 +78,9 @@ class GitHubClient:
             r.raise_for_status()
             return r
 
-        r.raise_for_status()
-        return r
+        if r is not None:
+            r.raise_for_status()
+        return r  # type: ignore[return-value]
 
     def _normalize_repo_pattern(self, pattern: str) -> str:
         """Strip GitHub URL prefix from pattern if present"""
@@ -235,7 +243,7 @@ class GitHubClient:
 
         # 10x speedup, no need for more
         # could be made configurable later if needed
-        num_workers = min(10, len(repos))
+        num_workers = min(DEFAULT_MAX_WORKERS, len(repos))
         logger.debug(f"Using {num_workers} concurrent workers for {len(repos)} repos")
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:

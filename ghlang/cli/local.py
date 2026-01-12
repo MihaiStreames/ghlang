@@ -6,10 +6,13 @@ import typer
 
 from ghlang.cli.utils import format_autocomplete
 from ghlang.cli.utils import generate_charts
+from ghlang.cli.utils import get_chart_title
+from ghlang.cli.utils import get_output_path
+from ghlang.cli.utils import handle_cli_errors
 from ghlang.cli.utils import save_json_stats
+from ghlang.cli.utils import setup_cli_environment
 from ghlang.cli.utils import themes_autocomplete
 from ghlang.cloc_client import ClocClient
-from ghlang.config import load_config
 from ghlang.exceptions import ClocNotFoundError
 from ghlang.exceptions import ConfigError
 from ghlang.logging import logger
@@ -34,16 +37,6 @@ def _merge_cloc_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
             merged[lang]["code"] += data.get("code", 0)
 
     return merged
-
-
-def _get_chart_title(paths: list[Path], custom_title: str | None) -> str:
-    """Generate chart title based on paths or custom title"""
-    if custom_title:
-        return custom_title
-    if len(paths) == 1:
-        resolved = paths[0].expanduser().resolve()
-        return f"Local: {resolved.name}"
-    return f"Local: {len(paths)} paths"
 
 
 def local(
@@ -144,19 +137,16 @@ def local(
     if paths is None:
         paths = [Path()]
 
-    if stdout:
-        quiet = True
-        json_only = True
-
     try:
-        logger.configure(verbose, quiet=quiet)
-        cli_overrides = {
-            "output_dir": output_dir,
-            "verbose": verbose or None,
-            "theme": theme,
-        }
-        cfg = load_config(config_path=config_path, cli_overrides=cli_overrides, require_token=False)
-        logger.configure(cfg.verbose, quiet=quiet)
+        cfg, quiet, json_only = setup_cli_environment(
+            config_path=config_path,
+            output_dir=output_dir,
+            verbose=verbose,
+            theme=theme,
+            stdout=stdout,
+            quiet=quiet,
+            require_token=False,
+        )
 
     except ConfigError as e:
         logger.error(str(e))
@@ -173,23 +163,23 @@ def local(
         logger.error(str(e))
         raise typer.Exit(1)
 
-    if not stdout:
-        cfg.output_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Saving to {cfg.output_dir}")
-
-    try:
+    with handle_cli_errors():
         all_stats: list[dict[str, dict]] = []
 
         for i, path in enumerate(paths, start=1):
             path_name = path.name or path.expanduser().resolve().name or "current"
-            detailed_stats = cloc.get_language_stats(
-                path,
-                stats_output=(
-                    cfg.output_dir / f"cloc_stats_{i:02d}_{path_name}.json"
-                    if save_json and not stdout and len(paths) > 1
-                    else (cfg.output_dir / "cloc_stats.json" if save_json and not stdout else None)
-                ),
-            )
+            stats_output = None
+            if len(paths) > 1:
+                stats_output = get_output_path(
+                    cfg.output_dir,
+                    f"cloc_stats_{i:02d}_{path_name}.json",
+                    save_json,
+                    stdout,
+                )
+            else:
+                stats_output = get_output_path(cfg.output_dir, "cloc_stats.json", save_json, stdout)
+
+            detailed_stats = cloc.get_language_stats(path, stats_output=stats_output)
             all_stats.append(detailed_stats)
 
         merged_stats = _merge_cloc_stats(all_stats) if len(paths) > 1 else all_stats[0]
@@ -214,15 +204,9 @@ def local(
                 language_stats,
                 cfg,
                 colors_required=False,
-                title=_get_chart_title(paths, title),
+                title=get_chart_title(paths, title, "Local"),
                 output=output,
                 fmt=fmt,
                 top_n=top_n,
                 save_json=save_json,
             )
-
-    except typer.Exit:
-        raise
-    except Exception as e:
-        logger.exception(f"Something went wrong: {e}")
-        raise typer.Exit(1)

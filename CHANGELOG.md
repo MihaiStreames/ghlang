@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v235--refactoring--deduplicating">v2.3.5</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
@@ -33,6 +34,7 @@
 
 - Refactored parts of the `cli` package
 - Extracted duplicated code out of `github` / `local`
+- Centralized setting up cli environment & error handling
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
