@@ -30,17 +30,23 @@
 
 ## v3.0.0 — Tokount
 
-Introducing `tokount`, a small Rust tool that counts lines of code (like `cloc`), but about 42 times faster.
+Introducing `tokount`, a small Rust tool that counts lines of code.
 
 **New stuff:**
 
-- `tokount` Rust executable
+- `tokount`, providing a nice 42x speedup in line counting
 
 **Improved:**
 
 - Refactored parts of the `cli` package
 - Extracted duplicated code out of `github` / `local`
 - Centralized setting up cli environment & error handling
+- Better exception handling with the addition of `tokount`, errors are propagated via JSON
+
+**Changed:**
+
+- Replaced `cloc_client` with `tokount_client`
+- `config` uses `tokount` instead of `cloc`, deprecation warning added
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
