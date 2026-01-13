@@ -1,0 +1,151 @@
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+from ghlang.exceptions import TokountArgumentError
+from ghlang.exceptions import TokountError
+from ghlang.exceptions import TokountIoError
+from ghlang.exceptions import TokountNotFoundError
+from ghlang.logging import logger
+
+
+class TokountClient:
+    """Client for running tokount on local files/directories"""
+
+    def _find_tokount(self) -> str | None:
+        """Find tokount binary in PATH or common locations"""
+        bundled = Path("/usr/lib/ghlang/tokount")
+        if bundled.exists():
+            return str(bundled)
+
+        tokount = shutil.which("tokount")
+        if tokount:
+            return tokount
+
+        cargo_bin = Path.home() / ".cargo" / "bin" / "tokount"
+        if cargo_bin.exists():
+            return str(cargo_bin)
+
+        return None
+
+    def __init__(self, ignored_dirs: list[str]):
+        self._ignored_dirs = ignored_dirs
+        tokount_path = self._find_tokount()
+        if not tokount_path:
+            raise TokountNotFoundError(
+                "Couldn't find tokount... Install with: cargo install --path tokount"
+            )
+        self._tokount_path = tokount_path
+
+    def _build_tokount_command(self, path: Path) -> list[str]:
+        """Build tokount command with optional excluded dirs"""
+        cmd = [self._tokount_path, str(path.resolve())]
+
+        if self._ignored_dirs:
+            cmd.append(",".join(self._ignored_dirs))
+
+        return cmd
+
+    def _parse_tokount_error(self, stderr: str) -> TokountError | None:
+        """Parse tokount's structured JSON error output"""
+        try:
+            data = json.loads(stderr)
+        except json.JSONDecodeError:
+            return None
+
+        error = data.get("error")
+        if not isinstance(error, dict):
+            return None
+
+        message = error.get("message")
+        if not isinstance(message, str) or not message:
+            return None
+
+        kind = error.get("kind") if isinstance(error.get("kind"), str) else None
+        details = error.get("details") if isinstance(error.get("details"), dict) else None
+
+        error_map = {
+            "InvalidArgs": TokountArgumentError,
+            "NotFound": TokountNotFoundError,
+            "IoError": TokountIoError,
+        }
+
+        if kind is None:
+            exc_type = TokountError
+        else:
+            exc_type = error_map.get(kind, TokountError)
+
+        return exc_type(message, kind=kind, details=details)
+
+    def _analyze_path(self, path: Path) -> dict:
+        """Run tokount on a file or directory and return raw JSON output"""
+        cmd = self._build_tokount_command(path)
+        logger.debug(f"Running: {' '.join(cmd)}")
+
+        with logger.console.status(f"[bold]Analyzing {path}..."):
+            result = subprocess.run(
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                cwd=path if path.is_dir() else path.parent,
+            )
+
+        if result.returncode != 0:
+            logger.debug(f"tokount stderr: {result.stderr}")
+            parsed_error = self._parse_tokount_error(result.stderr)
+
+            if parsed_error:
+                raise parsed_error
+            raise subprocess.CalledProcessError(
+                result.returncode, cmd, result.stdout, result.stderr
+            )
+
+        try:
+            return dict(json.loads(result.stdout))
+
+        except json.JSONDecodeError as e:
+            logger.debug(f"Failed to parse tokount output: {result.stdout[:500]}")
+            raise ValueError(f"Invalid JSON from tokount: {e}") from e
+
+    def get_language_stats(
+        self,
+        path: Path,
+        stats_output: Path | None = None,
+    ) -> dict[str, dict]:
+        """Get language statistics for a path"""
+        logger.info(f"Analyzing {path}")
+
+        raw_output = self._analyze_path(path)
+
+        if stats_output:
+            stats_output.parent.mkdir(parents=True, exist_ok=True)
+
+            with stats_output.open("w") as f:
+                json.dump(raw_output, f, indent=2)
+
+            logger.debug(f"Saved raw tokount output to {stats_output}")
+
+        stats = {}
+        for key, value in raw_output.items():
+            if key == "SUM":
+                stats["_summary"] = {
+                    "files": value.get("nFiles", 0),
+                    "blank": value.get("blank", 0),
+                    "comment": value.get("comment", 0),
+                    "code": value.get("code", 0),
+                }
+            else:
+                stats[key] = {
+                    "files": value.get("nFiles", 0),
+                    "blank": value.get("blank", 0),
+                    "comment": value.get("comment", 0),
+                    "code": value.get("code", 0),
+                }
+
+        total_code = stats.get("_summary", {}).get("code", 0)
+        total_files = stats.get("_summary", {}).get("files", 0)
+        logger.success(f"Analyzed {total_files} files, {total_code} lines of code")
+
+        return stats

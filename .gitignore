@@ -20,6 +20,12 @@ dist/
 wheels/
 *.egg-info
 
+# Rust
+target/
+*.so
+*.dylib
+*.dll
+
 # Config
 config.toml
 .env

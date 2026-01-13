@@ -1,6 +1,6 @@
 [project]
 name = "ghlang"
-version = "2.3.4"
+version = "3.0.0"
 description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -16,7 +16,6 @@ keywords = [
     "developer-tools",
     "charts",
     "programming-languages",
-    "cloc",
     "analytics",
     "cli",
     "metrics",

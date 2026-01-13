@@ -70,12 +70,12 @@ def _print_config_table(config_path: Path) -> None:
     console.print(table)
     console.print()
 
-    # Cloc section
+    # Tokount section
     table = Table(show_header=False, box=None, padding=(0, 2))
     table.add_column("Key", style="cyan")
     table.add_column("Value")
 
-    console.print("[bold yellow]Cloc[/bold yellow]")
+    console.print("[bold yellow]Tokount[/bold yellow]")
     table.add_row("ignored_dirs", _format_value(cfg.ignored_dirs))
     console.print(table)
     console.print()

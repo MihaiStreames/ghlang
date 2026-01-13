@@ -11,7 +11,7 @@ import yaml
 
 from ghlang.config import get_config_path
 from ghlang.logging import logger
-from ghlang.static.lang_mapping import CLOC_TO_LINGUIST
+from ghlang.static.lang_mapping import TOKEI_TO_LINGUIST
 from ghlang.static.themes import THEMES
 from ghlang.themes import load_all_themes
 
@@ -72,10 +72,11 @@ def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
         return {}
 
 
-def _normalize_language(lang: str) -> str | None:
-    """Normalize cloc language name to GitHub linguist name"""
-    if lang in CLOC_TO_LINGUIST:
-        return CLOC_TO_LINGUIST[lang]
+def _normalize_language(lang: str) -> str:
+    """Normalize tokount language name to GitHub linguist name"""
+    if lang in TOKEI_TO_LINGUIST:
+        mapped = TOKEI_TO_LINGUIST[lang]
+        return mapped if mapped is not None else lang
     return lang
 
 
@@ -85,9 +86,6 @@ def normalize_language_stats(stats: dict[str, int]) -> dict[str, int]:
 
     for lang, count in stats.items():
         norm_lang = _normalize_language(lang)
-
-        if norm_lang is None:
-            norm_lang = lang
 
         normalized[norm_lang] = normalized.get(norm_lang, 0) + count
 

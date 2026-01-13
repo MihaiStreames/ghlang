@@ -24,7 +24,7 @@ DEFAULT_OUTPUT_DIR = "~/Documents/ghlang-stats"
 
 VALID_KEYS: dict[str, set[str]] = {
     "github": {"token", "affiliation", "visibility", "ignored_repos"},
-    "cloc": {"ignored_dirs"},
+    "tokount": {"ignored_dirs"},
     "output": {"directory"},
     "preferences": {"verbose", "theme"},
 }
@@ -40,7 +40,7 @@ class Config:
     visibility: str = "all"
     ignored_repos: list[str] = field(default_factory=list)
 
-    # Cloc settings
+    # Tokount settings
     ignored_dirs: list[str] = field(default_factory=lambda: DEFAULT_IGNORED_DIRS.copy())
 
     # Output settings
@@ -57,16 +57,13 @@ def get_config_path() -> Path:
         base = Path.home() / "AppData" / "Local"
     else:
         base = Path.home() / ".config"
-
     return base / "ghlang" / "config.toml"
 
 
 def create_default_config(config_path: Path) -> None:
     """Create a default config file from template"""
     config_path.parent.mkdir(parents=True, exist_ok=True)
-
     default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
-
     config_path.write_text(default_content)
     logger.debug(f"Created default config at: {config_path}")
 
@@ -74,8 +71,13 @@ def create_default_config(config_path: Path) -> None:
 def _validate_config(data: dict) -> None:
     """Warn about unknown config keys with fuzzy suggestions"""
     for section, keys in data.items():
-        if section not in VALID_KEYS:
-            suggestions = get_close_matches(section, VALID_KEYS.keys(), n=1, cutoff=0.6)
+        section_name = section
+        if section == "cloc":
+            logger.warning("Config section [cloc] is deprecated, use [tokount] instead")
+            section_name = "tokount"
+
+        if section_name not in VALID_KEYS:
+            suggestions = get_close_matches(section_name, VALID_KEYS.keys(), n=1, cutoff=0.6)
 
             if suggestions:
                 logger.warning(
@@ -88,7 +90,7 @@ def _validate_config(data: dict) -> None:
         if not isinstance(keys, dict):
             continue
 
-        valid = VALID_KEYS[section]
+        valid = VALID_KEYS[section_name]
         for key in keys:
             if key not in valid:
                 suggestions = get_close_matches(key, valid, n=1, cutoff=0.6)
@@ -128,7 +130,10 @@ def load_config(
     _validate_config(data)
 
     github = data.get("github", {})
-    cloc = data.get("cloc", {})
+    tokount = data.get("tokount")
+    if tokount is None:
+        tokount = data.get("cloc", {})
+
     output = data.get("output", {})
     preferences = data.get("preferences", {})
 
@@ -142,7 +147,7 @@ def load_config(
         affiliation=github.get("affiliation", Config.affiliation),
         visibility=github.get("visibility", Config.visibility),
         ignored_repos=github.get("ignored_repos", []),
-        ignored_dirs=cloc.get("ignored_dirs", DEFAULT_IGNORED_DIRS.copy()),
+        ignored_dirs=tokount.get("ignored_dirs", DEFAULT_IGNORED_DIRS.copy()),
         output_dir=Path(output.get("directory", DEFAULT_OUTPUT_DIR)).expanduser(),
         verbose=preferences.get("verbose", Config.verbose),
         theme=preferences.get("theme", Config.theme),

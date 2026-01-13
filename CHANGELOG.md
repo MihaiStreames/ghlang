@@ -10,7 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#v235--refactoring--deduplicating">v2.3.5</a></li>
+    <li><a href="#v300--tokount">v3.0.0</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
@@ -28,7 +28,13 @@
   </ol>
 </details>
 
-## v2.3.5 — Refactoring & deduplicating
+## v3.0.0 — Tokount
+
+Introducing `tokount`, a small Rust tool that counts lines of code (like `cloc`), but about 42 times faster.
+
+**New stuff:**
+
+- `tokount` Rust executable
 
 **Improved:**
 
