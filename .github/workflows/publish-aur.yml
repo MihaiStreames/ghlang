@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Install dependencies
-        run: pacman -Sy --noconfirm base-devel git openssh curl
+        run: pacman -Sy --noconfirm base-devel git openssh curl rust cargo
 
       - uses: actions/checkout@v6
 
@@ -28,11 +28,16 @@ jobs:
       - name: Update sha256
         run: bash ./.github/workflows/scripts/update-sha256.sh
 
-      - name: Generate SRCINFO
+      - name: Prepare build user
         run: |
           useradd -m builder
           chown -R builder:builder .
-          sudo -u builder bash ./.github/workflows/scripts/generate-srcinfo.sh
+
+      - name: Build package
+        run: sudo -u builder makepkg --syncdeps --noconfirm --cleanbuild
+
+      - name: Generate SRCINFO
+        run: sudo -u builder bash ./.github/workflows/scripts/generate-srcinfo.sh
 
       - name: Push to AUR
         env:

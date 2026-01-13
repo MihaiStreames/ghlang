@@ -13,6 +13,24 @@ repos:
 
   - repo: local
     hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: bash -c "cd tokount && cargo fmt --all -- --check"
+        language: system
+        types: [rust]
+        pass_filenames: false
+      - id: cargo-check
+        name: cargo check
+        entry: bash -c "cd tokount && cargo check"
+        language: system
+        types: [rust]
+        pass_filenames: false
+      - id: cargo-clippy
+        name: cargo clippy
+        entry: bash -c "cd tokount && cargo clippy -- -D warnings"
+        language: system
+        types: [rust]
+        pass_filenames: false
       - id: mypy
         name: mypy
         entry: uv run mypy . --check-untyped-defs
@@ -26,4 +44,3 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-      - id: check-added-large-files
