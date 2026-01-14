@@ -1,6 +1,8 @@
+from importlib import resources
 import json
 from pathlib import Path
-import shutil
+import platform
+import stat
 import subprocess
 
 from ghlang.exceptions import TokountArgumentError
@@ -8,39 +10,38 @@ from ghlang.exceptions import TokountError
 from ghlang.exceptions import TokountIoError
 from ghlang.exceptions import TokountNotFoundError
 from ghlang.logging import logger
+from ghlang.platforms import platform_tag
+from ghlang.platforms import tokount_binary_name
 
 
 class TokountClient:
     """Client for running tokount on local files/directories"""
 
-    def _find_tokount(self) -> str | None:
-        """Find tokount binary in PATH or common locations"""
-        bundled = Path("/usr/lib/ghlang/tokount")
-        if bundled.exists():
-            return str(bundled)
+    def _tokount_resource(self):
+        try:
+            tag = platform_tag()
 
-        tokount = shutil.which("tokount")
-        if tokount:
-            return tokount
+        except ValueError as exc:
+            raise TokountNotFoundError(str(exc)) from exc
 
-        cargo_bin = Path.home() / ".cargo" / "bin" / "tokount"
-        if cargo_bin.exists():
-            return str(cargo_bin)
-
-        return None
+        binary_name = tokount_binary_name()
+        return resources.files("ghlang").joinpath("_bin", tag, binary_name)
 
     def __init__(self, ignored_dirs: list[str]):
         self._ignored_dirs = ignored_dirs
-        tokount_path = self._find_tokount()
-        if not tokount_path:
-            raise TokountNotFoundError(
-                "Couldn't find tokount... Install with: cargo install --path tokount"
-            )
-        self._tokount_path = tokount_path
+        self._tokount_resource_handle = self._tokount_resource()
 
-    def _build_tokount_command(self, path: Path) -> list[str]:
+    @staticmethod
+    def _ensure_executable(tokount_path: Path) -> None:
+        if platform.system() == "Windows":
+            return
+
+        mode = tokount_path.stat().st_mode
+        tokount_path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+    def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
         """Build tokount command with optional excluded dirs"""
-        cmd = [self._tokount_path, str(path.resolve())]
+        cmd = [str(tokount_path), str(path.resolve())]
 
         if self._ignored_dirs:
             cmd.append(",".join(self._ignored_dirs))
@@ -80,17 +81,25 @@ class TokountClient:
 
     def _analyze_path(self, path: Path) -> dict:
         """Run tokount on a file or directory and return raw JSON output"""
-        cmd = self._build_tokount_command(path)
-        logger.debug(f"Running: {' '.join(cmd)}")
+        with resources.as_file(self._tokount_resource_handle) as tokount_path:
+            if not tokount_path.exists():
+                tag = platform_tag()
+                raise TokountNotFoundError(
+                    f"Bundled tokount binary for {tag} is missing at {tokount_path}"
+                )
 
-        with logger.console.status(f"[bold]Analyzing {path}..."):
-            result = subprocess.run(
-                cmd,
-                check=False,
-                capture_output=True,
-                text=True,
-                cwd=path if path.is_dir() else path.parent,
-            )
+            self._ensure_executable(tokount_path)
+            cmd = self._build_tokount_command(tokount_path, path)
+            logger.debug(f"Running: {' '.join(cmd)}")
+
+            with logger.console.status(f"[bold]Analyzing {path}..."):
+                result = subprocess.run(
+                    cmd,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    cwd=path if path.is_dir() else path.parent,
+                )
 
         if result.returncode != 0:
             logger.debug(f"tokount stderr: {result.stderr}")

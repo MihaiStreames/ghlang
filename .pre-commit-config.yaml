@@ -13,6 +13,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy . --check-untyped-defs
+        language: system
+        types: [python]
+        pass_filenames: false
       - id: cargo-fmt
         name: cargo fmt
         entry: bash -c "cd tokount && cargo fmt --all -- --check"
@@ -30,12 +36,6 @@ repos:
         entry: bash -c "cd tokount && cargo clippy -- -D warnings"
         language: system
         types: [rust]
-        pass_filenames: false
-      - id: mypy
-        name: mypy
-        entry: uv run mypy . --check-untyped-defs
-        language: system
-        types: [python]
         pass_filenames: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

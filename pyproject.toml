@@ -68,7 +68,7 @@ where = ["."]
 include = ["ghlang*"]
 
 [tool.setuptools.package-data]
-ghlang = ["static/*.toml"]
+ghlang = ["static/*.toml", "_bin/**/*"]
 
 [tool.ruff]
 line-length = 100

@@ -42,7 +42,7 @@ fn emit_error(kind: &str, message: &str, details: Option<HashMap<String, String>
     match serde_json::to_string(&payload) {
         Ok(json) => eprintln!("{json}"),
         Err(err) => {
-            eprintln!("{{\"error\":{{\"kind\":\"SerializeError\",\"message\":\"{err}\"}}}}")
+            eprintln!("{{\"error\":{{\"kind\":\"SerializeError\",\"message\":\"{err}\"}}}}");
         }
     }
 
