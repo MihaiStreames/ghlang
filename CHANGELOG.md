@@ -38,17 +38,18 @@ Introducing `tokount`, a small Rust tool that counts lines of code.
 
 **Improved:**
 
-- Refactored most of the Python code (`cli`)
+- Refactored most of the Python code (especially `cli`)
 - Extracted duplicated code out of `github` / `local`
 - Centralized setting up cli environment & error handling
-- Better exception handling with the addition of `tokount`, errors are propagated via JSON
+- Better exception handling via `tokount`, errors are propagated via JSON
 
 **Changed:**
 
 - Replaced `cloc_client` with `tokount_client`
 - `config` uses `tokount` instead of `cloc`, deprecation warning added
 - Swapped `build` with `hatchling` as it's more modern
-- Added a hatchling build hook to force platform-tagged wheels for `cibuildwheel`
+- Added a `hatchling` build hook to force platform-tagged wheels for `cibuildwheel`
+- `tokount` is bundled with the wheels per platform
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
