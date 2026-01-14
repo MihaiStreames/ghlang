@@ -4,7 +4,7 @@ import shutil
 import sys
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 
 from ghlang.platforms import platform_tag  # noqa: E402

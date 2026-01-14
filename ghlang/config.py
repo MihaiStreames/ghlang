@@ -73,7 +73,7 @@ def _validate_config(data: dict) -> None:
     for section, keys in data.items():
         section_name = section
         if section == "cloc":
-            logger.warning("Config section [cloc] is deprecated, use [tokount] instead")
+            logger.warning("Config section 'cloc' is deprecated, use 'tokount' instead")
             section_name = "tokount"
 
         if section_name not in VALID_KEYS:
