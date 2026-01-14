@@ -1,5 +1,0 @@
-include tokount/Cargo.toml
-include tokount/Cargo.lock
-recursive-include tokount/src *
-prune tokount/target
-include ghlang/static/*.toml
