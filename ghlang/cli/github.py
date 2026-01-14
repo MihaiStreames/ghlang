@@ -29,7 +29,6 @@ def github(
         dir_okay=False,
         file_okay=True,
         readable=True,
-        path_type=Path,
     ),
     output_dir: Path | None = typer.Option(
         None,
@@ -38,14 +37,12 @@ def github(
         file_okay=False,
         dir_okay=True,
         writable=True,
-        path_type=Path,
     ),
     output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
         help="Custom output path/filename",
-        path_type=Path,
     ),
     title: str | None = typer.Option(
         None,

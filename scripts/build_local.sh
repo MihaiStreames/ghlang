@@ -7,14 +7,12 @@ cd "$repo_root"
 python_bin=${PYTHON:-python}
 python_bin=$(command -v "$python_bin")
 
-uv pip install --upgrade --python "$python_bin" build
-
 cargo build --manifest-path tokount/Cargo.toml --release
 .github/workflows/scripts/copy_tokount_binary.py
 
 rm -rf dist
-"$python_bin" -m build --wheel
 
+uv build --wheel --out-dir dist --clear
 uv pip install dist/*.whl --force-reinstall
 
 "$python_bin" -c "import ghlang; print('ghlang import ok')"

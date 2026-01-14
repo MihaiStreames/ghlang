@@ -1,24 +1,22 @@
-# IDEs
+# Editors
 .vscode/
 .idea/
 
-# Outputs
-output/
+# Environment
+.env
 
 # Python
-.ruff_cache/
-.mypy_cache/
-.pytest_cache/
 __pycache__/
-
+*.py[oc]
+*.egg-info
 .venv/
 venv/
-
 build/
 dist/
-*.py[oc]
 wheels/
-*.egg-info
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # Rust
 target/
@@ -26,9 +24,11 @@ target/
 *.dylib
 *.dll
 
-# Config
-config.toml
-.env
+# Executables
+*.exe
+*.out
+*.app
+tokount
 
 # Claude
 .claude/

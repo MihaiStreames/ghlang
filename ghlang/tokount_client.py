@@ -14,30 +14,31 @@ from ghlang.platforms import platform_tag
 from ghlang.platforms import tokount_binary_name
 
 
+def _tokount_resource():
+    try:
+        tag = platform_tag()
+
+    except ValueError as exc:
+        raise TokountNotFoundError(str(exc)) from exc
+
+    binary_name = tokount_binary_name()
+    return resources.files("ghlang").joinpath("_bin", tag, binary_name)
+
+
+def _ensure_executable(tokount_path: Path) -> None:
+    if platform.system() == "Windows":
+        return
+
+    mode = tokount_path.stat().st_mode
+    tokount_path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+
 class TokountClient:
     """Client for running tokount on local files/directories"""
 
-    def _tokount_resource(self):
-        try:
-            tag = platform_tag()
-
-        except ValueError as exc:
-            raise TokountNotFoundError(str(exc)) from exc
-
-        binary_name = tokount_binary_name()
-        return resources.files("ghlang").joinpath("_bin", tag, binary_name)
-
     def __init__(self, ignored_dirs: list[str]):
         self._ignored_dirs = ignored_dirs
-        self._tokount_resource_handle = self._tokount_resource()
-
-    @staticmethod
-    def _ensure_executable(tokount_path: Path) -> None:
-        if platform.system() == "Windows":
-            return
-
-        mode = tokount_path.stat().st_mode
-        tokount_path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        self._tokount_resource_handle = _tokount_resource()
 
     def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
         """Build tokount command with optional excluded dirs"""
@@ -52,6 +53,7 @@ class TokountClient:
         """Parse tokount's structured JSON error output"""
         try:
             data = json.loads(stderr)
+
         except json.JSONDecodeError:
             return None
 
@@ -88,7 +90,7 @@ class TokountClient:
                     f"Bundled tokount binary for {tag} is missing at {tokount_path}"
                 )
 
-            self._ensure_executable(tokount_path)
+            _ensure_executable(tokount_path)
             cmd = self._build_tokount_command(tokount_path, path)
             logger.debug(f"Running: {' '.join(cmd)}")
 

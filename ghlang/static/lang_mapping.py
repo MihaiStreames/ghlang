@@ -3,6 +3,7 @@
 # Generated from `etc/tokei_names.txt` and `etc/linguist_names.txt`
 # None means no GitHub linguist equivalent
 TOKEI_TO_LINGUIST: dict[str, str | None] = {
+    # A
     ".NET Resource": None,
     "8th": None,
     "Alex": None,
@@ -17,12 +18,14 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Automake": None,
     "AWK": "Awk",
     "AXAML": None,
+    # B
     "BASH": "Shell",
     "Batch": "Batchfile",
     "Bazel": None,
     "Bean": None,
     "Bitbake": "BitBake",
     "BrightScript": "Brightscript",
+    # C
     "C Header": "C",
     "C Shell": "Tcsh",
     "C++ Header": "C++",
@@ -36,27 +39,32 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "ColdFusion CFScript": "ColdFusion CFC",
     "Coq": "Rocq Prover",
     "CUDA": "Cuda",
+    # D
     "DAML": None,
     "Device Tree": None,
     "Dream Maker": None,
     "Dust.js": None,
+    # E
     "Ebuild": None,
     "EdgeDB Schema Definition": None,
     "Edn": "edn",
     "Emacs Dev Env": None,
     "Emojicode": None,
+    # F
     "FEN": None,
     "Fish": "fish",
     "FlatBuffers Schema": None,
     "Forge Config": None,
     "FORTRAN Legacy": "Fortran",
     "FORTRAN Modern": "Fortran",
+    # G
     "GDB Script": None,
     "Gherkin (Cucumber)": None,
     "Gml": None,
     "GNU Style Assembly": "Unix Assembly",
     "Go HTML": "HTML",
     "Gwion": None,
+    # H
     "Hamlet": "Haml",
     "Happy": None,
     "Headache": None,
@@ -66,24 +74,29 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Hex2": None,
     "HICAD": None,
     "hledger": None,
+    # I
     "Intel HEX": None,
+    # J
     "JAI": "Jai",
     "Jinja2": "Jinja",
     "JSLT": None,
     "JSX": "JavaScript",
     "Julius": None,
     "Jupyter Notebooks": "Jupyter Notebook",
+    # K
     "K": None,
     "Kaem": None,
     "Kakoune script": "KakouneScript",
     "Korn shell": "Shell",
     "KV Language": None,
+    # L
     "LALRPOP": None,
     "Lauterbach PRACTICE Script": None,
     "LD Script": "Linker Script",
     "LESS": "Less",
     "Lingua Franca": None,
     "Lucius": None,
+    # M
     "M1 Assembly": "Unix Assembly",
     "Madlang": None,
     "Menhir": None,
@@ -91,8 +104,10 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Mlatu": None,
     "Module-Definition": None,
     "MSBuild": "XML",
+    # N
     "Not Quite Perl": None,
     "NuGet Config": None,
+    # P
     "Pacman's makepkg": None,
     "Pest": None,
     "Phix": None,
@@ -103,8 +118,10 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Protocol Buffers": "Protocol Buffer",
     "PRQL": None,
     "PSL Assertion": None,
+    # Q
     "Q": "q",
     "QCL": None,
+    # R
     "Rakefile": None,
     "Razor": "HTML+Razor",
     "Redscript": None,
@@ -112,17 +129,20 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "RPM Specfile": "RPM Spec",
     "Ruby HTML": "HTML+ERB",
     "Rusty Object Notation": None,
+    # S
     "Scons": None,
     "SIL": None,
     "Specman e": "E",
     "Spice Netlist": None,
     "Standard ML (SML)": "Standard ML",
     "Stratego/XT": None,
+    # T
     "TCL": "Tcl",
     "Templ": "templ",
     "Tera": "Terra",
     "The WenYan Programming Language": None,
     "TTCN-3": None,
+    # U
     "Uiua": None,
     "UMPL": None,
     "Unison": None,
@@ -134,6 +154,7 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Unreal Shader Header": None,
     "Ur/Web": "UrWeb",
     "Ur/Web Project": "UrWeb",
+    # V
     "VB6/VBA": "VBA",
     "Verilog Args File": None,
     "Virgil": None,
@@ -142,9 +163,11 @@ TOKEI_TO_LINGUIST: dict[str, str | None] = {
     "Visual Studio Solution": "Microsoft Visual Studio Solution",
     "WebGPU Shader Language": None,
     "Wolfram": "Wolfram Language",
+    # X
     "XAML": "XML",
     "Xcode Config": None,
     "XSL": None,
+    # Z
     "ZenCode": None,
     "ZoKrates": None,
     "Zsh": "Shell",

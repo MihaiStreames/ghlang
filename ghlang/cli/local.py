@@ -46,7 +46,6 @@ def local(
         file_okay=True,
         dir_okay=True,
         readable=True,
-        path_type=Path,
         help="Paths to analyze (defaults to current directory)",
     ),
     config_path: Path | None = typer.Option(
@@ -57,7 +56,6 @@ def local(
         dir_okay=False,
         file_okay=True,
         readable=True,
-        path_type=Path,
     ),
     output_dir: Path | None = typer.Option(
         None,
@@ -66,14 +64,12 @@ def local(
         file_okay=False,
         dir_okay=True,
         writable=True,
-        path_type=Path,
     ),
     output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
         help="Custom output path/filename",
-        path_type=Path,
     ),
     title: str | None = typer.Option(
         None,

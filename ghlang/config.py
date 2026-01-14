@@ -51,23 +51,6 @@ class Config:
     theme: str = "light"
 
 
-def get_config_path() -> Path:
-    """Get the platform-specific config file path"""
-    if sys.platform == "win32":
-        base = Path.home() / "AppData" / "Local"
-    else:
-        base = Path.home() / ".config"
-    return base / "ghlang" / "config.toml"
-
-
-def create_default_config(config_path: Path) -> None:
-    """Create a default config file from template"""
-    config_path.parent.mkdir(parents=True, exist_ok=True)
-    default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
-    config_path.write_text(default_content)
-    logger.debug(f"Created default config at: {config_path}")
-
-
 def _validate_config(data: dict) -> None:
     """Warn about unknown config keys with fuzzy suggestions"""
     for section, keys in data.items():
@@ -101,6 +84,23 @@ def _validate_config(data: dict) -> None:
                     )
                 else:
                     logger.warning(f"Unknown config key '{section}.{key}'")
+
+
+def get_config_path() -> Path:
+    """Get the platform-specific config file path"""
+    if sys.platform == "win32":
+        base = Path.home() / "AppData" / "Local"
+    else:
+        base = Path.home() / ".config"
+    return base / "ghlang" / "config.toml"
+
+
+def create_default_config(config_path: Path) -> None:
+    """Create a default config file from template"""
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
+    config_path.write_text(default_content)
+    logger.debug(f"Created default config at: {config_path}")
 
 
 def load_config(
