@@ -19,9 +19,8 @@ depends=(
 )
 makedepends=(
   'python-build'
+  'python-hatchling'
   'python-installer'
-  'python-setuptools'
-  'python-wheel'
 )
 source=("https://files.pythonhosted.org/packages/source/${_pypiname:0:1}/$_pypiname/$_pypiname-$pkgver.tar.gz")
 sha256sums=('0c39a744e5b08a3db090dc2d7ac85622fc419f48a4a1ad39cd4d34b32786d62b')

@@ -34,6 +34,7 @@ jobs:
           CIBW_SKIP: "*musllinux*"
           CIBW_BEFORE_BUILD: "bash .github/workflows/scripts/cibw_before_build.sh"
           CIBW_BEFORE_BUILD_WINDOWS: "powershell -ExecutionPolicy Bypass -File .github/workflows/scripts/cibw_before_build.ps1"
+          CIBW_REPAIR_WHEEL_COMMAND: ""
           CIBW_TEST_COMMAND: "python .github/workflows/scripts/wheel_smoke_test.py"
         run: python -m cibuildwheel --output-dir dist
 
