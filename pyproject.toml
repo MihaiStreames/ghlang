@@ -71,11 +71,11 @@ packages = ["ghlang"]
 include = ["ghlang/static/*.toml", "ghlang/_bin/**/*"]
 
 [tool.hatch.build.targets.sdist]
-include = ["ghlang/static/*.toml", "ghlang/_bin/**/*", "ghlang/build_hooks.py"]
+include = ["ghlang/**", "ghlang/static/*.toml", "ghlang/_bin/**/*", "ghlang/build_hooks.py"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -139,7 +139,7 @@ max-statements = 50
 
 [tool.mypy]
 python_executable = ".venv/bin/python"
-python_version = "3.13"
+python_version = "3.14"
 mypy_path = "."
 explicit_package_bases = true
 exclude = "^(build|dist)/"

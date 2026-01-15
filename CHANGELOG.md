@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v301--sdist-fix">v3.0.1</a></li>
     <li><a href="#v300--tokount">v3.0.0</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
@@ -27,6 +28,14 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v3.0.1 — sdist fix
+
+**Fixed:**
+
+- Ensure the PyPI sdist includes all package files (fixes missing `ghlang.cli` in AUR builds)
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v3.0.0 — Tokount
 

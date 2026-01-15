@@ -24,12 +24,6 @@ target/
 *.dylib
 *.dll
 
-# Executables
-*.exe
-*.out
-*.app
-tokount
-
 # Claude
 .claude/
 CLAUDE.md
