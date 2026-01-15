@@ -10,7 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#v240--tokount">v2.4.0</a></li>
+    <li><a href="#v241--tokount">v2.4.1</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
@@ -28,7 +28,7 @@
   </ol>
 </details>
 
-## v2.4.0 — Tokount
+## v2.4.1 — Tokount
 
 Introducing [`tokount`](https://github.com/MihaiStreames/tokount), a small Rust tool that counts lines of code.
 
