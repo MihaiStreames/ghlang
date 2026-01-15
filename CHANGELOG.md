@@ -10,8 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#v301--sdist-fix">v3.0.1</a></li>
-    <li><a href="#v300--tokount">v3.0.0</a></li>
+    <li><a href="#v240--tokount">v2.4.0</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
@@ -29,21 +28,14 @@
   </ol>
 </details>
 
-## v3.0.1 — sdist fix
+## v2.4.0 — Tokount
 
-**Fixed:**
-
-- Ensure the PyPI sdist includes all package files (fixes missing `ghlang.cli` in AUR builds)
-
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
-
-## v3.0.0 — Tokount
-
-Introducing `tokount`, a small Rust tool that counts lines of code.
+Introducing [`tokount`](https://github.com/MihaiStreames/tokount), a small Rust tool that counts lines of code.
 
 **New stuff:**
 
 - `tokount`, providing a nice 42x speedup in line counting
+- Automated AUR publishing on release
 
 **Improved:**
 
@@ -57,8 +49,6 @@ Introducing `tokount`, a small Rust tool that counts lines of code.
 - Replaced `cloc_client` with `tokount_client`
 - `config` uses `tokount` instead of `cloc`, deprecation warning added
 - Swapped `build` with `hatchling` as it's more modern
-- Added a `hatchling` build hook to force platform-tagged wheels for `cibuildwheel`
-- `tokount` is bundled with the wheels per platform
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
