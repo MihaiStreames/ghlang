@@ -2,4 +2,4 @@
 set -euo pipefail
 
 VERSION="$1"
-sed -i "s/^pkgver=.*/pkgver=${VERSION}/" PKGBUILD
+sed -i "s|^pkgver=.*|pkgver=${VERSION}|" PKGBUILD
