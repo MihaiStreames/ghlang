@@ -106,7 +106,7 @@ Getting this running is pretty straightforward.
 
 - Python 3.10+
 - For GitHub mode: a GitHub token
-- For local mode: tokount (bundled)
+- For local mode: [tokount](https://github.com/MihaiStreames/tokount)
 
 ### Installation
 
@@ -127,7 +127,15 @@ paru -S python-ghlang
 pip install git+https://github.com/MihaiStreames/ghlang.git
 ```
 
-For local mode, tokount is bundled with ghlang.
+For local mode, you'll also need tokount:
+
+```bash
+# with cargo
+cargo install tokount
+
+# or with yay (AUR)
+yay -S tokount
+```
 
 ### Setting Up GitHub Mode
 

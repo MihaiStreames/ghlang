@@ -38,7 +38,21 @@ class TokountArgumentError(TokountError):
 
 
 class TokountNotFoundError(TokountError):
-    """Raised when tokount cannot find a required path"""
+    """Raised when tokount binary is not found in PATH"""
+
+    def __init__(
+        self,
+        message: str | None = None,
+        kind: str | None = None,
+        details: dict[str, str] | None = None,
+    ) -> None:
+        if message is None:
+            message = (
+                "tokount not found in PATH!\n"
+                "Install it from: https://github.com/MihaiStreames/tokount\n"
+                "Or via cargo: cargo install tokount"
+            )
+        super().__init__(message, kind=kind, details=details)
 
 
 class TokountIoError(TokountError):

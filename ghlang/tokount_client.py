@@ -1,8 +1,6 @@
-from importlib import resources
 import json
 from pathlib import Path
-import platform
-import stat
+import shutil
 import subprocess
 
 from ghlang.exceptions import TokountArgumentError
@@ -10,27 +8,14 @@ from ghlang.exceptions import TokountError
 from ghlang.exceptions import TokountIoError
 from ghlang.exceptions import TokountNotFoundError
 from ghlang.logging import logger
-from ghlang.platforms import platform_tag
-from ghlang.platforms import tokount_binary_name
 
 
-def _tokount_resource():
-    try:
-        tag = platform_tag()
-
-    except ValueError as exc:
-        raise TokountNotFoundError(str(exc)) from exc
-
-    binary_name = tokount_binary_name()
-    return resources.files("ghlang").joinpath("_bin", tag, binary_name)
-
-
-def _ensure_executable(tokount_path: Path) -> None:
-    if platform.system() == "Windows":
-        return
-
-    mode = tokount_path.stat().st_mode
-    tokount_path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+def _find_tokount() -> Path:
+    """Find tokount binary in PATH"""
+    tokount_path = shutil.which("tokount")
+    if tokount_path is None:
+        raise TokountNotFoundError()
+    return Path(tokount_path)
 
 
 class TokountClient:
@@ -38,7 +23,7 @@ class TokountClient:
 
     def __init__(self, ignored_dirs: list[str]):
         self._ignored_dirs = ignored_dirs
-        self._tokount_resource_handle = _tokount_resource()
+        self._tokount_path = _find_tokount()
 
     def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
         """Build tokount command with optional excluded dirs"""
@@ -68,14 +53,14 @@ class TokountClient:
         kind = error.get("kind") if isinstance(error.get("kind"), str) else None
         details = error.get("details") if isinstance(error.get("details"), dict) else None
 
-        error_map = {
+        error_map: dict[str, type[TokountError]] = {
             "InvalidArgs": TokountArgumentError,
             "NotFound": TokountNotFoundError,
             "IoError": TokountIoError,
         }
 
         if kind is None:
-            exc_type = TokountError
+            exc_type: type[TokountError] = TokountError
         else:
             exc_type = error_map.get(kind, TokountError)
 
@@ -83,25 +68,17 @@ class TokountClient:
 
     def _analyze_path(self, path: Path) -> dict:
         """Run tokount on a file or directory and return raw JSON output"""
-        with resources.as_file(self._tokount_resource_handle) as tokount_path:
-            if not tokount_path.exists():
-                tag = platform_tag()
-                raise TokountNotFoundError(
-                    f"Bundled tokount binary for {tag} is missing at {tokount_path}"
-                )
+        cmd = self._build_tokount_command(self._tokount_path, path)
+        logger.debug(f"Running: {' '.join(cmd)}")
 
-            _ensure_executable(tokount_path)
-            cmd = self._build_tokount_command(tokount_path, path)
-            logger.debug(f"Running: {' '.join(cmd)}")
-
-            with logger.console.status(f"[bold]Analyzing {path}..."):
-                result = subprocess.run(
-                    cmd,
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    cwd=path if path.is_dir() else path.parent,
-                )
+        with logger.console.status(f"[bold]Analyzing {path}..."):
+            result = subprocess.run(
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                cwd=path if path.is_dir() else path.parent,
+            )
 
         if result.returncode != 0:
             logger.debug(f"tokount stderr: {result.stderr}")

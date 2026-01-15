@@ -19,24 +19,6 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-      - id: cargo-fmt
-        name: cargo fmt
-        entry: bash -c "cd tokount && cargo fmt --all -- --check"
-        language: system
-        types: [rust]
-        pass_filenames: false
-      - id: cargo-check
-        name: cargo check
-        entry: bash -c "cd tokount && cargo check"
-        language: system
-        types: [rust]
-        pass_filenames: false
-      - id: cargo-clippy
-        name: cargo clippy
-        entry: bash -c "cd tokount && cargo clippy -- -D warnings"
-        language: system
-        types: [rust]
-        pass_filenames: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -48,6 +30,3 @@ repos:
 ci:
   skip:
     - mypy
-    - cargo-fmt
-    - cargo-check
-    - cargo-clippy

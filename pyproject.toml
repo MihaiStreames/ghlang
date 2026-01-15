@@ -63,15 +63,11 @@ Issues = "https://github.com/MihaiStreames/ghlang/issues"
 requires = ["hatchling>=1.28.0"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build.hooks.custom]
-path = "ghlang/build_hooks.py"
-
 [tool.hatch.build.targets.wheel]
 packages = ["ghlang"]
-include = ["ghlang/static/*.toml", "ghlang/_bin/**/*"]
 
 [tool.hatch.build.targets.sdist]
-include = ["ghlang/**", "ghlang/static/*.toml", "ghlang/_bin/**/*", "ghlang/build_hooks.py"]
+include = ["ghlang/**"]
 
 [tool.ruff]
 line-length = 100

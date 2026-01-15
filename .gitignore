@@ -1,4 +1,4 @@
-# Editors
+# IDEs
 .vscode/
 .idea/
 
@@ -18,12 +18,9 @@ wheels/
 .pytest_cache/
 .ruff_cache/
 
-# Rust
-target/
-*.so
-*.dylib
-*.dll
-
 # Claude
 .claude/
 CLAUDE.md
+
+# AUR
+.SRCINFO

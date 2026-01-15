@@ -63,7 +63,7 @@ def get_chart_title(items: list | None, custom_title: str | None, source: str) -
 
 def generate_charts(
     language_stats: dict[str, int],
-    cfg: "Config",
+    cfg: Config,
     colors_required: bool = True,
     title: str | None = None,
     output: Path | None = None,
@@ -157,7 +157,7 @@ def setup_cli_environment(
     stdout: bool,
     quiet: bool,
     require_token: bool,
-) -> tuple["Config", bool, bool]:
+) -> tuple[Config, bool, bool]:
     """Common CLI setup tasks"""
     if stdout:
         quiet = True
