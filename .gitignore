@@ -21,6 +21,3 @@ wheels/
 # Claude
 .claude/
 CLAUDE.md
-
-# AUR
-.SRCINFO
