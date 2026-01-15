@@ -18,25 +18,6 @@ if TYPE_CHECKING:
     from ghlang.config import Config
 
 
-def get_chart_title(items: list | None, custom_title: str | None, source: str) -> str:
-    """Generate chart title based on items or custom title"""
-    if custom_title:
-        return custom_title
-
-    if items and len(items) == 1:
-        if source == "GitHub":
-            return f"GitHub: {items[0]}"
-
-        resolved = items[0].expanduser().resolve()
-        return f"Local: {resolved.name}"
-
-    if items:
-        item_type = "repos" if source == "GitHub" else "paths"
-        return f"{source}: {len(items)} {item_type}"
-
-    return f"{source} Language Stats"
-
-
 def format_autocomplete(incomplete: str) -> list[str]:
     """Callback for output formats"""
     return [f for f in ["png", "svg"] if f.startswith(incomplete)]
@@ -61,19 +42,28 @@ def themes_autocomplete(incomplete: str) -> list[str]:
     return [t for t in themes if t.startswith(incomplete)]
 
 
-def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
-    """Save language stats as JSON file"""
-    stats_file = output_dir / "language_stats.json"
+def get_chart_title(items: list | None, custom_title: str | None, source: str) -> str:
+    """Generate chart title based on items or custom title"""
+    if custom_title:
+        return custom_title
 
-    with stats_file.open("w") as f:
-        json.dump(language_stats, f, indent=2)
+    if items and len(items) == 1:
+        if source == "GitHub":
+            return f"GitHub: {items[0]}"
 
-    logger.success(f"Saved stats to {stats_file}")
+        resolved = items[0].expanduser().resolve()
+        return f"Local: {resolved.name}"
+
+    if items:
+        item_type = "repos" if source == "GitHub" else "paths"
+        return f"{source}: {len(items)} {item_type}"
+
+    return f"{source} Language Stats"
 
 
 def generate_charts(
     language_stats: dict[str, int],
-    cfg: "Config",
+    cfg: Config,
     colors_required: bool = True,
     title: str | None = None,
     output: Path | None = None,
@@ -142,6 +132,16 @@ def generate_charts(
         progress.advance(task)
 
 
+def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
+    """Save language stats as JSON file"""
+    stats_file = output_dir / "language_stats.json"
+
+    with stats_file.open("w") as f:
+        json.dump(language_stats, f, indent=2)
+
+    logger.success(f"Saved stats to {stats_file}")
+
+
 def get_output_path(output_dir: Path, filename: str, save_json: bool, stdout: bool) -> Path | None:
     """Get output path for JSON files or None if not saving"""
     if not save_json or stdout:
@@ -157,7 +157,7 @@ def setup_cli_environment(
     stdout: bool,
     quiet: bool,
     require_token: bool,
-) -> tuple["Config", bool, bool]:
+) -> tuple[Config, bool, bool]:
     """Common CLI setup tasks"""
     if stdout:
         quiet = True

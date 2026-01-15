@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-import sys
 
 import typer
 
@@ -12,15 +11,15 @@ from ghlang.cli.utils import handle_cli_errors
 from ghlang.cli.utils import save_json_stats
 from ghlang.cli.utils import setup_cli_environment
 from ghlang.cli.utils import themes_autocomplete
-from ghlang.cloc_client import ClocClient
-from ghlang.exceptions import ClocNotFoundError
 from ghlang.exceptions import ConfigError
+from ghlang.exceptions import TokountNotFoundError
 from ghlang.logging import logger
+from ghlang.tokount_client import TokountClient
 from ghlang.visualizers import normalize_language_stats
 
 
-def _merge_cloc_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
-    """Merge multiple cloc stats dictionaries into one"""
+def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
+    """Merge multiple stats dictionaries into one"""
     merged: dict[str, dict] = {}
 
     for stats in all_stats:
@@ -47,7 +46,6 @@ def local(
         file_okay=True,
         dir_okay=True,
         readable=True,
-        path_type=Path,
         help="Paths to analyze (defaults to current directory)",
     ),
     config_path: Path | None = typer.Option(
@@ -58,7 +56,6 @@ def local(
         dir_okay=False,
         file_okay=True,
         readable=True,
-        path_type=Path,
     ),
     output_dir: Path | None = typer.Option(
         None,
@@ -67,14 +64,12 @@ def local(
         file_okay=False,
         dir_okay=True,
         writable=True,
-        path_type=Path,
     ),
     output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
         help="Custom output path/filename",
-        path_type=Path,
     ),
     title: str | None = typer.Option(
         None,
@@ -117,7 +112,7 @@ def local(
     follow_links: bool = typer.Option(
         False,
         "--follow-links",
-        help="Follow symlinks when analyzing (unix only)",
+        help="Follow symlinks when analyzing (unix only, not yet supported by tokount)",
     ),
     theme: str | None = typer.Option(
         None,
@@ -133,7 +128,7 @@ def local(
         autocompletion=format_autocomplete,
     ),
 ) -> None:
-    """Analyze local files with cloc"""
+    """Analyze local files with tokount"""
     if paths is None:
         paths = [Path()]
 
@@ -152,14 +147,12 @@ def local(
         logger.error(str(e))
         raise typer.Exit(1)
 
-    if follow_links and sys.platform == "win32":
-        logger.warning("--follow-links is not supported on Windows, ignoring")
-        follow_links = False
-
     try:
-        cloc = ClocClient(ignored_dirs=cfg.ignored_dirs, follow_links=follow_links)
+        if follow_links:
+            logger.warning("--follow-links is not supported by tokount yet, ignoring")
+        tokount = TokountClient(ignored_dirs=cfg.ignored_dirs)
 
-    except ClocNotFoundError as e:
+    except TokountNotFoundError as e:
         logger.error(str(e))
         raise typer.Exit(1)
 
@@ -172,17 +165,19 @@ def local(
             if len(paths) > 1:
                 stats_output = get_output_path(
                     cfg.output_dir,
-                    f"cloc_stats_{i:02d}_{path_name}.json",
+                    f"tokount_stats_{i:02d}_{path_name}.json",
                     save_json,
                     stdout,
                 )
             else:
-                stats_output = get_output_path(cfg.output_dir, "cloc_stats.json", save_json, stdout)
+                stats_output = get_output_path(
+                    cfg.output_dir, "tokount_stats.json", save_json, stdout
+                )
 
-            detailed_stats = cloc.get_language_stats(path, stats_output=stats_output)
+            detailed_stats = tokount.get_language_stats(path, stats_output=stats_output)
             all_stats.append(detailed_stats)
 
-        merged_stats = _merge_cloc_stats(all_stats) if len(paths) > 1 else all_stats[0]
+        merged_stats = _merge_stats(all_stats) if len(paths) > 1 else all_stats[0]
 
         raw_stats = {
             lang: data["code"]

@@ -19,10 +19,41 @@ class MissingTokenError(ConfigError):
         super().__init__(msg)
 
 
-class ClocNotFoundError(GhlangError):
-    """Raised when cloc is not installed"""
+class TokountError(GhlangError):
+    """Raised when tokount fails"""
 
-    def __init__(self):
-        super().__init__(
-            "It seems cloc is missing...\nInstall it from: https://github.com/AlDanial/cloc"
-        )
+    def __init__(
+        self,
+        message: str,
+        kind: str | None = None,
+        details: dict[str, str] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.kind = kind
+        self.details = details or {}
+
+
+class TokountArgumentError(TokountError):
+    """Raised when tokount is called with invalid arguments"""
+
+
+class TokountNotFoundError(TokountError):
+    """Raised when tokount binary is not found in PATH"""
+
+    def __init__(
+        self,
+        message: str | None = None,
+        kind: str | None = None,
+        details: dict[str, str] | None = None,
+    ) -> None:
+        if message is None:
+            message = (
+                "tokount not found in PATH!\n"
+                "Install it from: https://github.com/MihaiStreames/tokount\n"
+                "Or via cargo: cargo install tokount"
+            )
+        super().__init__(message, kind=kind, details=details)
+
+
+class TokountIoError(TokountError):
+    """Raised when tokount encounters an IO error"""

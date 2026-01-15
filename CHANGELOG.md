@@ -10,7 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#v235--refactoring--deduplicating">v2.3.5</a></li>
+    <li><a href="#v240--tokount">v2.4.0</a></li>
     <li><a href="#v234--faster-github-processing">v2.3.4</a></li>
     <li><a href="#v233--small--fixes">v2.3.3</a></li>
     <li><a href="#v232--community-themes">v2.3.2</a></li>
@@ -28,13 +28,27 @@
   </ol>
 </details>
 
-## v2.3.5 — Refactoring & deduplicating
+## v2.4.0 — Tokount
+
+Introducing [`tokount`](https://github.com/MihaiStreames/tokount), a small Rust tool that counts lines of code.
+
+**New stuff:**
+
+- `tokount`, providing a nice 42x speedup in line counting
+- Automated AUR publishing on release
 
 **Improved:**
 
-- Refactored parts of the `cli` package
+- Refactored most of the Python code (especially `cli`)
 - Extracted duplicated code out of `github` / `local`
 - Centralized setting up cli environment & error handling
+- Better exception handling via `tokount`, errors are propagated via JSON
+
+**Changed:**
+
+- Replaced `cloc_client` with `tokount_client`
+- `config` uses `tokount` instead of `cloc`, deprecation warning added
+- Swapped `build` with `hatchling` as it's more modern
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 

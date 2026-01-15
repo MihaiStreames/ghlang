@@ -1,6 +1,6 @@
 [project]
 name = "ghlang"
-version = "2.3.4"
+version = "2.4.0"
 description = "Generate language statistics and visualizations from GitHub repositories or local files"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -16,7 +16,6 @@ keywords = [
     "developer-tools",
     "charts",
     "programming-languages",
-    "cloc",
     "analytics",
     "cli",
     "metrics",
@@ -49,7 +48,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "types-requests>=2.32.4.20260107",
-    "types-PyYAML>=6.0.12.20250915"
+    "types-PyYAML>=6.0.12.20250915",
 ]
 
 [project.scripts]
@@ -61,19 +60,18 @@ Repository = "https://github.com/MihaiStreames/ghlang"
 Issues = "https://github.com/MihaiStreames/ghlang/issues"
 
 [build-system]
-requires = ["setuptools>=80.9.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.28.0"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["ghlang*"]
+[tool.hatch.build.targets.wheel]
+packages = ["ghlang"]
 
-[tool.setuptools.package-data]
-ghlang = ["static/*.toml"]
+[tool.hatch.build.targets.sdist]
+include = ["ghlang/**"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -137,9 +135,10 @@ max-statements = 50
 
 [tool.mypy]
 python_executable = ".venv/bin/python"
-python_version = "3.13"
+python_version = "3.14"
 mypy_path = "."
 explicit_package_bases = true
+exclude = "^(build|dist)/"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
@@ -150,7 +149,3 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 strict_equality = true
-
-[[tool.mypy.overrides]]
-module = ["ghlang.cli.local", "ghlang.cli.github"]
-disable_error_code = ["arg-type"]                  # typer stubs incorrectly type path_type

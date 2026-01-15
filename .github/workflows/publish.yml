@@ -1,0 +1,93 @@
+name: Build and Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    outputs:
+      sha256: ${{ steps.sha.outputs.sha256 }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build wheel and sdist
+        run: uv build --out-dir dist
+
+      - name: Calculate SHA256
+        id: sha
+        run: ./.github/workflows/scripts/update-sha256.sh
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+  publish_pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+          password: ${{ secrets.PYPI_TOKEN }}
+
+  publish_aur:
+    name: Publish to AUR
+    runs-on: ubuntu-latest
+    needs: [build, publish_pypi]
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update PKGBUILD version
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          ./.github/workflows/scripts/update-version.sh "$VERSION"
+
+      - name: Update PKGBUILD sha256
+        run: |
+          sed -i "s/^sha256sums=.*/sha256sums=('${{ needs.build.outputs.sha256 }}')/" PKGBUILD
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        with:
+          pkgname: python-ghlang
+          pkgbuild: PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to ${{ github.ref_name }}"
+          assets: .SRCINFO
+          post_process: makepkg --printsrcinfo > .SRCINFO

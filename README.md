@@ -65,7 +65,7 @@ Ever wondered what languages you actually use? **ghlang** makes pretty charts to
 </div>
 
 - **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
-- **Local mode**: Analyzes files on your machine using [cloc](https://github.com/AlDanial/cloc) (counts lines)
+- **Local mode**: Analyzes files on your machine using tokount (counts lines)
 
 ### Why ghlang?
 
@@ -92,7 +92,7 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 - [Pillow](https://python-pillow.org/)
 - [Requests](https://requests.readthedocs.io/)
 - [Rich](https://github.com/Textualize/rich)
-- [cloc](https://github.com/AlDanial/cloc) (for local analysis)
+- tokount (for local analysis)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -106,7 +106,7 @@ Getting this running is pretty straightforward.
 
 - Python 3.10+
 - For GitHub mode: a GitHub token
-- For local mode: [cloc](https://github.com/AlDanial/cloc)
+- For local mode: [tokount](https://github.com/MihaiStreames/tokount)
 
 ### Installation
 
@@ -127,20 +127,14 @@ paru -S python-ghlang
 pip install git+https://github.com/MihaiStreames/ghlang.git
 ```
 
-For local mode, you'll also need cloc:
+For local mode, you'll also need tokount:
 
 ```bash
-# Arch
-pacman -S cloc
+# with cargo
+cargo install tokount
 
-# Ubuntu/Debian
-apt install cloc
-
-# macOS
-brew install cloc
-
-# Windows
-choco install cloc
+# or with yay (AUR)
+yay -S tokount
 ```
 
 ### Setting Up GitHub Mode
@@ -240,7 +234,7 @@ Charts end up in your output directory (`.png` by default, or `.svg` with `--for
 | `language_pie.png`    | pie chart with all languages                             |
 | `language_bar.png`    | bar chart with top N languages                           |
 | `language_stats.json` | raw stats (with `--save-json`)                           |
-| `cloc_stats.json`     | detailed cloc output (local mode, with `--save-json`)    |
+| `tokount_stats.json`  | detailed tokount output (local mode, with `--save-json`) |
 | `repositories.json`   | list of repos analyzed (GitHub mode, with `--save-json`) |
 | `github_colors.json`  | language colors from GitHub (with `--save-json`)         |
 
@@ -261,7 +255,7 @@ Everything lives in `config.toml`:
 | `visibility`    | `"all"`                                    | `all`, `public`, or `private`                                    |
 | `ignored_repos` | `[]`                                       | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`) |
 
-### `[cloc]`
+### `[tokount]`
 
 | Option         | Default                           | What it does        |
 | -------------- | --------------------------------- | ------------------- |

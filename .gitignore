@@ -2,28 +2,25 @@
 .vscode/
 .idea/
 
-# Outputs
-output/
+# Environment
+.env
 
 # Python
-.ruff_cache/
-.mypy_cache/
-.pytest_cache/
 __pycache__/
-
+*.py[oc]
+*.egg-info
 .venv/
 venv/
-
 build/
 dist/
-*.py[oc]
 wheels/
-*.egg-info
-
-# Config
-config.toml
-.env
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # Claude
 .claude/
 CLAUDE.md
+
+# AUR
+.SRCINFO

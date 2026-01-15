@@ -11,7 +11,7 @@ import yaml
 
 from ghlang.config import get_config_path
 from ghlang.logging import logger
-from ghlang.static.lang_mapping import CLOC_TO_LINGUIST
+from ghlang.static.lang_mapping import TOKEI_TO_LINGUIST
 from ghlang.static.themes import THEMES
 from ghlang.themes import load_all_themes
 
@@ -41,41 +41,11 @@ BAR_LEGEND_FONTSIZE: int = 10
 BAR_LEGEND_NCOL: int = 3
 
 
-def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
-    """Fetch GitHub's language colors from linguist YAML"""
-    logger.info("Grabbing language colors from GitHub")
-
-    try:
-        r = requests.get(LINGUIST_LANGUAGES_URL, timeout=10)
-        r.raise_for_status()
-        data = yaml.safe_load(r.text)
-        colors = {}
-
-        for lang, props in data.items():
-            if isinstance(props, dict) and "color" in props:
-                colors[lang] = props["color"]
-
-        logger.success(f"Loaded {len(colors)} language colors")
-
-        if output_file:
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-
-            with output_file.open("w") as f:
-                json.dump(colors, f, indent=2)
-
-            logger.debug(f"Saved color data to {output_file}")
-
-        return colors
-
-    except Exception as e:
-        logger.warning(f"Couldn't load GitHub colors: {e}")
-        return {}
-
-
-def _normalize_language(lang: str) -> str | None:
-    """Normalize cloc language name to GitHub linguist name"""
-    if lang in CLOC_TO_LINGUIST:
-        return CLOC_TO_LINGUIST[lang]
+def _normalize_language(lang: str) -> str:
+    """Normalize tokount language name to GitHub linguist name"""
+    if lang in TOKEI_TO_LINGUIST:
+        mapped = TOKEI_TO_LINGUIST[lang]
+        return mapped if mapped is not None else lang
     return lang
 
 
@@ -85,9 +55,6 @@ def normalize_language_stats(stats: dict[str, int]) -> dict[str, int]:
 
     for lang, count in stats.items():
         norm_lang = _normalize_language(lang)
-
-        if norm_lang is None:
-            norm_lang = lang
 
         normalized[norm_lang] = normalized.get(norm_lang, 0) + count
 
@@ -132,6 +99,37 @@ def _save_chart(output: Path, background_color: str) -> None:
         img = Image.open(buf)
         rounded = _add_rounded_corners(img)
         rounded.save(output)
+
+
+def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
+    """Fetch GitHub's language colors from linguist YAML"""
+    logger.info("Grabbing language colors from GitHub")
+
+    try:
+        r = requests.get(LINGUIST_LANGUAGES_URL, timeout=10)
+        r.raise_for_status()
+        data = yaml.safe_load(r.text)
+        colors = {}
+
+        for lang, props in data.items():
+            if isinstance(props, dict) and "color" in props:
+                colors[lang] = props["color"]
+
+        logger.success(f"Loaded {len(colors)} language colors")
+
+        if output_file:
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+
+            with output_file.open("w") as f:
+                json.dump(colors, f, indent=2)
+
+            logger.debug(f"Saved color data to {output_file}")
+
+        return colors
+
+    except Exception as e:
+        logger.warning(f"Couldn't load GitHub colors: {e}")
+        return {}
 
 
 def generate_pie(

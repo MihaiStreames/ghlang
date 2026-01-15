@@ -2,11 +2,9 @@
 token = "YOUR_TOKEN_HERE"
 affiliation = "owner,collaborator,organization_member"
 visibility = "all"
-# globs like "org/*" or URLs like "https://github.com/user/repo"
 ignored_repos = []
 
-[cloc]
-# patterns to ignore directories
+[tokount]
 ignored_dirs = [
     "node_modules",
     "vendor",
@@ -23,4 +21,4 @@ directory = "~/Documents/ghlang-stats"
 
 [preferences]
 verbose = false
-theme = "light" # built-in: "light", "dark"
+theme = "light"
