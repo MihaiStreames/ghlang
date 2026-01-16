@@ -92,7 +92,7 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 - [Pillow](https://python-pillow.org/)
 - [Requests](https://requests.readthedocs.io/)
 - [Rich](https://github.com/Textualize/rich)
-- tokount (for local analysis)
+- [tokount](https://github.com/MihaiStreames/tokount) (for local analysis)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -106,7 +106,7 @@ Getting this running is pretty straightforward.
 
 - Python 3.10+
 - For GitHub mode: a GitHub token
-- For local mode: [tokount](https://github.com/MihaiStreames/tokount)
+- For local mode: `tokount`
 
 ### Installation
 
@@ -127,7 +127,7 @@ paru -S python-ghlang
 pip install git+https://github.com/MihaiStreames/ghlang.git
 ```
 
-For local mode, you'll also need tokount:
+For local mode, you'll also need `tokount`:
 
 ```bash
 # with cargo
