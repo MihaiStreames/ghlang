@@ -10,7 +10,6 @@
 [![codecov](https://codecov.io/gh/MihaiStreames/ghlang/graph/badge.svg)](https://codecov.io/gh/MihaiStreames/ghlang)
 [![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
 [![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
-[![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)](https://github.com/MihaiStreames/ghlang/issues)
 
 </div>
 
