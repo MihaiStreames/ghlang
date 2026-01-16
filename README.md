@@ -7,6 +7,7 @@
 [![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
 [![AUR Version](https://img.shields.io/aur/version/python-ghlang?label=AUR)](https://aur.archlinux.org/packages/python-ghlang)
 [![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
+[![codecov](https://codecov.io/gh/MihaiStreames/ghlang/graph/badge.svg)](https://codecov.io/gh/MihaiStreames/ghlang)
 [![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
 [![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/MihaiStreames/ghlang?label=Issues)](https://github.com/MihaiStreames/ghlang/issues)
