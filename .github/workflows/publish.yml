@@ -81,7 +81,7 @@ jobs:
           sed -i "s/^sha256sums=.*/sha256sums=('${{ needs.build.outputs.sha256 }}')/" PKGBUILD
 
       - name: Publish to AUR
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
           pkgname: python-ghlang
           pkgbuild: PKGBUILD
