@@ -1,6 +1,10 @@
 from pathlib import Path
+import tomllib
 
 import pytest
+
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -13,31 +17,12 @@ def tmp_config(tmp_path: Path) -> Path:
 @pytest.fixture
 def valid_config_content() -> str:
     """Valid TOML config content"""
-    return
-    """
-    [github]
-    token = "ghp_test_token_12345"
-    affiliation = "owner"
-    visibility = "public"
-    ignored_repos = ["test-repo", "another-repo"]
-
-    [tokount]
-    ignored_dirs = ["node_modules", ".git"]
-
-    [output]
-    directory = "~/test-output"
-
-    [preferences]
-    verbose = true
-    theme = "dark"
-    """
+    configs = tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    return configs["valid"]["content"]
 
 
 @pytest.fixture
 def minimal_config_content() -> str:
     """Minimal valid config with just a token"""
-    return
-    """
-    [github]
-    token = "ghp_test_token_12345"
-    """
+    configs = tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    return configs["minimal"]["content"]
