@@ -1,5 +1,3 @@
-"""Tests for config loading and validation"""
-
 from pathlib import Path
 
 import pytest
@@ -151,13 +149,15 @@ class TestLoadConfig:
 
     def test_output_dir_expanded(self, tmp_config: Path):
         """Output directory with ~ should be expanded"""
-        tmp_config.write_text("""
-[github]
-token = "test_token"
+        tmp_config.write_text(
+            """
+        [github]
+        token = "test_token"
 
-[output]
-directory = "~/my-output"
-""")
+        [output]
+        directory = "~/my-output"
+        """
+        )
 
         config = load_config(config_path=tmp_config)
 

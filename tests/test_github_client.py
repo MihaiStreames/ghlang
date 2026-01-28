@@ -1,5 +1,3 @@
-"""Tests for GitHub client"""
-
 import json
 from pathlib import Path
 from unittest.mock import MagicMock
