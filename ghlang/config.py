@@ -41,7 +41,7 @@ class Config:
     ignored_repos: list[str] = field(default_factory=list)
 
     # Tokount settings
-    ignored_dirs: list[str] = field(default_factory=lambda: DEFAULT_IGNORED_DIRS.copy())
+    ignored_dirs: list[str] = field(default_factory=DEFAULT_IGNORED_DIRS.copy)
 
     # Output settings
     output_dir: Path = field(default_factory=lambda: Path(DEFAULT_OUTPUT_DIR))
