@@ -9,11 +9,11 @@ from PIL import ImageDraw
 import requests
 import yaml
 
-from ghlang.config import get_config_path
-from ghlang.logging import logger
-from ghlang.static.lang_mapping import TOKEI_TO_LINGUIST
-from ghlang.static.themes import THEMES
-from ghlang.themes import load_all_themes
+from .config import get_config_path
+from .logging import logger
+from .static.lang_mapping import TOKEI_TO_LINGUIST
+from .static.themes import THEMES
+from .themes import load_all_themes
 
 
 LINGUIST_LANGUAGES_URL: str = (

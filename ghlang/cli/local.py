@@ -3,19 +3,20 @@ from pathlib import Path
 
 import typer
 
-from ghlang.cli.utils import format_autocomplete
-from ghlang.cli.utils import generate_charts
-from ghlang.cli.utils import get_chart_title
-from ghlang.cli.utils import get_output_path
-from ghlang.cli.utils import handle_cli_errors
-from ghlang.cli.utils import save_json_stats
-from ghlang.cli.utils import setup_cli_environment
-from ghlang.cli.utils import themes_autocomplete
 from ghlang.exceptions import ConfigError
 from ghlang.exceptions import TokountNotFoundError
 from ghlang.logging import logger
 from ghlang.tokount_client import TokountClient
 from ghlang.visualizers import normalize_language_stats
+
+from .utils import format_autocomplete
+from .utils import generate_charts
+from .utils import get_chart_title
+from .utils import get_output_path
+from .utils import handle_cli_errors
+from .utils import save_json_stats
+from .utils import setup_cli_environment
+from .utils import themes_autocomplete
 
 
 def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:

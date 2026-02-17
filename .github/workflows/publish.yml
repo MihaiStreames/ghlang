@@ -32,7 +32,7 @@ jobs:
 
       - name: Calculate SHA256
         id: sha
-        run: ./.github/workflows/scripts/update-sha256.sh
+        run: ./.github/workflows/scripts/update_sha256.sh
 
       - name: Upload distributions
         uses: actions/upload-artifact@v6
@@ -74,7 +74,7 @@ jobs:
       - name: Update PKGBUILD version
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
-          ./.github/workflows/scripts/update-version.sh "$VERSION"
+          ./.github/workflows/scripts/update_version.sh "$VERSION"
 
       - name: Update PKGBUILD sha256
         run: |

@@ -6,9 +6,9 @@ from pathlib import Path
 import sys
 import tomllib
 
-from ghlang.exceptions import ConfigError
-from ghlang.exceptions import MissingTokenError
-from ghlang.logging import logger
+from .exceptions import ConfigError
+from .exceptions import MissingTokenError
+from .logging import logger
 
 
 DEFAULT_IGNORED_DIRS = [

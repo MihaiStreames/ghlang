@@ -1,9 +1,10 @@
 import typer
 
 from ghlang import __version__
-from ghlang.cli.config import config
-from ghlang.cli.github import github
-from ghlang.cli.local import local
+
+from .config import config
+from .github import github
+from .local import local
 
 
 app = typer.Typer(help="See what languages you've been coding in", add_completion=True)

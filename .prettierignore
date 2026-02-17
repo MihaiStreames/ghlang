@@ -1,0 +1,10 @@
+dist/
+*.egg-info/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+*.py
+*.sh
+PKGBUILD
+.SRCINFO
+uv.lock

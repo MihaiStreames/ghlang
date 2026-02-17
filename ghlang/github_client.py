@@ -9,7 +9,7 @@ import time
 
 import requests
 
-from ghlang.logging import logger
+from .logging import logger
 
 
 DEFAULT_PER_PAGE = 100

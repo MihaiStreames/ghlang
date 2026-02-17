@@ -6,8 +6,8 @@ from typing import cast
 
 import requests
 
-from ghlang.logging import logger
-from ghlang.static.themes import THEMES
+from .logging import logger
+from .static.themes import THEMES
 
 
 THEME_MANIFEST_URL: str = (

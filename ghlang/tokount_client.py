@@ -3,11 +3,11 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from ghlang.exceptions import TokountArgumentError
-from ghlang.exceptions import TokountError
-from ghlang.exceptions import TokountIoError
-from ghlang.exceptions import TokountNotFoundError
-from ghlang.logging import logger
+from .exceptions import TokountArgumentError
+from .exceptions import TokountError
+from .exceptions import TokountIoError
+from .exceptions import TokountNotFoundError
+from .logging import logger
 
 
 def _find_tokount() -> Path:

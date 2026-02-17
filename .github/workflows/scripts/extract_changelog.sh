@@ -15,6 +15,6 @@ awk -v ver="$VERSION" '
     }
     found { print }
 ' "$CHANGELOG" \
-| sed '/<p align="right">/,/<\/p>/d' \
-| sed -e :a -e '/^[[:space:]]*$/{ $d; N; ba; }' \
-| sed '/^[[:space:]]*$/{ N; /^\n$/d; }'
+	| sed '/<p align="right">/,/<\/p>/d' \
+	| sed -e :a -e '/^[[:space:]]*$/{ $d; N; ba; }' \
+	| sed '/^[[:space:]]*$/{ N; /^\n$/d; }'

@@ -1,4 +1,4 @@
-from ghlang.cli import app
+from . import app
 
 
 if __name__ == "__main__":

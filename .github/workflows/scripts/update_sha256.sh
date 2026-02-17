@@ -8,5 +8,5 @@ echo "SHA256: $SHA"
 sed -i "s|^sha256sums=.*|sha256sums=('${SHA}')|" PKGBUILD
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-  echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+	echo "sha256=$SHA" >>"$GITHUB_OUTPUT"
 fi
