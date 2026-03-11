@@ -29,7 +29,7 @@ optdepends=(
 	'tokount: local directory analysis with ghlang local'
 )
 source=("https://files.pythonhosted.org/packages/source/${_pypiname::1}/${_pypiname}/${_pypiname}-$pkgver.tar.gz")
-sha256sums=('18ff437c8bf8d80a96e72e37f286353dbe355dc3f13befbae1bb38323edf0307')
+sha256sums=('1bacb8d7453e7aceca9a7020e21bbd551af1994dea2fef222ca90ec0cfd8a244')
 
 build() {
 	cd "$srcdir/$_pypiname-$pkgver"
