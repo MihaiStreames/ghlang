@@ -104,7 +104,7 @@ Getting this running is pretty straightforward.
 
 ### What You'll Need
 
-- Python 3.10+
+- Python 3.11+
 - For GitHub mode: a GitHub token
 - For local mode: `tokount`
 
@@ -130,11 +130,11 @@ pip install git+https://github.com/MihaiStreames/ghlang.git
 For local mode, you'll also need `tokount`:
 
 ```bash
-# with cargo
-cargo install tokount
-
-# or with yay (AUR)
+# with yay (AUR)
 yay -S tokount
+
+# or with paru (AUR)
+paru -S tokount
 ```
 
 ### Setting Up GitHub Mode
@@ -191,9 +191,9 @@ Both `github` and `local` commands share the same options:
 
 The `local` command also takes an optional `[PATH]` argument (defaults to `.`) and has one extra flag:
 
-| Flag             | What it does                               |
-| ---------------- | ------------------------------------------ |
-| `--follow-links` | follow symlinks when analyzing (unix only) |
+| Flag             | Short | What it does                               |
+| ---------------- | ----- | ------------------------------------------ |
+| `--follow-links` | `-L`  | follow symlinks when analyzing (unix only) |
 
 The `config` command has its own options:
 

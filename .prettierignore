@@ -1,7 +1,0 @@
-__pycache__/
-.mypy_cache/
-.ruff_cache/
-*.py
-*.sh
-PKGBUILD
-uv.lock

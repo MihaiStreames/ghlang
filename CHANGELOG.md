@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v244--tokount-v110-compat">v2.4.4</a></li>
     <li><a href="#v243--packaging-fix">v2.4.3</a></li>
     <li><a href="#v242--bugfix--cleanup">v2.4.2</a></li>
     <li><a href="#v241--tokount">v2.4.1</a></li>
@@ -29,6 +30,16 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.4.4 — tokount v1.1.0 compat
+
+**Changed:**
+
+- `tokount_client`: pass `--json` flag explicitly (tokount now outputs a human-readable table by default)
+- `tokount_client`: excluded dirs now passed as `--excluded <DIRS>` named flag (was positional)
+- `local`: `--follow-links` now has a `-L` short alias and is blocked on Windows
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.4.3 — Packaging fix
 

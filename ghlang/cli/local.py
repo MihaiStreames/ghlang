@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from sys import platform
 
 import typer
 
@@ -111,7 +112,8 @@ def local(
     follow_links: bool = typer.Option(
         False,
         "--follow-links",
-        help="Follow symlinks when analyzing (unix only, not yet supported by tokount)",
+        "-L",
+        help="Follow symlinks when analyzing",
     ),
     theme: str | None = typer.Option(
         None,
@@ -148,10 +150,12 @@ def local(
         logger.error(str(e))
         raise typer.Exit(1)
 
+    if follow_links and platform == "win32":
+        logger.error("--follow-links is not supported on Windows")
+        raise typer.Exit(1)
+
     try:
-        if follow_links:
-            logger.warning("--follow-links is not supported by tokount yet, ignoring")
-        tokount = TokountClient(ignored_dirs=cfg.ignored_dirs)
+        tokount = TokountClient(ignored_dirs=cfg.ignored_dirs, follow_symlinks=follow_links)
 
     except TokountNotFoundError as e:
         logger.error(str(e))

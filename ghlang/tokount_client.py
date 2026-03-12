@@ -21,16 +21,20 @@ def _find_tokount() -> Path:
 class TokountClient:
     """Client for running tokount on local files/directories"""
 
-    def __init__(self, ignored_dirs: list[str]):
+    def __init__(self, ignored_dirs: list[str], follow_symlinks: bool = False):
         self._ignored_dirs = ignored_dirs
+        self._follow_symlinks = follow_symlinks
         self._tokount_path = _find_tokount()
 
     def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
         """Build tokount command with optional excluded dirs"""
-        cmd = [str(tokount_path), str(path.resolve())]
+        cmd = [str(tokount_path), str(path.resolve()), "--json"]
+
+        if self._follow_symlinks:
+            cmd.append("-L")
 
         if self._ignored_dirs:
-            cmd.append(",".join(self._ignored_dirs))
+            cmd.extend(["--excluded", ",".join(self._ignored_dirs)])
 
         return cmd
 

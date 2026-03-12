@@ -1,9 +1,9 @@
 # Maintainer: MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>
 pkgname=python-ghlang
 _pypiname=ghlang
-pkgver=2.4.3
+pkgver=2.4.4
 pkgrel=1
-pkgdesc="Generate language statistics and visualizations from GitHub repositories or local files"
+pkgdesc="Generate pretty charts showing language statistics from GitHub repos or local code using Python"
 arch=(any)
 url="https://github.com/MihaiStreames/ghlang"
 license=(MIT)
