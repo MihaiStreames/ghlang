@@ -30,15 +30,15 @@ from .constants import PNG_DPI
 from .constants import REQUEST_TIMEOUT
 from .constants import ROUNDED_CORNER_RADIUS
 from .logging import logger
-from .static.lang_mapping import TOKEI_TO_LINGUIST
+from .static.lang_mapping import TOKOUNT_TO_LINGUIST
 from .static.themes import THEMES
 from .themes import load_all_themes
 
 
 def _normalize_language(lang: str) -> str:
     """Normalize tokount language name to GitHub linguist name"""
-    if lang in TOKEI_TO_LINGUIST:
-        mapped = TOKEI_TO_LINGUIST[lang]
+    if lang in TOKOUNT_TO_LINGUIST:
+        mapped = TOKOUNT_TO_LINGUIST[lang]
         return mapped if mapped is not None else lang
     return lang
 

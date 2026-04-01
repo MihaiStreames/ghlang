@@ -1,11 +1,11 @@
 # Maintainer: MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>
 pkgname=python-ghlang
 _pypiname=ghlang
-pkgver=2.4.4
+pkgver=2.4.5
 pkgrel=1
 pkgdesc="Generate pretty charts showing language statistics from GitHub repos or local code using Python"
 arch=(any)
-url="https://github.com/MihaiStreames/ghlang"
+url="https://github.com/velox-sh/ghlang"
 license=(MIT)
 depends=(
 	python

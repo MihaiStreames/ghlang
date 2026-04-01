@@ -3,21 +3,21 @@
 <!-- PROJECT SHIELDS -->
 <div align="center">
 
-[![Stars](https://img.shields.io/github/stars/MihaiStreames/ghlang?style=social)](https://github.com/MihaiStreames/ghlang/stargazers)
+[![Stars](https://img.shields.io/github/stars/velox-sh/ghlang?style=social)](https://github.com/velox-sh/ghlang/stargazers)
 [![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
 [![AUR Version](https://img.shields.io/aur/version/python-ghlang?label=AUR)](https://aur.archlinux.org/packages/python-ghlang)
 [![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
-[![codecov](https://codecov.io/gh/MihaiStreames/ghlang/graph/badge.svg)](https://codecov.io/gh/MihaiStreames/ghlang)
+[![codecov](https://codecov.io/gh/velox-sh/ghlang/graph/badge.svg)](https://codecov.io/gh/velox-sh/ghlang)
 [![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
-[![License](https://img.shields.io/github/license/MihaiStreames/ghlang?label=License)](LICENSE)
+[![License](https://img.shields.io/github/license/velox-sh/ghlang?label=License)](LICENSE)
 
 </div>
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <h1>
-    <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/logo-text.svg" alt="ghlang logo" width="256" />
-  </h1>
+  <img src="assets/ghlang-icon.svg" alt="ghlang logo" width="120" />
+
+  <h1>ghlang</h1>
 
   <h3 align="center">See what languages you've been coding in</h3>
 
@@ -59,13 +59,13 @@
 Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/example_pie.png" alt="Pie chart example" width="60%" />
-  <img src="https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/example_bar.png" alt="Bar chart example" width="60%" />
+  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_pie.png" alt="Pie chart example" width="60%" />
+  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_bar.png" alt="Bar chart example" width="60%" />
   <p><i>my actual language stats across all repos</i></p>
 </div>
 
 - **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
-- **Local mode**: Analyzes files on your machine using tokount (counts lines)
+- **Local mode**: Analyzes files on your machine using [tokount](https://github.com/velox-sh/tokount) (counts lines)
 
 ### Why ghlang?
 
@@ -92,7 +92,7 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 - [Pillow](https://python-pillow.org/)
 - [Requests](https://requests.readthedocs.io/)
 - [Rich](https://github.com/Textualize/rich)
-- [tokount](https://github.com/MihaiStreames/tokount) (for local analysis)
+- [tokount](https://github.com/velox-sh/tokount) (for local analysis)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -102,11 +102,11 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 
 Getting this running is pretty straightforward.
 
-### What You'll Need
+### Prerequisites
 
 - Python 3.11+
 - For GitHub mode: a GitHub token
-- For local mode: `tokount`
+- For local mode: [`tokount`](https://github.com/velox-sh/tokount)
 
 ### Installation
 
@@ -124,13 +124,16 @@ yay -S python-ghlang
 paru -S python-ghlang
 
 # or install from source
-pip install git+https://github.com/MihaiStreames/ghlang.git
+pip install git+https://github.com/velox-sh/ghlang.git
 ```
 
-For local mode, you'll also need `tokount`:
+For local mode, you'll also need [`tokount`](https://github.com/velox-sh/tokount):
 
 ```bash
-# with yay (AUR)
+# with cargo
+cargo install tokount
+
+# or with yay (AUR)
 yay -S tokount
 
 # or with paru (AUR)
@@ -282,15 +285,11 @@ Everything lives in `config.toml`:
 
 ghlang comes with built-in themes and supports community themes:
 
-<!-- THEMES_TABLE_START -->
-
 | Theme     | Preview                                                                                             | Source    |
 | --------- | --------------------------------------------------------------------------------------------------- | --------- |
-| `light`   | ![light](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/light.png)     | built-in  |
-| `dark`    | ![dark](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/dark.png)       | built-in  |
-| `monokai` | ![monokai](https://raw.githubusercontent.com/MihaiStreames/ghlang/master/assets/themes/monokai.png) | community |
-
-<!-- THEMES_TABLE_END -->
+| `light`   | ![light](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/light.png)          | built-in  |
+| `dark`    | ![dark](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/dark.png)            | built-in  |
+| `monokai` | ![monokai](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/monokai.png)      | community |
 
 **Using themes:**
 

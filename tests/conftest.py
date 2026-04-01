@@ -1,5 +1,6 @@
 from pathlib import Path
 import tomllib
+from typing import cast
 
 import pytest
 
@@ -17,12 +18,16 @@ def tmp_config(tmp_path: Path) -> Path:
 @pytest.fixture
 def valid_config_content() -> str:
     """Valid TOML config content"""
-    configs = tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    configs = cast(
+        dict[str, dict[str, str]], tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    )
     return configs["valid"]["content"]
 
 
 @pytest.fixture
 def minimal_config_content() -> str:
     """Minimal valid config with just a token"""
-    configs = tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    configs = cast(
+        dict[str, dict[str, str]], tomllib.loads((FIXTURES_DIR / "configs.toml").read_text())
+    )
     return configs["minimal"]["content"]

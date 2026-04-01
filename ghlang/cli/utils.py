@@ -1,5 +1,5 @@
-from __future__ import annotations
-
+from collections.abc import Iterator
+import contextlib
 from contextlib import contextmanager
 import json
 from pathlib import Path
@@ -15,6 +15,40 @@ from ghlang.static.themes import THEMES
 
 if TYPE_CHECKING:
     from ghlang.config import Config
+
+
+def get_config_dir() -> Path:
+    """Get the config directory path"""
+    return get_config_path().parent
+
+
+def get_active_theme() -> str:
+    """Get the currently active theme name"""
+    try:
+        return load_config(require_token=False).theme
+    except Exception:
+        return "light"
+
+
+def load_themes_by_source(
+    config_dir: Path,
+) -> tuple[dict[str, dict[str, str]], dict[str, dict[str, str]], dict[str, dict[str, str]]]:
+    """Return (built-in, remote, custom) theme dicts loaded independently"""
+    built_in: dict[str, dict[str, str]] = dict(THEMES)
+
+    remote: dict[str, dict[str, str]] = {}
+    remote_path = config_dir / "themes.json"
+    if remote_path.exists():
+        with contextlib.suppress(Exception):
+            remote = json.loads(remote_path.read_text())
+
+    custom: dict[str, dict[str, str]] = {}
+    custom_path = config_dir / "custom_themes.json"
+    if custom_path.exists():
+        with contextlib.suppress(Exception):
+            custom = json.loads(custom_path.read_text())
+
+    return built_in, remote, custom
 
 
 def format_autocomplete(incomplete: str) -> list[str]:
@@ -192,7 +226,7 @@ def setup_cli_environment(
 
 
 @contextmanager
-def handle_cli_errors():
+def handle_cli_errors() -> Iterator[None]:
     """Context manager for handling CLI exceptions"""
     try:
         yield

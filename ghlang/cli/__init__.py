@@ -2,15 +2,17 @@ import typer
 
 from ghlang import __version__
 
-from .config import config
-from .github import github
-from .local import local
+from .config import config as config_cmd
+from .github import github as github_cmd
+from .local import local as local_cmd
+from .theme import theme as theme_cmd
 
 
 app = typer.Typer(help="See what languages you've been coding in", add_completion=True)
-app.command()(config)
-app.command()(github)
-app.command()(local)
+app.command()(config_cmd)
+app.command()(github_cmd)
+app.command()(local_cmd)
+app.command()(theme_cmd)
 
 
 def _version_callback(value: bool) -> None:

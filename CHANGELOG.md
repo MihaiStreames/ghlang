@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v245--themes-cli">v2.4.5</a></li>
     <li><a href="#v244--tokount-v110-compat">v2.4.4</a></li>
     <li><a href="#v243--packaging-fix">v2.4.3</a></li>
     <li><a href="#v242--bugfix--cleanup">v2.4.2</a></li>
@@ -30,6 +31,19 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.4.5 — Themes CLI
+
+**New stuff:**
+
+- `ghlang theme` command with `--list`, `--refresh`, `--info <name>` (#20)
+
+**Fixed:**
+
+- `tokount` CLI flags updated for v2.1.6 compat (`-o json`, `-e`)
+- Various mypy type errors resolved
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.4.4 — tokount v1.1.0 compat
 
@@ -59,9 +73,7 @@ Patch release fixing a crash in `ghlang local` and cleaning up CI.
 
 **Changed:**
 
-- Removed automated AUR publishing from CI (now manual)
 - Use relative imports for same-package siblings
-- Added `.editorconfig` and `.prettierrc` for consistent formatting
 - Consolidated all magic constants into `ghlang/constants.py`
 - Lazy-load `matplotlib`/`PIL` in CLI to speed up shell tab completion (~3x faster autocomplete path)
 - Added `from __future__ import annotations` for Python 3.11–3.13 compatibility
@@ -71,12 +83,11 @@ Patch release fixing a crash in `ghlang local` and cleaning up CI.
 
 ## v2.4.1 — Tokount
 
-Introducing [`tokount`](https://github.com/MihaiStreames/tokount), a small Rust tool that counts lines of code.
+Introducing [`tokount`](https://github.com/velox-sh/tokount), a small Rust tool that counts lines of code.
 
 **New stuff:**
 
 - `tokount`, providing a nice 42x speedup in line counting
-- Automated AUR publishing on release
 
 **Improved:**
 
@@ -173,10 +184,7 @@ Now available on [PyPI](https://pypi.org/project/ghlang/)! Install with `pipx in
 
 **New stuff:**
 
-- Published to PyPI, no more installing from source
 - `--save-json` flag to control JSON file generation (replaces config options)
-- GitHub Actions workflow for automated PyPI releases on tags
-- GitHub issue templates for bug reports and feature requests
 
 **Changed:**
 
@@ -187,7 +195,6 @@ Now available on [PyPI](https://pypi.org/project/ghlang/)! Install with `pipx in
 
 **Improved:**
 
-- Easier installation experience via package managers
 - More flexible per-command control vs global config
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
@@ -370,7 +377,6 @@ First version. GitHub-only.
 - Pie and bar charts with GitHub's linguist colors
 - Config via `config.toml`
 - Filter by repo affiliation and visibility
-- MIT License
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 

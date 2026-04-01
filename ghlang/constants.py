@@ -25,9 +25,7 @@ REQUEST_TIMEOUT = 10
 LINGUIST_LANGUAGES_URL = (
     "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml"
 )
-THEME_MANIFEST_URL = (
-    "https://raw.githubusercontent.com/MihaiStreames/ghlang/master/themes/manifest.json"
-)
+THEME_MANIFEST_URL = "https://raw.githubusercontent.com/velox-sh/ghlang/master/themes/manifest.json"
 
 # themes
 THEME_CACHE_TTL = timedelta(days=1)
