@@ -1,9 +1,9 @@
 [project]
 name = "ghlang"
-version = "2.4.5"
+version = "2.4.6"
 description = "Generate pretty charts showing language statistics from GitHub repos or local code using Python"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "MihaiStreames", email = "72852703+MihaiStreames@users.noreply.github.com" },
@@ -27,6 +27,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -43,6 +44,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "typer>=0.24.1",
     "rich>=14.3.3",
+    "tomli>=2.4.1; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]
@@ -74,7 +76,7 @@ include = ["ghlang/**", "tests/**"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py314"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [

@@ -4,7 +4,12 @@ from difflib import get_close_matches
 from importlib import resources
 from pathlib import Path
 import sys
-import tomllib
+
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 from .constants import DEFAULT_IGNORED_DIRS
 from .constants import DEFAULT_OUTPUT_DIR

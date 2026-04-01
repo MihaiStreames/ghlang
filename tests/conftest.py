@@ -1,8 +1,8 @@
 from pathlib import Path
-import tomllib
 from typing import cast
 
 import pytest
+import tomllib
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"

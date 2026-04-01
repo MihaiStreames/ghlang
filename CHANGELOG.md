@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v246--python-310-support">v2.4.6</a></li>
     <li><a href="#v245--themes-cli">v2.4.5</a></li>
     <li><a href="#v244--tokount-v110-compat">v2.4.4</a></li>
     <li><a href="#v243--packaging-fix">v2.4.3</a></li>
@@ -31,6 +32,13 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.4.6 — Python 3.10 support
+
+- Lowered minimum Python version from 3.11 to 3.10
+- Added `tomli` backport for `tomllib` on Python 3.10
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.4.5 — Themes CLI
 
