@@ -34,33 +34,33 @@
   </ol>
 </details>
 
-## v2.5.0 — Chart styles
+## v2.5.0 - Chart styles
 
 **New stuff:**
 
-- `--style` / `-s` flag on `github` and `local` commands — choose between `pixel` (default), `pie`, and `bar`
-- `pixel` chart style — isometric tower chart with Cozette bitmap font, per-language color blocks, and segment connectors
+- `--style` / `-s` flag on `github` and `local` commands - choose between `pixel` (default), `pie`, and `bar`
+- `pixel` chart style - isometric tower chart with Cozette bitmap font, per-language color blocks, and segment connectors
 - Style registry: each style is self-contained and discovered dynamically via `get_style_registry()`
 - Shell autocomplete for `--style`
 
 **Changed:**
 
 - `display/` split: chart rendering lives in `styles/`, Rich console output in `display/`
-- `build_display_segments()` shared utility — top_n and hide threshold applied consistently across all styles
+- `build_display_segments()` shared utility - top_n and hide threshold applied consistently across all styles
 - "Other" aggregate now uses theme fallback color in all styles (was inconsistent between pie/bar)
 - Pie chart shows all languages regardless of top_n; only hides percentage label text below threshold
 - Config and theme table rendering extracted from CLI into `display/config.py` and `display/themes.py`
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.6 — Python 3.10 support
+## v2.4.6 - Python 3.10 support
 
 - Lowered minimum Python version from 3.11 to 3.10
 - Added `tomli` backport for `tomllib` on Python 3.10
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.5 — Themes CLI
+## v2.4.5 - Themes CLI
 
 **New stuff:**
 
@@ -73,7 +73,7 @@
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.4 — tokount v1.1.0 compat
+## v2.4.4 - tokount v1.1.0 compat
 
 **Changed:**
 
@@ -83,7 +83,7 @@
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.3 — Packaging fix
+## v2.4.3 - Packaging fix
 
 **Fixed:**
 
@@ -91,7 +91,7 @@
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.2 — Bugfix & cleanup
+## v2.4.2 - Bugfix & cleanup
 
 Patch release fixing a crash in `ghlang local` and cleaning up CI.
 
@@ -109,7 +109,7 @@ Patch release fixing a crash in `ghlang local` and cleaning up CI.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.4.1 — Tokount
+## v2.4.1 - Tokount
 
 Introducing [`tokount`](https://github.com/velox-sh/tokount), a small Rust tool that counts lines of code.
 
@@ -132,7 +132,7 @@ Introducing [`tokount`](https://github.com/velox-sh/tokount), a small Rust tool 
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.4 — Faster GitHub processing
+## v2.3.4 - Faster GitHub processing
 
 GitHub language data now fetches way faster using concurrent requests.
 
@@ -142,7 +142,7 @@ GitHub language data now fetches way faster using concurrent requests.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.3 — Small fixes
+## v2.3.3 - Small fixes
 
 **Fixed:**
 
@@ -167,7 +167,7 @@ GitHub language data now fetches way faster using concurrent requests.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.2 — Community themes
+## v2.3.2 - Community themes
 
 Community theme system is now fully functional. Monokai moved from built-in to community theme.
 
@@ -190,7 +190,7 @@ Community theme system is now fully functional. Monokai moved from built-in to c
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.1 — Bugfix & theme support
+## v2.3.1 - Bugfix & theme support
 
 Critical bugfix for `ghlang config show` and basic *community* theme system support.
 
@@ -206,7 +206,7 @@ Critical bugfix for `ghlang config show` and basic *community* theme system supp
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.3.0 — PyPI & simplified config
+## v2.3.0 - PyPI & simplified config
 
 Now available on [PyPI](https://pypi.org/project/ghlang/)! Install with `pipx install ghlang` or `pip install ghlang`. Simplified config and added GitHub automation.
 
@@ -227,7 +227,7 @@ Now available on [PyPI](https://pypi.org/project/ghlang/)! Install with `pipx in
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.2.0 — Rich logging & config validation
+## v2.2.0 - Rich logging & config validation
 
 Replaced loguru with [Rich](https://github.com/Textualize/rich) for better progress bars and unified console output. Added config validation with helpful suggestions for typos.
 
@@ -255,7 +255,7 @@ Replaced loguru with [Rich](https://github.com/Textualize/rich) for better progr
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.1.0 — Themes & SVG export
+## v2.1.0 - Themes & SVG export
 
 Theme support and SVG output for better customization.
 
@@ -284,7 +284,7 @@ Theme support and SVG output for better customization.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.5 — Reliability & symlinks
+## v2.0.5 - Reliability & symlinks
 
 Better rate limit handling and symlink support for local mode.
 
@@ -306,7 +306,7 @@ Better rate limit handling and symlink support for local mode.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.4 — Config command
+## v2.0.4 - Config command
 
 New `ghlang config` command for managing your config file.
 
@@ -323,7 +323,7 @@ New `ghlang config` command for managing your config file.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.3 — Pipeline friendly
+## v2.0.3 - Pipeline friendly
 
 New flags for scripting and CI/CD workflows.
 
@@ -340,7 +340,7 @@ New flags for scripting and CI/CD workflows.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.2 — Custom titles & output
+## v2.0.2 - Custom titles & output
 
 New CLI flags for more control over your charts.
 
@@ -356,7 +356,7 @@ New CLI flags for more control over your charts.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.1 — Typer swap
+## v2.0.1 - Typer swap
 
 Swapped Click for [Typer](https://typer.tiangolo.com/). Same functionality, but now with:
 
@@ -373,7 +373,7 @@ Swapped Click for [Typer](https://typer.tiangolo.com/). Same functionality, but 
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.0 — Local mode & big refactor
+## v2.0.0 - Local mode & big refactor
 
 Big update. You can now analyze local files, not just GitHub repos.
 
@@ -397,7 +397,7 @@ Big update. You can now analyze local files, not just GitHub repos.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v1.0.0 — Initial release
+## v1.0.0 - Initial release
 
 First version. GitHub-only.
 
