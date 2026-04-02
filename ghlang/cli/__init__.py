@@ -4,17 +4,17 @@ import typer
 
 from ghlang import __version__
 
-from .config import config as config_cmd
-from .github import github as github_cmd
-from .local import local as local_cmd
-from .theme import theme as theme_cmd
+from . import config as config_mod
+from . import github as github_mod
+from . import local as local_mod
+from . import theme as theme_mod
 
 
 app = typer.Typer(help="See what languages you've been coding in", add_completion=True)
-app.command()(config_cmd)
-app.command()(github_cmd)
-app.command()(local_cmd)
-app.command()(theme_cmd)
+app.command()(config_mod.config)
+app.command()(github_mod.github)
+app.command()(local_mod.local)
+app.command()(theme_mod.theme)
 
 
 def _version_callback(value: bool) -> None:

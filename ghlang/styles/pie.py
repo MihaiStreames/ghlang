@@ -2,16 +2,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ..logging import logger
-from ..themes import get_theme
-from .constants import HIDE_THRESHOLD
-from .constants import PIE_FIGSIZE
-from .constants import PIE_LEGEND_FONTSIZE
-from .constants import PIE_LEGEND_TITLE_FONTSIZE
-from .constants import PIE_PCT_FONTSIZE
-from .constants import PIE_TITLE_FONTSIZE
-from .constants import PIE_TITLE_PAD
-from .utils import save_matplotlib_chart
+from ghlang import log
+from ghlang import themes
+
+from . import constants
+from . import utils
 
 
 def generate_pie(
@@ -24,9 +19,9 @@ def generate_pie(
 ) -> None:
     """Generate a pie chart showing language distribution"""
     title = title if title else "Language Distribution"
-    logger.debug(f"Generating pie chart with {len(language_stats)} languages...")
+    log.logger.debug(f"Generating pie chart with {len(language_stats)} languages...")
 
-    theme_colors = get_theme(theme)
+    theme_colors = themes.get_theme(theme)
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
     total = sum(language_stats.values()) or 1
 
@@ -35,21 +30,21 @@ def generate_pie(
     fallback = theme_colors["fallback"]
     chart_colors = [colors.get(lang, fallback) for lang in labels]
 
-    fig, ax = plt.subplots(figsize=PIE_FIGSIZE)
+    fig, ax = plt.subplots(figsize=constants.PIE_FIGSIZE)
     fig.patch.set_facecolor(theme_colors["background"])
     ax.set_facecolor(theme_colors["background"])
 
     wedges, _, autotexts = ax.pie(  # type: ignore[misc]
         sizes,
         colors=chart_colors,
-        autopct=lambda p: f"{p:.1f}%" if p >= HIDE_THRESHOLD else "",
+        autopct=lambda p: f"{p:.1f}%" if p >= constants.HIDE_THRESHOLD else "",
         startangle=90,
         pctdistance=0.85,
     )
 
     for autotext in autotexts:
         autotext.set_color("white")
-        autotext.set_fontsize(PIE_PCT_FONTSIZE)
+        autotext.set_fontsize(constants.PIE_PCT_FONTSIZE)
         autotext.set_weight("bold")  # type: ignore[union-attr]
 
     legend_labels = [f"{lang} ({count / total * 100:.1f}%)" for lang, count in items]
@@ -59,8 +54,8 @@ def generate_pie(
         title="Languages",
         loc="center left",
         bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=PIE_LEGEND_FONTSIZE,
-        title_fontsize=PIE_LEGEND_TITLE_FONTSIZE,
+        fontsize=constants.PIE_LEGEND_FONTSIZE,
+        title_fontsize=constants.PIE_LEGEND_TITLE_FONTSIZE,
     )
 
     legend.get_frame().set_facecolor(theme_colors["legend_bg"])
@@ -71,11 +66,11 @@ def generate_pie(
 
     ax.set_title(
         title,
-        fontsize=PIE_TITLE_FONTSIZE,
+        fontsize=constants.PIE_TITLE_FONTSIZE,
         weight="bold",
         color=theme_colors["text"],
-        pad=PIE_TITLE_PAD,
+        pad=constants.PIE_TITLE_PAD,
     )
 
-    save_matplotlib_chart(output, theme_colors["background"])
-    logger.success(f"Saved pie chart to {output}")
+    utils.save_matplotlib_chart(output, theme_colors["background"])
+    log.logger.success(f"Saved pie chart to {output}")

@@ -1,9 +1,9 @@
-from .static.lang_mapping import TOKOUNT_TO_LINGUIST
+from .static import lang_mapping
 
 
 def _normalize_language(lang: str) -> str:
-    if lang in TOKOUNT_TO_LINGUIST:
-        mapped = TOKOUNT_TO_LINGUIST[lang]
+    if lang in lang_mapping.TOKOUNT_TO_LINGUIST:
+        mapped = lang_mapping.TOKOUNT_TO_LINGUIST[lang]
         return mapped if mapped is not None else lang
     return lang
 

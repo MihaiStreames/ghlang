@@ -5,16 +5,14 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from PIL import ImageDraw
 
-from .constants import HIDE_THRESHOLD
-from .constants import PNG_DPI
-from .constants import ROUNDED_CORNER_RADIUS
+from . import constants
 
 
 def build_display_segments(
     language_stats: dict[str, int],
     top_n: int,
 ) -> list[tuple[str, float]]:
-    """Build (name, pct) segments applying top_n + HIDE_THRESHOLD, remainder into 'Other'"""
+    """Build (name, pct) segments applying top_n + constants.HIDE_THRESHOLD, remainder into 'Other'"""
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
     total = sum(language_stats.values()) or 1
 
@@ -23,7 +21,7 @@ def build_display_segments(
 
     for i, (name, count) in enumerate(items):
         pct = count / total * 100
-        if i < top_n and pct >= HIDE_THRESHOLD:
+        if i < top_n and pct >= constants.HIDE_THRESHOLD:
             shown.append((name, pct))
         else:
             others_pct += pct
@@ -40,7 +38,9 @@ def hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 
-def add_rounded_corners(img: Image.Image, radius: int = ROUNDED_CORNER_RADIUS) -> Image.Image:
+def add_rounded_corners(
+    img: Image.Image, radius: int = constants.ROUNDED_CORNER_RADIUS
+) -> Image.Image:
     """Add rounded corners to an image"""
     img = img.convert("RGBA")
     mask = Image.new("L", img.size, 0)
@@ -56,7 +56,9 @@ def save_matplotlib_chart(output: Path, background_color: str) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
 
     buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=PNG_DPI, bbox_inches="tight", facecolor=background_color)
+    plt.savefig(
+        buf, format="png", dpi=constants.PNG_DPI, bbox_inches="tight", facecolor=background_color
+    )
     plt.close()
     buf.seek(0)
 

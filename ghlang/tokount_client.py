@@ -3,17 +3,14 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from .exceptions import TokountArgumentError
-from .exceptions import TokountError
-from .exceptions import TokountIoError
-from .exceptions import TokountNotFoundError
-from .logging import logger
+from . import exceptions
+from . import log
 
 
 def _find_tokount() -> Path:
     tokount_path = shutil.which("tokount")
     if tokount_path is None:
-        raise TokountNotFoundError()
+        raise exceptions.TokountNotFoundError()
     return Path(tokount_path)
 
 
@@ -36,7 +33,7 @@ class TokountClient:
 
         return cmd
 
-    def _parse_tokount_error(self, stderr: str) -> TokountError | None:
+    def _parse_tokount_error(self, stderr: str) -> exceptions.TokountError | None:
         try:
             data = json.loads(stderr)
         except json.JSONDecodeError:
@@ -53,25 +50,25 @@ class TokountClient:
         kind = error.get("kind") if isinstance(error.get("kind"), str) else None
         details = error.get("details") if isinstance(error.get("details"), dict) else None
 
-        error_map: dict[str, type[TokountError]] = {
-            "InvalidArgs": TokountArgumentError,
-            "NotFound": TokountNotFoundError,
-            "IoError": TokountIoError,
+        error_map: dict[str, type[exceptions.TokountError]] = {
+            "InvalidArgs": exceptions.TokountArgumentError,
+            "NotFound": exceptions.TokountNotFoundError,
+            "IoError": exceptions.TokountIoError,
         }
 
         if kind is None:
-            exc_type: type[TokountError] = TokountError
+            exc_type: type[exceptions.TokountError] = exceptions.TokountError
         else:
-            exc_type = error_map.get(kind, TokountError)
+            exc_type = error_map.get(kind, exceptions.TokountError)
 
         return exc_type(message, kind=kind, details=details)
 
     def _analyze_path(self, path: Path) -> dict:
         """Run tokount on a file or directory and return raw JSON output"""
         cmd = self._build_tokount_command(self._tokount_path, path)
-        logger.debug(f"Running: {' '.join(cmd)}")
+        log.logger.debug(f"Running: {' '.join(cmd)}")
 
-        with logger.console.status(f"[bold]Analyzing {path}..."):
+        with log.logger.console.status(f"[bold]Analyzing {path}..."):
             result = subprocess.run(
                 cmd,
                 check=False,
@@ -81,7 +78,7 @@ class TokountClient:
             )
 
         if result.returncode != 0:
-            logger.debug(f"tokount stderr: {result.stderr}")
+            log.logger.debug(f"tokount stderr: {result.stderr}")
             parsed_error = self._parse_tokount_error(result.stderr)
 
             if parsed_error:
@@ -94,7 +91,7 @@ class TokountClient:
             return dict(json.loads(result.stdout))
 
         except json.JSONDecodeError as e:
-            logger.debug(f"Failed to parse tokount output: {result.stdout[:500]}")
+            log.logger.debug(f"Failed to parse tokount output: {result.stdout[:500]}")
             raise ValueError(f"Invalid JSON from tokount: {e}") from e
 
     def get_language_stats(
@@ -103,7 +100,7 @@ class TokountClient:
         stats_output: Path | None = None,
     ) -> dict[str, dict]:
         """Get language statistics for a path"""
-        logger.info(f"Analyzing {path}")
+        log.logger.info(f"Analyzing {path}")
 
         raw_output = self._analyze_path(path)
 
@@ -113,7 +110,7 @@ class TokountClient:
             with stats_output.open("w") as f:
                 json.dump(raw_output, f, indent=2)
 
-            logger.debug(f"Saved raw tokount output to {stats_output}")
+            log.logger.debug(f"Saved raw tokount output to {stats_output}")
 
         stats = {}
         for key, value in raw_output.items():
@@ -137,6 +134,6 @@ class TokountClient:
 
         total_code = stats.get("_summary", {}).get("code", 0)
         total_files = stats.get("_summary", {}).get("files", 0)
-        logger.success(f"Analyzed {total_files} files, {total_code} lines of code")
+        log.logger.success(f"Analyzed {total_files} files, {total_code} lines of code")
 
         return stats

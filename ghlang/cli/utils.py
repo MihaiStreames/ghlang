@@ -9,11 +9,10 @@ from typing import TYPE_CHECKING
 
 import typer
 
-from ghlang.config import get_config_path
-from ghlang.config import load_config
-from ghlang.logging import logger
-from ghlang.static.themes import THEMES
-from ghlang.styles import STYLES
+from ghlang import config
+from ghlang import log
+from ghlang import styles
+from ghlang.static import themes as static_themes
 
 
 if TYPE_CHECKING:
@@ -22,13 +21,13 @@ if TYPE_CHECKING:
 
 def get_config_dir() -> Path:
     """Get the config directory path"""
-    return get_config_path().parent
+    return config.get_config_path().parent
 
 
 def get_active_theme() -> str:
     """Get the currently active theme name"""
     try:
-        return load_config(require_token=False).theme
+        return config.load_config(require_token=False).theme
     except Exception:
         return "light"
 
@@ -37,7 +36,7 @@ def load_themes_by_source(
     config_dir: Path,
 ) -> tuple[dict[str, dict[str, str]], dict[str, dict[str, str]], dict[str, dict[str, str]]]:
     """Return (built-in, remote, custom) theme dicts loaded independently"""
-    built_in: dict[str, dict[str, str]] = dict(THEMES)
+    built_in: dict[str, dict[str, str]] = dict(static_themes.THEMES)
 
     remote: dict[str, dict[str, str]] = {}
     remote_path = config_dir / "themes.json"
@@ -61,9 +60,9 @@ def format_autocomplete(incomplete: str) -> list[str]:
 
 def themes_autocomplete(incomplete: str) -> list[str]:
     """Callback for theme names"""
-    themes = list(THEMES.keys())
+    themes = list(static_themes.THEMES.keys())
 
-    config_path = get_config_path()
+    config_path = config.get_config_path()
     remote_path = config_path.parent / "themes.json"
     if remote_path.exists():
         try:
@@ -79,7 +78,7 @@ def themes_autocomplete(incomplete: str) -> list[str]:
 
 def styles_autocomplete(incomplete: str) -> list[str]:
     """Callback for chart styles"""
-    return [s for s in STYLES if s.startswith(incomplete)]
+    return [s for s in styles.STYLES if s.startswith(incomplete)]
 
 
 def setup_cli_environment(
@@ -98,7 +97,7 @@ def setup_cli_environment(
     else:
         json_only = False
 
-    logger.configure(verbose, quiet=quiet)
+    log.logger.configure(verbose, quiet=quiet)
 
     cli_overrides = {
         "output_dir": output_dir,
@@ -106,17 +105,17 @@ def setup_cli_environment(
         "theme": theme,
     }
 
-    cfg = load_config(
+    cfg = config.load_config(
         config_path=config_path,
         cli_overrides=cli_overrides,
         require_token=require_token,
     )
 
-    logger.configure(cfg.verbose, quiet=quiet)
+    log.logger.configure(cfg.verbose, quiet=quiet)
 
     if not stdout:
         cfg.output_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Saving to {cfg.output_dir}")
+        log.logger.info(f"Saving to {cfg.output_dir}")
 
     return cfg, quiet, json_only
 
@@ -129,5 +128,5 @@ def handle_cli_errors() -> Iterator[None]:
     except typer.Exit:
         raise
     except Exception as e:
-        logger.exception(f"Something went wrong: {e}")
+        log.logger.exception(f"Something went wrong: {e}")
         raise typer.Exit(1)

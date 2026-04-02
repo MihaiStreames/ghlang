@@ -5,12 +5,10 @@ from typing import cast
 
 import requests
 
-from .config import get_config_path
-from .constants import MANIFEST_URL
-from .constants import REQUEST_TIMEOUT
-from .constants import THEME_CACHE_TTL
-from .logging import logger
-from .static.themes import THEMES
+from . import config
+from . import constants
+from . import log
+from .static import themes as static_themes
 
 
 def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dict[str, str]]:
@@ -21,14 +19,14 @@ def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dic
             meta = json.loads(cache_meta.read_text())
             cached_time = datetime.fromisoformat(meta["timestamp"])
 
-            if datetime.now() - cached_time < THEME_CACHE_TTL:
+            if datetime.now() - cached_time < constants.THEME_CACHE_TTL:
                 return cast(dict[str, dict[str, str]], json.loads(cache_path.read_text()))
 
         except Exception:
             pass
 
     try:
-        r = requests.get(MANIFEST_URL, timeout=REQUEST_TIMEOUT)
+        r = requests.get(constants.MANIFEST_URL, timeout=constants.REQUEST_TIMEOUT)
         r.raise_for_status()
         themes = cast(dict[str, dict[str, str]], r.json())
 
@@ -37,7 +35,7 @@ def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dic
             json.dumps(
                 {
                     "timestamp": datetime.now().isoformat(),
-                    "url": MANIFEST_URL,
+                    "url": constants.MANIFEST_URL,
                 }
             )
         )
@@ -45,13 +43,13 @@ def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dic
         return themes
 
     except Exception as e:
-        logger.warning(f"Couldn't fetch remote themes: {e}")
+        log.logger.warning(f"Couldn't fetch remote themes: {e}")
         return {}
 
 
 def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, dict[str, str]]:
     """Load: built-in + remote + custom"""
-    themes = THEMES.copy()
+    themes = static_themes.THEMES.copy()
 
     remote_path = config_dir / "themes.json"
     remote = _fetch_remote_themes(remote_path, force=force_refresh)
@@ -64,18 +62,18 @@ def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, 
             themes.update(custom)
 
         except Exception as e:
-            logger.warning(f"Couldn't load custom themes: {e}")
+            log.logger.warning(f"Couldn't load custom themes: {e}")
 
     return themes
 
 
 def get_theme(theme: str) -> dict[str, str]:
     """Get theme colors (built-in + remote + custom), defaulting to light if invalid"""
-    config_dir = get_config_path().parent
+    config_dir = config.get_config_path().parent
 
     all_themes = load_all_themes(config_dir)
     if theme not in all_themes:
-        logger.warning(f"No '{theme}' theme exists, using light instead")
-        return THEMES["light"]
+        log.logger.warning(f"No '{theme}' theme exists, using light instead")
+        return static_themes.THEMES["light"]
 
     return all_themes[theme]

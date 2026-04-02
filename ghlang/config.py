@@ -11,11 +11,9 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib
 
-from .constants import DEFAULT_IGNORED_DIRS
-from .constants import DEFAULT_OUTPUT_DIR
-from .exceptions import ConfigError
-from .exceptions import MissingTokenError
-from .logging import logger
+from . import constants
+from . import exceptions
+from . import log
 
 
 VALID_KEYS: dict[str, set[str]] = {
@@ -37,10 +35,10 @@ class Config:
     ignored_repos: list[str] = field(default_factory=list)
 
     # Tokount settings
-    ignored_dirs: list[str] = field(default_factory=DEFAULT_IGNORED_DIRS.copy)
+    ignored_dirs: list[str] = field(default_factory=constants.DEFAULT_IGNORED_DIRS.copy)
 
     # Output settings
-    output_dir: Path = field(default_factory=lambda: Path(DEFAULT_OUTPUT_DIR))
+    output_dir: Path = field(default_factory=lambda: Path(constants.DEFAULT_OUTPUT_DIR))
 
     # Preferences
     verbose: bool = False
@@ -51,18 +49,18 @@ def _validate_config(data: dict) -> None:
     for section, keys in data.items():
         section_name = section
         if section == "cloc":
-            logger.warning("Config section 'cloc' is deprecated, use 'tokount' instead")
+            log.logger.warning("Config section 'cloc' is deprecated, use 'tokount' instead")
             section_name = "tokount"
 
         if section_name not in VALID_KEYS:
             suggestions = get_close_matches(section_name, VALID_KEYS.keys(), n=1, cutoff=0.6)
 
             if suggestions:
-                logger.warning(
+                log.logger.warning(
                     f"Unknown config section '{section}' - did you mean '{suggestions[0]}'?"
                 )
             else:
-                logger.warning(f"Unknown config section '{section}'")
+                log.logger.warning(f"Unknown config section '{section}'")
             continue
 
         if not isinstance(keys, dict):
@@ -74,11 +72,11 @@ def _validate_config(data: dict) -> None:
                 suggestions = get_close_matches(key, valid, n=1, cutoff=0.6)
 
                 if suggestions:
-                    logger.warning(
+                    log.logger.warning(
                         f"Unknown key '{section}.{key}' - did you mean '{suggestions[0]}'?"
                     )
                 else:
-                    logger.warning(f"Unknown config key '{section}.{key}'")
+                    log.logger.warning(f"Unknown config key '{section}.{key}'")
 
 
 def get_config_path() -> Path:
@@ -95,7 +93,7 @@ def create_default_config(config_path: Path) -> None:
     config_path.parent.mkdir(parents=True, exist_ok=True)
     default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
     config_path.write_text(default_content)
-    logger.debug(f"Created default config at: {config_path}")
+    log.logger.debug(f"Created default config at: {config_path}")
 
 
 def load_config(
@@ -111,16 +109,16 @@ def load_config(
         create_default_config(config_path)
 
         if require_token:
-            raise MissingTokenError(str(config_path))
+            raise exceptions.MissingTokenError(str(config_path))
 
-        logger.debug(f"Config file created at: {config_path}")
+        log.logger.debug(f"Config file created at: {config_path}")
 
     try:
         with config_path.open("rb") as f:
             data = tomllib.load(f)
 
     except tomllib.TOMLDecodeError as e:
-        raise ConfigError(f"Invalid TOML in config file: {e}") from e
+        raise exceptions.ConfigError(f"Invalid TOML in config file: {e}") from e
 
     _validate_config(data)
 
@@ -135,15 +133,15 @@ def load_config(
     token = github.get("token", "")
 
     if require_token and (not token or token == "YOUR_TOKEN_HERE"):
-        raise MissingTokenError()
+        raise exceptions.MissingTokenError()
 
     config = Config(
         token=token if token != "YOUR_TOKEN_HERE" else "",
         affiliation=github.get("affiliation", Config.affiliation),
         visibility=github.get("visibility", Config.visibility),
         ignored_repos=github.get("ignored_repos", []),
-        ignored_dirs=tokount.get("ignored_dirs", DEFAULT_IGNORED_DIRS.copy()),
-        output_dir=Path(output.get("directory", DEFAULT_OUTPUT_DIR)).expanduser(),
+        ignored_dirs=tokount.get("ignored_dirs", constants.DEFAULT_IGNORED_DIRS.copy()),
+        output_dir=Path(output.get("directory", constants.DEFAULT_OUTPUT_DIR)).expanduser(),
         verbose=preferences.get("verbose", Config.verbose),
         theme=preferences.get("theme", Config.theme),
     )

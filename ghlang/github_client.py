@@ -9,13 +9,8 @@ import time
 
 import requests
 
-from .constants import API_BASE_DELAY
-from .constants import API_MAX_RETRIES
-from .constants import API_MAX_WORKERS
-from .constants import API_PER_PAGE
-from .constants import API_URL
-from .constants import API_VERSION
-from .logging import logger
+from . import constants
+from . import log
 
 
 class GitHubClient:
@@ -28,28 +23,28 @@ class GitHubClient:
         visibility: str,
         ignored_repos: list[str],
     ):
-        self._api = API_URL
+        self._api = constants.API_URL
         self._session = requests.Session()
         self._session.headers.update(
             {
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": API_VERSION,
+                "X-GitHub-Api-Version": constants.API_VERSION,
             }
         )
         self._affiliation = affiliation
         self._visibility = visibility
         self._ignored_repos = ignored_repos
-        self._per_page = API_PER_PAGE
-        self._max_retries = API_MAX_RETRIES
-        self._base_delay = API_BASE_DELAY
+        self._per_page = constants.API_PER_PAGE
+        self._max_retries = constants.API_MAX_RETRIES
+        self._base_delay = constants.API_BASE_DELAY
 
     def _log_rate_limit(self, response: requests.Response) -> None:
         remaining = response.headers.get("X-RateLimit-Remaining")
         limit = response.headers.get("X-RateLimit-Limit")
 
         if remaining and limit:
-            logger.debug(f"Rate limit: {remaining}/{limit} remaining")
+            log.logger.debug(f"Rate limit: {remaining}/{limit} remaining")
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
         r = None
@@ -60,13 +55,13 @@ class GitHubClient:
             if r.status_code == 403 and r.headers.get("X-RateLimit-Remaining") == "0":
                 reset = int(r.headers.get("X-RateLimit-Reset", "0"))
                 sleep_for = max(0, reset - int(time.time()) + 2)
-                logger.warning(f"Rate limit hit, waiting {sleep_for}s until reset...")
+                log.logger.warning(f"Rate limit hit, waiting {sleep_for}s until reset...")
                 time.sleep(sleep_for)
                 continue
 
             if r.status_code in (429, 500, 502, 503, 504):
                 delay = self._base_delay * (2**attempt)
-                logger.warning(
+                log.logger.warning(
                     f"Got {r.status_code}, retrying in {delay}s "
                     f"(attempt {attempt + 1}/{self._max_retries})..."
                 )
@@ -111,11 +106,11 @@ class GitHubClient:
         return dict(r.json())
 
     def _list_repos(self, output_file: Path | None = None) -> list[dict]:
-        logger.info("Fetching repos")
+        log.logger.info("Fetching repos")
         repos = []
         page = 1
 
-        with logger.spinner() as progress:
+        with log.logger.spinner() as progress:
             task = progress.add_task("Fetching repos...", total=None)
 
             while True:
@@ -153,13 +148,13 @@ class GitHubClient:
             seen.add(fn)
 
             if self._should_ignore_repo(fn):
-                logger.debug(f"Ignoring repo: {fn}")
+                log.logger.debug(f"Ignoring repo: {fn}")
                 ignored_count += 1
                 continue
 
             unique_repos.append(repo)
 
-        logger.info(f"Found {len(unique_repos)} repos ({ignored_count} ignored)")
+        log.logger.info(f"Found {len(unique_repos)} repos ({ignored_count} ignored)")
 
         if output_file:
             output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -167,7 +162,7 @@ class GitHubClient:
             with output_file.open("w") as f:
                 json.dump(unique_repos, f, indent=2)
 
-            logger.debug(f"Saved repository data to {output_file}")
+            log.logger.debug(f"Saved repository data to {output_file}")
 
         return unique_repos
 
@@ -183,21 +178,21 @@ class GitHubClient:
             try:
                 repo = self._get_repo_info(normalized)
                 repos.append(repo)
-                logger.debug(f"Found repo: {normalized}")
+                log.logger.debug(f"Found repo: {normalized}")
 
             except ValueError as e:
-                logger.warning(str(e))
+                log.logger.warning(str(e))
             except requests.HTTPError as e:
                 status_code = e.response.status_code if e.response else None
 
                 if status_code == 404:
-                    logger.warning(f"Repository not found: {normalized}")
+                    log.logger.warning(f"Repository not found: {normalized}")
                 elif status_code == 403:
-                    logger.warning(f"Access denied to {normalized} (check permissions)")
+                    log.logger.warning(f"Access denied to {normalized} (check permissions)")
                 else:
-                    logger.warning(f"Failed to fetch {normalized}: {e}")
+                    log.logger.warning(f"Failed to fetch {normalized}: {e}")
             except requests.RequestException as e:
-                logger.warning(f"Network error fetching {normalized}: {e}")
+                log.logger.warning(f"Network error fetching {normalized}: {e}")
 
         return repos
 
@@ -209,7 +204,7 @@ class GitHubClient:
     ) -> dict[str, int]:
         """Get aggregated language statistics across all repos or specific ones"""
         if specific_repos:
-            logger.info(f"Fetching {len(specific_repos)} specific repos")
+            log.logger.info(f"Fetching {len(specific_repos)} specific repos")
             repos = self._fetch_specific_repos(specific_repos)
 
             if repos_output:
@@ -218,12 +213,12 @@ class GitHubClient:
                 with repos_output.open("w") as f:
                     json.dump(repos, f, indent=2)
 
-                logger.debug(f"Saved repository data to {repos_output}")
+                log.logger.debug(f"Saved repository data to {repos_output}")
         else:
             repos = self._list_repos(output_file=repos_output)
 
         if not repos:
-            logger.warning("No repositories found, nothing to do")
+            log.logger.warning("No repositories found, nothing to do")
             return {}
 
         totals: defaultdict[str, int] = defaultdict(int)
@@ -232,15 +227,15 @@ class GitHubClient:
 
         # 10x speedup, no need for more
         # could be made configurable later if needed
-        num_workers = min(API_MAX_WORKERS, len(repos))
-        logger.debug(f"Using {num_workers} concurrent workers for {len(repos)} repos")
+        num_workers = min(constants.API_MAX_WORKERS, len(repos))
+        log.logger.debug(f"Using {num_workers} concurrent workers for {len(repos)} repos")
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             future_to_repo = {
                 executor.submit(self._get_repo_languages, repo["full_name"]): repo for repo in repos
             }
 
-            with logger.progress() as progress:
+            with log.logger.progress() as progress:
                 task = progress.add_task("Processing repos", total=len(repos))
 
                 for future in as_completed(future_to_repo):
@@ -254,18 +249,18 @@ class GitHubClient:
                             totals[lang] += int(bytes_count)
 
                         processed += 1
-                        logger.debug(f"Processed {full_name}")
+                        log.logger.debug(f"Processed {full_name}")
 
                     except requests.HTTPError as e:
                         skipped += 1
-                        logger.warning(f"Skipped {full_name}: {e}")
+                        log.logger.warning(f"Skipped {full_name}: {e}")
                     except Exception as e:
                         skipped += 1
-                        logger.warning(f"Skipped {full_name}: {e}")
+                        log.logger.warning(f"Skipped {full_name}: {e}")
 
                     progress.advance(task)
 
-        logger.success(f"Processed {processed} repositories ({skipped} skipped)")
+        log.logger.success(f"Processed {processed} repositories ({skipped} skipped)")
 
         result = dict(totals)
         if stats_output:
@@ -274,6 +269,6 @@ class GitHubClient:
             with stats_output.open("w") as f:
                 json.dump(result, f, indent=2)
 
-            logger.debug(f"Saved language statistics to {stats_output}")
+            log.logger.debug(f"Saved language statistics to {stats_output}")
 
         return result

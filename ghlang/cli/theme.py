@@ -1,14 +1,11 @@
 from rich.console import Console
 import typer
 
-from ghlang.cli.utils import get_active_theme
-from ghlang.cli.utils import get_config_dir
-from ghlang.cli.utils import handle_cli_errors
-from ghlang.cli.utils import load_themes_by_source
-from ghlang.display.themes import print_theme_info
-from ghlang.display.themes import print_theme_list
-from ghlang.static.themes import THEMES
-from ghlang.themes import load_all_themes
+from ghlang import themes
+from ghlang.display import themes as display_themes
+from ghlang.static import themes as static_themes
+
+from . import utils
 
 
 def theme(
@@ -29,20 +26,20 @@ def theme(
     ),
 ) -> None:
     """Manage themes"""
-    with handle_cli_errors():
+    with utils.handle_cli_errors():
         console = Console()
-        config_dir = get_config_dir()
+        config_dir = utils.get_config_dir()
 
         if refresh:
-            themes = load_all_themes(config_dir, force_refresh=True)
-            remote_count = len(themes) - len(THEMES)
+            refreshed = themes.load_all_themes(config_dir, force_refresh=True)
+            remote_count = len(refreshed) - len(static_themes.THEMES)
             console.print(
-                f"[green]Refreshed[/green] remote themes - {remote_count} remote theme(s) loaded"
+                f"[green]Refreshed[/green] remote themes: {remote_count} remote theme(s) loaded"
             )
             return
 
-        active = get_active_theme()
-        built_in, remote, custom = load_themes_by_source(config_dir)
+        active = utils.get_active_theme()
+        built_in, remote, custom = utils.load_themes_by_source(config_dir)
 
         if info and not list_themes:
             all_themes: dict[str, dict[str, str]] = {**built_in, **remote, **custom}
@@ -59,7 +56,7 @@ def theme(
             else:
                 source = "built-in"
 
-            print_theme_info(info, colors, source, is_active=info == active)
+            display_themes.print_theme_info(info, colors, source, is_active=info == active)
             return
 
-        print_theme_list(built_in, remote, custom, active)
+        display_themes.print_theme_list(built_in, remote, custom, active)

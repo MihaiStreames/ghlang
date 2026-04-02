@@ -3,18 +3,12 @@ from pathlib import Path
 
 import typer
 
-from ghlang.exceptions import ConfigError
-from ghlang.github_client import GitHubClient
-from ghlang.logging import logger
+from ghlang import exceptions
+from ghlang import github_client
+from ghlang import log
 
-from .charts import generate_charts
-from .charts import get_chart_title
-from .charts import get_output_path
-from .charts import save_json_stats
-from .utils import handle_cli_errors
-from .utils import setup_cli_environment
-from .utils import styles_autocomplete
-from .utils import themes_autocomplete
+from . import charts
+from . import utils
 
 
 def github(
@@ -87,19 +81,19 @@ def github(
         None,
         "--theme",
         help="Chart theme (default: light)",
-        autocompletion=themes_autocomplete,
+        autocompletion=utils.themes_autocomplete,
     ),
     style: str = typer.Option(
         "pixel",
         "--style",
         "-s",
         help="Chart style (default: pixel)",
-        autocompletion=styles_autocomplete,
+        autocompletion=utils.styles_autocomplete,
     ),
 ) -> None:
     """Analyze your GitHub repos"""
     try:
-        cfg, quiet, json_only = setup_cli_environment(
+        cfg, quiet, json_only = utils.setup_cli_environment(
             config_path=config_path,
             output_dir=output_dir,
             verbose=verbose,
@@ -109,12 +103,12 @@ def github(
             require_token=True,
         )
 
-    except ConfigError as e:
-        logger.error(str(e))
+    except exceptions.ConfigError as e:
+        log.logger.error(str(e))
         raise typer.Exit(1)
 
-    with handle_cli_errors():
-        client = GitHubClient(
+    with utils.handle_cli_errors():
+        client = github_client.GitHubClient(
             token=cfg.token,
             affiliation=cfg.affiliation,
             visibility=cfg.visibility,
@@ -122,24 +116,28 @@ def github(
         )
 
         language_stats = client.get_all_language_stats(
-            repos_output=get_output_path(cfg.output_dir, "repositories.json", save_json, stdout),
-            stats_output=get_output_path(cfg.output_dir, "language_stats.json", save_json, stdout),
+            repos_output=charts.get_output_path(
+                cfg.output_dir, "repositories.json", save_json, stdout
+            ),
+            stats_output=charts.get_output_path(
+                cfg.output_dir, "language_stats.json", save_json, stdout
+            ),
             specific_repos=repos,
         )
 
         if not language_stats:
-            logger.error("No language statistics found, nothing to visualize")
+            log.logger.error("No language statistics found, nothing to visualize")
             raise typer.Exit(1)
 
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            save_json_stats(language_stats, cfg.output_dir)
+            charts.save_json_stats(language_stats, cfg.output_dir)
         else:
-            generate_charts(
+            charts.generate_charts(
                 language_stats,
                 cfg,
-                title=get_chart_title(repos, title, "GitHub"),
+                title=charts.get_chart_title(repos, title, "GitHub"),
                 output=output,
                 style=style,
                 top_n=top_n,

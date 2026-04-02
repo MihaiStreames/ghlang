@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 
 import typer
 
-from ghlang.logging import logger
-from ghlang.styles import STYLES
-from ghlang.styles.constants import TOP_N
+from ghlang import log
+from ghlang import styles
+from ghlang.styles import constants as style_constants
 
 
 if TYPE_CHECKING:
@@ -40,28 +40,27 @@ def generate_charts(
     title: str | None = None,
     output: Path | None = None,
     style: str = "pixel",
-    top_n: int = TOP_N,
+    top_n: int = style_constants.TOP_N,
     save_json: bool = False,
 ) -> None:
     """Load colors and generate a chart in the requested style"""
-    from ghlang.colors import load_github_colors  # noqa: PLC0415
-    from ghlang.styles import get_style_registry  # noqa: PLC0415
+    from ghlang import colors as colors_mod  # noqa: PLC0415
 
-    style_fn = get_style_registry().get(style)
+    style_fn = styles.get_style_registry().get(style)
     if style_fn is None:
-        logger.error(f"Unknown style '{style}', available: {', '.join(STYLES)}")
+        log.logger.error(f"Unknown style '{style}', available: {', '.join(styles.STYLES)}")
         raise typer.Exit(1)
 
-    with logger.progress() as progress:
+    with log.logger.progress() as progress:
         task = progress.add_task("Generating chart", total=2)
 
         progress.update(task, description="Loading language colors...")
         colors_file = cfg.output_dir / "github_colors.json" if save_json else None
-        colors = load_github_colors(output_file=colors_file)
+        colors = colors_mod.load_github_colors(output_file=colors_file)
         progress.advance(task)
 
         if not colors:
-            logger.warning("Couldn't load GitHub colors, charts will be gray")
+            log.logger.warning("Couldn't load GitHub colors, charts will be gray")
             colors = {}
 
         # all output is PNG for now (SVG support TODO)
@@ -91,7 +90,7 @@ def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
     with stats_file.open("w") as f:
         json.dump(language_stats, f, indent=2)
 
-    logger.success(f"Saved stats to {stats_file}")
+    log.logger.success(f"Saved stats to {stats_file}")
 
 
 def get_output_path(output_dir: Path, filename: str, save_json: bool, stdout: bool) -> Path | None:

@@ -41,38 +41,38 @@ def config_dir_with_custom(tmp_path: Path) -> Path:
 @pytest.fixture
 def theme_env(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> None:
     """Patch theme module to use test config dir with 'light' active"""
-    monkeypatch.setattr("ghlang.cli.theme.get_config_dir", lambda: config_dir)
-    monkeypatch.setattr("ghlang.cli.theme.get_active_theme", lambda: "light")
-    monkeypatch.setattr("ghlang.cli.theme.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "light")
+    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_dark(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> None:
     """Patch theme module to use test config dir with 'dark' active"""
-    monkeypatch.setattr("ghlang.cli.theme.get_config_dir", lambda: config_dir)
-    monkeypatch.setattr("ghlang.cli.theme.get_active_theme", lambda: "dark")
-    monkeypatch.setattr("ghlang.cli.theme.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "dark")
+    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_remote(monkeypatch: pytest.MonkeyPatch, config_dir_with_remote: Path) -> None:
     """Patch theme module to use config dir with remote themes"""
-    monkeypatch.setattr("ghlang.cli.theme.get_config_dir", lambda: config_dir_with_remote)
-    monkeypatch.setattr("ghlang.cli.theme.get_active_theme", lambda: "light")
-    monkeypatch.setattr("ghlang.cli.theme.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir_with_remote)
+    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "light")
+    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_refresh(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> list[bool]:
     """Patch theme module for refresh test with fake load_all_themes"""
-    monkeypatch.setattr("ghlang.cli.theme.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
     calls: list[bool] = []
 
     def fake_load(_d: Path, force_refresh: bool = False) -> dict:
         calls.append(force_refresh)
         return {**THEMES, "monokai": {}}
 
-    monkeypatch.setattr("ghlang.cli.theme.load_all_themes", fake_load)
+    monkeypatch.setattr("ghlang.themes.load_all_themes", fake_load)
     return calls
 
 

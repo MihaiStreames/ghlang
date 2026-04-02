@@ -4,19 +4,12 @@ from sys import platform
 
 import typer
 
-from ghlang.exceptions import ConfigError
-from ghlang.exceptions import TokountNotFoundError
-from ghlang.logging import logger
-from ghlang.tokount_client import TokountClient
+from ghlang import exceptions
+from ghlang import log
+from ghlang import tokount_client
 
-from .charts import generate_charts
-from .charts import get_chart_title
-from .charts import get_output_path
-from .charts import save_json_stats
-from .utils import handle_cli_errors
-from .utils import setup_cli_environment
-from .utils import styles_autocomplete
-from .utils import themes_autocomplete
+from . import charts
+from . import utils
 
 
 def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
@@ -118,24 +111,24 @@ def local(
         None,
         "--theme",
         help="Chart theme (default: light)",
-        autocompletion=themes_autocomplete,
+        autocompletion=utils.themes_autocomplete,
     ),
     style: str = typer.Option(
         "pixel",
         "--style",
         "-s",
         help="Chart style (default: pixel)",
-        autocompletion=styles_autocomplete,
+        autocompletion=utils.styles_autocomplete,
     ),
 ) -> None:
     """Analyze local files with tokount"""
-    from ghlang.languages import normalize_language_stats  # noqa: PLC0415
+    from ghlang import languages  # noqa: PLC0415
 
     if paths is None:
         paths = [Path()]
 
     try:
-        cfg, quiet, json_only = setup_cli_environment(
+        cfg, quiet, json_only = utils.setup_cli_environment(
             config_path=config_path,
             output_dir=output_dir,
             verbose=verbose,
@@ -145,35 +138,37 @@ def local(
             require_token=False,
         )
 
-    except ConfigError as e:
-        logger.error(str(e))
+    except exceptions.ConfigError as e:
+        log.logger.error(str(e))
         raise typer.Exit(1)
 
     if follow_links and platform == "win32":
-        logger.error("--follow-links is not supported on Windows")
+        log.logger.error("--follow-links is not supported on Windows")
         raise typer.Exit(1)
 
     try:
-        tokount = TokountClient(ignored_dirs=cfg.ignored_dirs, follow_symlinks=follow_links)
-    except TokountNotFoundError as e:
-        logger.error(str(e))
+        tokount = tokount_client.TokountClient(
+            ignored_dirs=cfg.ignored_dirs, follow_symlinks=follow_links
+        )
+    except exceptions.TokountNotFoundError as e:
+        log.logger.error(str(e))
         raise typer.Exit(1)
 
-    with handle_cli_errors():
+    with utils.handle_cli_errors():
         all_stats: list[dict[str, dict]] = []
 
         for i, path in enumerate(paths, start=1):
             path_name = path.name or path.expanduser().resolve().name or "current"
             stats_output = None
             if len(paths) > 1:
-                stats_output = get_output_path(
+                stats_output = charts.get_output_path(
                     cfg.output_dir,
                     f"tokount_stats_{i:02d}_{path_name}.json",
                     save_json,
                     stdout,
                 )
             else:
-                stats_output = get_output_path(
+                stats_output = charts.get_output_path(
                     cfg.output_dir, "tokount_stats.json", save_json, stdout
                 )
 
@@ -187,21 +182,21 @@ def local(
             for lang, data in merged_stats.items()
             if lang != "_summary" and data["code"] > 0
         }
-        language_stats = normalize_language_stats(raw_stats)
+        language_stats = languages.normalize_language_stats(raw_stats)
 
         if not language_stats:
-            logger.error("No code found to analyze, nothing to visualize")
+            log.logger.error("No code found to analyze, nothing to visualize")
             raise typer.Exit(1)
 
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            save_json_stats(language_stats, cfg.output_dir)
+            charts.save_json_stats(language_stats, cfg.output_dir)
         else:
-            generate_charts(
+            charts.generate_charts(
                 language_stats,
                 cfg,
-                title=get_chart_title(paths, title, "Local"),
+                title=charts.get_chart_title(paths, title, "Local"),
                 output=output,
                 style=style,
                 top_n=top_n,

@@ -3,18 +3,11 @@ from pathlib import Path
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
-from ..logging import logger
-from ..themes import get_theme
-from .constants import BAR_FIGSIZE
-from .constants import BAR_HEIGHT
-from .constants import BAR_LABEL_FONTSIZE
-from .constants import BAR_LEGEND_FONTSIZE
-from .constants import BAR_LEGEND_NCOL
-from .constants import BAR_TITLE_FONTSIZE
-from .constants import BAR_TITLE_PAD
-from .constants import TOP_N
-from .utils import build_display_segments
-from .utils import save_matplotlib_chart
+from ghlang import log
+from ghlang import themes
+
+from . import constants
+from . import utils
 
 
 def generate_bar(
@@ -23,16 +16,16 @@ def generate_bar(
     output: Path,
     title: str | None = None,
     theme: str = "light",
-    top_n: int = TOP_N,
+    top_n: int = constants.TOP_N,
 ) -> None:
     """Generate a horizontal segmented bar chart showing top N languages"""
     title = title if title else f"Top {top_n} Languages"
-    logger.debug(f"Generating segmented bar chart (top {top_n} languages)...")
+    log.logger.debug(f"Generating segmented bar chart (top {top_n} languages)...")
 
-    theme_colors = get_theme(theme)
-    segments = build_display_segments(language_stats, top_n)
+    theme_colors = themes.get_theme(theme)
+    segments = utils.build_display_segments(language_stats, top_n)
 
-    fig, ax = plt.subplots(figsize=BAR_FIGSIZE)
+    fig, ax = plt.subplots(figsize=constants.BAR_FIGSIZE)
     fig.patch.set_facecolor(theme_colors["background"])
     ax.set_facecolor(theme_colors["background"])
 
@@ -46,7 +39,7 @@ def generate_bar(
         ax.barh(
             0,
             width,
-            BAR_HEIGHT,
+            constants.BAR_HEIGHT,
             left=left,
             color=color,
             edgecolor=theme_colors["background"],
@@ -60,7 +53,7 @@ def generate_bar(
             ha="center",
             va="center",
             color="white",
-            fontsize=BAR_LABEL_FONTSIZE,
+            fontsize=constants.BAR_LABEL_FONTSIZE,
             weight="bold",
         )
 
@@ -78,9 +71,9 @@ def generate_bar(
         handles=legend_elements,
         loc="upper center",
         bbox_to_anchor=(0.5, 0.05),
-        ncol=min(len(segments), BAR_LEGEND_NCOL),
+        ncol=min(len(segments), constants.BAR_LEGEND_NCOL),
         frameon=False,
-        fontsize=BAR_LEGEND_FONTSIZE,
+        fontsize=constants.BAR_LEGEND_FONTSIZE,
     )
     for text in legend.get_texts():
         text.set_color(theme_colors["secondary"])
@@ -91,11 +84,11 @@ def generate_bar(
 
     ax.set_title(
         title,
-        fontsize=BAR_TITLE_FONTSIZE,
+        fontsize=constants.BAR_TITLE_FONTSIZE,
         weight="bold",
         color=theme_colors["text"],
-        pad=BAR_TITLE_PAD,
+        pad=constants.BAR_TITLE_PAD,
     )
 
-    save_matplotlib_chart(output, theme_colors["background"])
-    logger.success(f"Saved segmented bar chart to {output}")
+    utils.save_matplotlib_chart(output, theme_colors["background"])
+    log.logger.success(f"Saved segmented bar chart to {output}")
