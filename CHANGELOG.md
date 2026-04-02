@@ -48,9 +48,13 @@
 - Module restructure: `styles/` for chart rendering, `display/` for Rich console output, `cli/charts.py` for chart orchestration
 - Extracted `colors.py` (linguist color loading), `languages.py` (tokount name normalization), `get_theme()` moved to `themes.py`
 - `styles/` is now a pure rendering layer - no network IO, no config dependencies
+- Adopted Google/Django module-import convention - all internal imports are module imports
+- Renamed `logging.py` to `log.py` to avoid stdlib collision
+- NumPy-style docstrings on all public functions and classes
 - `build_display_segments()` shared utility - top_n and hide threshold applied consistently across all styles
 - "Other" aggregate now uses theme fallback color in all styles (was inconsistent between pie/bar)
 - Pie chart shows all languages regardless of top_n; only hides percentage label text below threshold
+- Added benchmark scripts (`scripts/benchmark.sh`) for import profiling, startup timing, and chart generation
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
