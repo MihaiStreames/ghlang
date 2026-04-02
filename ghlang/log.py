@@ -7,7 +7,13 @@ from rich.progress import TextColumn
 
 
 class Logger:
-    """Loguru-style logger using Rich for output"""
+    """Loguru-style logger using Rich for output.
+
+    Attributes
+    ----------
+    console : Console
+        Rich console used for all output.
+    """
 
     def __init__(self) -> None:
         self.console = Console()

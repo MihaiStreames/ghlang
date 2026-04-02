@@ -26,7 +26,27 @@ VALID_KEYS: dict[str, set[str]] = {
 
 @dataclass
 class Config:
-    """Configuration for the language stats"""
+    """Configuration for the language stats.
+
+    Attributes
+    ----------
+    token : str
+        GitHub personal access token.
+    affiliation : str
+        Comma-separated repo affiliations (owner, collaborator, organization_member).
+    visibility : str
+        Repo visibility filter (all, public, private).
+    ignored_repos : list[str]
+        Glob patterns for repos to skip.
+    ignored_dirs : list[str]
+        Directory names tokount should skip.
+    output_dir : Path
+        Directory where charts and JSON files are written.
+    verbose : bool
+        Enable debug-level log output.
+    theme : str
+        Name of the chart color theme.
+    """
 
     # GitHub settings
     token: str = ""
@@ -80,7 +100,14 @@ def _validate_config(data: dict) -> None:
 
 
 def get_config_path() -> Path:
-    """Get the platform-specific config file path"""
+    """Return the platform-specific config file path.
+
+    Returns
+    -------
+    Path
+        ``~/.config/ghlang/config.toml`` on Unix,
+        ``~/AppData/Local/ghlang/config.toml`` on Windows.
+    """
     if sys.platform == "win32":
         base = Path.home() / "AppData" / "Local"
     else:
@@ -89,7 +116,13 @@ def get_config_path() -> Path:
 
 
 def create_default_config(config_path: Path) -> None:
-    """Create a default config file from template"""
+    """Create a default config file from the bundled template.
+
+    Parameters
+    ----------
+    config_path : Path
+        Destination path. Parent directories are created if needed.
+    """
     config_path.parent.mkdir(parents=True, exist_ok=True)
     default_content = resources.files("ghlang.static").joinpath("default_config.toml").read_text()
     config_path.write_text(default_content)
@@ -101,7 +134,29 @@ def load_config(
     cli_overrides: dict | None = None,
     require_token: bool = True,
 ) -> Config:
-    """Load config from TOML file with optional CLI overrides"""
+    """Load config from TOML file with optional CLI overrides.
+
+    Parameters
+    ----------
+    config_path : Path | None
+        Explicit path to the TOML file. Uses the platform default when *None*.
+    cli_overrides : dict | None
+        Key-value pairs that override values read from the file.
+    require_token : bool
+        Raise ``MissingTokenError`` when the GitHub token is empty.
+
+    Returns
+    -------
+    Config
+        Populated configuration dataclass.
+
+    Raises
+    ------
+    MissingTokenError
+        If *require_token* is True and no valid token is found.
+    ConfigError
+        If the TOML file cannot be parsed.
+    """
     if config_path is None:
         config_path = get_config_path()
 

@@ -10,6 +10,7 @@ from ghlang.display import config as display_config
 
 
 def _open_in_editor(path: Path) -> None:
+    """Open a file in the user's editor or system default"""
     editor = os.environ.get("EDITOR")
 
     if editor:

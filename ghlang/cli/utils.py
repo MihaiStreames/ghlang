@@ -35,7 +35,18 @@ def get_active_theme() -> str:
 def load_themes_by_source(
     config_dir: Path,
 ) -> tuple[dict[str, dict[str, str]], dict[str, dict[str, str]], dict[str, dict[str, str]]]:
-    """Return (built-in, remote, custom) theme dicts loaded independently"""
+    """Load themes split by origin for display purposes.
+
+    Parameters
+    ----------
+    config_dir : Path
+        Config directory containing cached theme files.
+
+    Returns
+    -------
+    tuple[dict, dict, dict]
+        Three dicts: (built-in, remote, custom) theme registries.
+    """
     built_in: dict[str, dict[str, str]] = dict(static_themes.THEMES)
 
     remote: dict[str, dict[str, str]] = {}
@@ -54,12 +65,12 @@ def load_themes_by_source(
 
 
 def format_autocomplete(incomplete: str) -> list[str]:
-    """Callback for output formats"""
+    """Return matching output format completions"""
     return [f for f in ["png", "svg"] if f.startswith(incomplete)]
 
 
 def themes_autocomplete(incomplete: str) -> list[str]:
-    """Callback for theme names"""
+    """Return matching theme name completions"""
     themes = list(static_themes.THEMES.keys())
 
     config_path = config.get_config_path()
@@ -77,7 +88,7 @@ def themes_autocomplete(incomplete: str) -> list[str]:
 
 
 def styles_autocomplete(incomplete: str) -> list[str]:
-    """Callback for chart styles"""
+    """Return matching chart style completions"""
     return [s for s in styles.STYLES if s.startswith(incomplete)]
 
 
@@ -90,7 +101,30 @@ def setup_cli_environment(
     quiet: bool,
     require_token: bool,
 ) -> tuple[Config, bool, bool]:
-    """Common CLI setup tasks"""
+    """Load config, configure logging, and create output directory.
+
+    Parameters
+    ----------
+    config_path : Path | None
+        Explicit config file path, or *None* for platform default.
+    output_dir : Path | None
+        Override for the output directory.
+    verbose : bool
+        Enable debug logging.
+    theme : str | None
+        Override for the chart theme.
+    stdout : bool
+        Send JSON to stdout (implies quiet and json_only).
+    quiet : bool
+        Suppress non-error log output.
+    require_token : bool
+        Whether a valid GitHub token must be present.
+
+    Returns
+    -------
+    tuple[Config, bool, bool]
+        ``(config, quiet, json_only)`` ready for the command handler.
+    """
     if stdout:
         quiet = True
         json_only = True
@@ -122,7 +156,14 @@ def setup_cli_environment(
 
 @contextmanager
 def handle_cli_errors() -> Iterator[None]:
-    """Context manager for handling CLI exceptions"""
+    """Catch unexpected exceptions, log them, and exit with code 1.
+
+    Raises
+    ------
+    typer.Exit
+        Re-raised directly when the wrapped code calls ``typer.Exit``.
+        All other exceptions are logged and converted to ``typer.Exit(1)``.
+    """
     try:
         yield
     except typer.Exit:

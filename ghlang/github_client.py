@@ -14,7 +14,21 @@ from . import log
 
 
 class GitHubClient:
-    """Client for interacting with GitHub API"""
+    """Client for interacting with the GitHub REST API.
+
+    Attributes
+    ----------
+    _api : str
+        Base URL for the GitHub API.
+    _session : requests.Session
+        Authenticated HTTP session with GitHub headers.
+    _affiliation : str
+        Repo affiliation filter.
+    _visibility : str
+        Repo visibility filter.
+    _ignored_repos : list[str]
+        Glob patterns for repos to skip.
+    """
 
     def __init__(
         self,
@@ -40,6 +54,7 @@ class GitHubClient:
         self._base_delay = constants.API_BASE_DELAY
 
     def _log_rate_limit(self, response: requests.Response) -> None:
+        """Log remaining API rate limit from response headers"""
         remaining = response.headers.get("X-RateLimit-Remaining")
         limit = response.headers.get("X-RateLimit-Limit")
 
@@ -47,6 +62,7 @@ class GitHubClient:
             log.logger.debug(f"Rate limit: {remaining}/{limit} remaining")
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
+        """Send GET request with retry and rate-limit handling"""
         r = None
         for attempt in range(self._max_retries):
             r = self._session.get(url, params=params)
@@ -76,6 +92,7 @@ class GitHubClient:
         return r  # type: ignore[return-value]
 
     def _normalize_repo_pattern(self, pattern: str) -> str:
+        """Strip GitHub URL prefixes to get owner/repo"""
         prefixes = ["https://github.com/", "http://github.com/", "github.com/"]
 
         for prefix in prefixes:
@@ -85,10 +102,12 @@ class GitHubClient:
         return pattern
 
     def _validate_repo_name(self, repo_name: str) -> bool:
+        """Check that repo_name matches owner/repo format"""
         pattern = r"^[\w\-\.]+/[\w\-\.]+$"
         return bool(re.match(pattern, repo_name)) and len(repo_name) <= 100
 
     def _should_ignore_repo(self, full_name: str) -> bool:
+        """Return True if full_name matches any ignored-repo glob"""
         for pattern in self._ignored_repos:
             normalized = self._normalize_repo_pattern(pattern)
 
@@ -100,12 +119,14 @@ class GitHubClient:
         return False
 
     def _get_repo_info(self, full_name: str) -> dict:
+        """Fetch metadata for a single repo"""
         if not self._validate_repo_name(full_name):
             raise ValueError(f"Invalid repository name format: {full_name}")
         r = self._get(f"{self._api}/repos/{full_name}")
         return dict(r.json())
 
     def _list_repos(self, output_file: Path | None = None) -> list[dict]:
+        """Paginate all repos matching affiliation/visibility filters"""
         log.logger.info("Fetching repos")
         repos = []
         page = 1
@@ -167,10 +188,12 @@ class GitHubClient:
         return unique_repos
 
     def _get_repo_languages(self, full_name: str) -> dict[str, int]:
+        """Fetch byte-count language breakdown for a single repo"""
         r = self._get(f"{self._api}/repos/{full_name}/languages")
         return dict(r.json())
 
     def _fetch_specific_repos(self, specific_repos: list[str]) -> list[dict]:
+        """Resolve a list of owner/repo strings to repo dicts"""
         repos = []
         for repo_name in specific_repos:
             normalized = self._normalize_repo_pattern(repo_name)
@@ -202,7 +225,23 @@ class GitHubClient:
         stats_output: Path | None = None,
         specific_repos: list[str] | None = None,
     ) -> dict[str, int]:
-        """Get aggregated language statistics across all repos or specific ones"""
+        """Aggregate language byte counts across all repos or specific ones
+
+        Parameters
+        ----------
+        repos_output : Path | None
+            If given, write the repo list JSON to this path.
+        stats_output : Path | None
+            If given, write the aggregated stats JSON to this path.
+        specific_repos : list[str] | None
+            Explicit owner/repo names. When *None*, all repos matching the
+            client's affiliation/visibility filters are used.
+
+        Returns
+        -------
+        dict[str, int]
+            Language name to total byte count. Empty dict when no repos found.
+        """
         if specific_repos:
             log.logger.info(f"Fetching {len(specific_repos)} specific repos")
             repos = self._fetch_specific_repos(specific_repos)

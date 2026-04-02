@@ -12,6 +12,7 @@ from . import utils
 
 
 def _shade(rgb: tuple[int, int, int], f: float) -> tuple[int, int, int]:
+    """Scale an RGB color by factor *f*, clamping to 0-255"""
     r, g, b = rgb
     return min(255, max(0, int(r * f))), min(255, max(0, int(g * f))), min(255, max(0, int(b * f)))
 
@@ -22,6 +23,7 @@ def _build_segments(
     top_n: int,
     fallback: tuple[int, int, int],
 ) -> list[tuple[str, float, tuple[int, int, int], int, int]]:
+    """Build tower segments with pixel-grid y-offsets"""
     display = utils.build_display_segments(language_stats, top_n)
 
     colored = [
@@ -59,6 +61,7 @@ def _draw_iso_block(
     h_real: int,
     color: tuple[int, int, int],
 ) -> None:
+    """Draw a single isometric block with three shaded faces"""
     hw = w_real // 2
     qw = w_real // 4
     top_y = base_y - h_real - qw * 2
@@ -83,7 +86,23 @@ def generate_pixel(
     theme: str = "light",
     top_n: int = constants.TOP_N,
 ) -> None:
-    """Generate a pixel-art isometric tower chart showing language distribution"""
+    """Generate a pixel-art isometric tower chart showing language distribution.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    colors : dict[str, str]
+        Language name to hex color mapping.
+    output : Path
+        Destination PNG file path.
+    title : str | None
+        Chart title. Defaults to ``"Lang Stats"``.
+    theme : str
+        Theme name for background and text colors.
+    top_n : int
+        Maximum number of language segments before grouping into "Other".
+    """
     title = title if title else "Lang Stats"
     log.logger.debug(f"Generating pixel chart with {len(language_stats)} languages...")
 

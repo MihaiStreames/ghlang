@@ -12,7 +12,23 @@ def build_display_segments(
     language_stats: dict[str, int],
     top_n: int,
 ) -> list[tuple[str, float]]:
-    """Build (name, pct) segments applying top_n + constants.HIDE_THRESHOLD, remainder into 'Other'"""
+    """Build display segments from raw language stats.
+
+    Keep the top *top_n* languages above the hide threshold and fold the
+    remainder into an "Other" bucket.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    top_n : int
+        Maximum number of individual language segments.
+
+    Returns
+    -------
+    list[tuple[str, float]]
+        ``(name, percentage)`` pairs, possibly ending with ``("Other", ...)``.
+    """
     items = sorted(language_stats.items(), key=lambda x: x[1], reverse=True)
     total = sum(language_stats.values()) or 1
 
@@ -33,7 +49,18 @@ def build_display_segments(
 
 
 def hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
-    """Convert #RRGGBB hex string to (R, G, B) tuple"""
+    """Convert a ``#RRGGBB`` hex string to an ``(R, G, B)`` tuple.
+
+    Parameters
+    ----------
+    hex_color : str
+        Hex color string, with or without leading ``#``.
+
+    Returns
+    -------
+    tuple[int, int, int]
+        Red, green, blue channel values (0-255).
+    """
     h = hex_color.lstrip("#")
     return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
@@ -41,7 +68,20 @@ def hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
 def add_rounded_corners(
     img: Image.Image, radius: int = constants.ROUNDED_CORNER_RADIUS
 ) -> Image.Image:
-    """Add rounded corners to an image"""
+    """Return a copy of *img* with rounded-corner alpha masking applied.
+
+    Parameters
+    ----------
+    img : Image.Image
+        Source image (converted to RGBA internally).
+    radius : int
+        Corner radius in pixels.
+
+    Returns
+    -------
+    Image.Image
+        RGBA image with transparent corners.
+    """
     img = img.convert("RGBA")
     mask = Image.new("L", img.size, 0)
     draw = ImageDraw.Draw(mask)
@@ -51,7 +91,15 @@ def add_rounded_corners(
 
 
 def save_matplotlib_chart(output: Path, background_color: str) -> None:
-    """Save matplotlib figure to PNG with rounded corners"""
+    """Save the current matplotlib figure to PNG with rounded corners.
+
+    Parameters
+    ----------
+    output : Path
+        Destination file path. Parent directories are created if needed.
+    background_color : str
+        Hex color used as the figure face color.
+    """
     # TODO: re-enable SVG support once PNG pipeline is stable
     output.parent.mkdir(parents=True, exist_ok=True)
 

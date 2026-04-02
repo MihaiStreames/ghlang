@@ -8,6 +8,7 @@ from . import log
 
 
 def _find_tokount() -> Path:
+    """Locate the tokount binary in PATH"""
     tokount_path = shutil.which("tokount")
     if tokount_path is None:
         raise exceptions.TokountNotFoundError()
@@ -15,7 +16,17 @@ def _find_tokount() -> Path:
 
 
 class TokountClient:
-    """Client for running tokount on local files/directories"""
+    """Client for running tokount on local files/directories.
+
+    Attributes
+    ----------
+    _ignored_dirs : list[str]
+        Directory names passed to tokount's exclude flag.
+    _follow_symlinks : bool
+        Whether tokount should follow symlinks.
+    _tokount_path : Path
+        Resolved path to the tokount binary.
+    """
 
     def __init__(self, ignored_dirs: list[str], follow_symlinks: bool = False):
         self._ignored_dirs = ignored_dirs
@@ -23,6 +34,7 @@ class TokountClient:
         self._tokount_path = _find_tokount()
 
     def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
+        """Assemble the tokount CLI invocation"""
         cmd = [str(tokount_path), str(path.resolve()), "-o", "json"]
 
         if self._follow_symlinks:
@@ -34,6 +46,7 @@ class TokountClient:
         return cmd
 
     def _parse_tokount_error(self, stderr: str) -> exceptions.TokountError | None:
+        """Parse tokount's JSON stderr into a typed exception"""
         try:
             data = json.loads(stderr)
         except json.JSONDecodeError:
@@ -99,7 +112,21 @@ class TokountClient:
         path: Path,
         stats_output: Path | None = None,
     ) -> dict[str, dict]:
-        """Get language statistics for a path"""
+        """Run tokount on a path and return per-language line counts
+
+        Parameters
+        ----------
+        path : Path
+            File or directory to analyze.
+        stats_output : Path | None
+            If given, write the raw tokount JSON to this path.
+
+        Returns
+        -------
+        dict[str, dict]
+            Language name to ``{files, blank, comment, code}`` mapping.
+            A ``_summary`` key holds totals across all languages.
+        """
         log.logger.info(f"Analyzing {path}")
 
         raw_output = self._analyze_path(path)

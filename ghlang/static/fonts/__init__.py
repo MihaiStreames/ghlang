@@ -9,13 +9,34 @@ from PIL import Image
 
 @lru_cache(maxsize=1)
 def load_cozette() -> Font:
-    """Load Cozette BDF font, cached on first call"""
+    """Load the Cozette BDF bitmap font, cached after first call.
+
+    Returns
+    -------
+    Font
+        Parsed BDF font object.
+    """
     font_path = Path(__file__).parent / "cozette.bdf"
     return Font(str(font_path))
 
 
 def render_text(text: str, color: tuple[int, int, int], scale: int = 1) -> Image.Image:
-    """Render text string as a PIL RGBA image using Cozette font"""
+    """Render a text string as a PIL RGBA image using the Cozette font.
+
+    Parameters
+    ----------
+    text : str
+        Text to render.
+    color : tuple[int, int, int]
+        Foreground RGB color.
+    scale : int
+        Integer scaling factor applied to the bitmap.
+
+    Returns
+    -------
+    Image.Image
+        RGBA image with transparent background and colored glyphs.
+    """
     font = load_cozette()
     bm = font.draw(text)
     if scale > 1:
@@ -41,10 +62,34 @@ def render_text(text: str, color: tuple[int, int, int], scale: int = 1) -> Image
 
 
 def text_width(text: str, scale: int = 1) -> int:
-    """Return the pixel width of rendered text at given scale"""
+    """Return the pixel width of *text* at the given scale.
+
+    Parameters
+    ----------
+    text : str
+        Text to measure.
+    scale : int
+        Integer scaling factor.
+
+    Returns
+    -------
+    int
+        Width in pixels.
+    """
     return int(load_cozette().draw(text).width()) * scale
 
 
 def text_height(scale: int = 1) -> int:
-    """Return the pixel height for any text at given scale"""
+    """Return the line height in pixels at the given scale.
+
+    Parameters
+    ----------
+    scale : int
+        Integer scaling factor.
+
+    Returns
+    -------
+    int
+        Height in pixels.
+    """
     return int(load_cozette().headers["fbby"]) * scale

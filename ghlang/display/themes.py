@@ -8,7 +8,19 @@ def print_theme_info(
     source: str,
     is_active: bool,
 ) -> None:
-    """Print a single theme's color keys, hex values, and swatches"""
+    """Print a single theme's color keys, hex values, and swatches.
+
+    Parameters
+    ----------
+    name : str
+        Theme name.
+    colors : dict[str, str]
+        Color key to hex value mapping.
+    source : str
+        Origin label (built-in, remote, custom).
+    is_active : bool
+        Whether this theme is currently active.
+    """
     console = Console()
     active_tag = "  [green]*active[/green]" if is_active else ""
     console.print(f"\n[bold cyan]{name}[/bold cyan]  [dim]({source})[/dim]{active_tag}\n")
@@ -31,7 +43,19 @@ def print_theme_list(
     custom: dict[str, dict[str, str]],
     active: str,
 ) -> None:
-    """Print all themes grouped by source with active marker"""
+    """Print all themes grouped by source with an active marker.
+
+    Parameters
+    ----------
+    built_in : dict[str, dict[str, str]]
+        Built-in theme registry.
+    remote : dict[str, dict[str, str]]
+        Remote theme registry.
+    custom : dict[str, dict[str, str]]
+        Custom theme registry.
+    active : str
+        Name of the currently active theme (marked with ``*``).
+    """
     console = Console()
 
     table = Table(show_header=True, header_style="bold", box=None, padding=(0, 2))

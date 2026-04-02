@@ -12,6 +12,7 @@ from .static import themes as static_themes
 
 
 def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dict[str, str]]:
+    """Fetch remote theme manifest with local cache"""
     cache_meta = cache_path.with_suffix(".json.meta")
 
     if not force and cache_path.exists() and cache_meta.exists():
@@ -48,7 +49,20 @@ def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dic
 
 
 def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, dict[str, str]]:
-    """Load: built-in + remote + custom"""
+    """Load all themes: built-in, remote, and custom.
+
+    Parameters
+    ----------
+    config_dir : Path
+        Config directory containing ``themes.json`` and ``custom_themes.json``.
+    force_refresh : bool
+        Bypass the remote theme cache TTL.
+
+    Returns
+    -------
+    dict[str, dict[str, str]]
+        Merged theme registry keyed by theme name.
+    """
     themes = static_themes.THEMES.copy()
 
     remote_path = config_dir / "themes.json"
@@ -68,7 +82,18 @@ def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, 
 
 
 def get_theme(theme: str) -> dict[str, str]:
-    """Get theme colors (built-in + remote + custom), defaulting to light if invalid"""
+    """Look up a theme by name, falling back to light if not found.
+
+    Parameters
+    ----------
+    theme : str
+        Theme name to look up.
+
+    Returns
+    -------
+    dict[str, str]
+        Color key to hex value mapping for the resolved theme.
+    """
     config_dir = config.get_config_path().parent
 
     all_themes = load_all_themes(config_dir)

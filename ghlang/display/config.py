@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 
 def _format_value(value: object) -> str:
+    """Format a config value with Rich markup"""
     if isinstance(value, bool):
         return "[green]true[/green]" if value else "[red]false[/red]"
 
@@ -27,7 +28,15 @@ def _format_value(value: object) -> str:
 
 
 def print_config(cfg: "Config", config_path: Path) -> None:
-    """Print config as formatted section tables"""
+    """Print the active configuration as Rich-formatted section tables.
+
+    Parameters
+    ----------
+    cfg : Config
+        Loaded configuration dataclass.
+    config_path : Path
+        Path to the config file (shown as a header).
+    """
     console = Console()
     console.print(f"\n[bold]Config:[/bold] {config_path}\n")
 
@@ -73,7 +82,13 @@ def print_config(cfg: "Config", config_path: Path) -> None:
 
 
 def print_raw_config(config_path: Path) -> None:
-    """Print syntax-highlighted TOML config"""
+    """Print the raw TOML config file with syntax highlighting.
+
+    Parameters
+    ----------
+    config_path : Path
+        Path to the TOML config file.
+    """
     console = Console()
     syntax = Syntax(config_path.read_text(), "toml", theme="ansi_dark", line_numbers=True)
     console.print(syntax)

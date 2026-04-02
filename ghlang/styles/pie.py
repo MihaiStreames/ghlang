@@ -17,7 +17,23 @@ def generate_pie(
     theme: str = "light",
     **_kwargs: object,
 ) -> None:
-    """Generate a pie chart showing language distribution"""
+    """Generate a pie chart showing language distribution.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    colors : dict[str, str]
+        Language name to hex color mapping.
+    output : Path
+        Destination PNG file path.
+    title : str | None
+        Chart title. Defaults to ``"Language Distribution"``.
+    theme : str
+        Theme name for background, text, and legend colors.
+    **_kwargs : object
+        Ignored extra keyword arguments for signature compatibility.
+    """
     title = title if title else "Language Distribution"
     log.logger.debug(f"Generating pie chart with {len(language_stats)} languages...")
 

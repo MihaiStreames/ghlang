@@ -18,7 +18,23 @@ def generate_bar(
     theme: str = "light",
     top_n: int = constants.TOP_N,
 ) -> None:
-    """Generate a horizontal segmented bar chart showing top N languages"""
+    """Generate a horizontal segmented bar chart showing top N languages.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    colors : dict[str, str]
+        Language name to hex color mapping.
+    output : Path
+        Destination PNG file path.
+    title : str | None
+        Chart title. Defaults to ``"Top {top_n} Languages"``.
+    theme : str
+        Theme name for background, text, and legend colors.
+    top_n : int
+        Maximum number of language segments before grouping into "Other".
+    """
     title = title if title else f"Top {top_n} Languages"
     log.logger.debug(f"Generating segmented bar chart (top {top_n} languages)...")
 

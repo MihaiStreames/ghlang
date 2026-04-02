@@ -13,6 +13,7 @@ from . import utils
 
 
 def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
+    """Sum per-language counters across multiple tokount results"""
     merged: dict[str, dict] = {}
 
     for stats in all_stats:

@@ -7,7 +7,13 @@ class ConfigError(GhlangError):
 
 
 class MissingTokenError(ConfigError):
-    """Raised when GitHub token is not configured"""
+    """Raised when GitHub token is not configured.
+
+    Attributes
+    ----------
+    config_path : str | None
+        Path to the config file, shown in the error message when available.
+    """
 
     def __init__(self, config_path: str | None = None):
         msg = "It looks like your GitHub token isn't set up yet!\n"
@@ -20,7 +26,15 @@ class MissingTokenError(ConfigError):
 
 
 class TokountError(GhlangError):
-    """Raised when tokount fails"""
+    """Raised when tokount fails.
+
+    Attributes
+    ----------
+    kind : str | None
+        Machine-readable error category from tokount's JSON stderr.
+    details : dict[str, str]
+        Extra context fields from tokount's error payload.
+    """
 
     def __init__(
         self,

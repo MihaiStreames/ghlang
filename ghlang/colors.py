@@ -9,7 +9,19 @@ from . import log
 
 
 def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
-    """Fetch GitHub's language colors from linguist YAML"""
+    """Fetch GitHub's language colors from the linguist YAML.
+
+    Parameters
+    ----------
+    output_file : Path | None
+        If given, write the color map to this path as JSON.
+
+    Returns
+    -------
+    dict[str, str]
+        Mapping of language name to hex color string (e.g. ``"#3572A5"``).
+        Empty dict on network failure.
+    """
     log.logger.info("Grabbing language colors from GitHub")
 
     try:

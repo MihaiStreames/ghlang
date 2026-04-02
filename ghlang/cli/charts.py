@@ -16,7 +16,22 @@ if TYPE_CHECKING:
 
 
 def get_chart_title(items: list | None, custom_title: str | None, source: str) -> str:
-    """Generate chart title based on items or custom title"""
+    """Generate a chart title from the analyzed items or a custom override.
+
+    Parameters
+    ----------
+    items : list | None
+        Repos (str) or paths (Path) being analyzed.
+    custom_title : str | None
+        Explicit title that takes priority when set.
+    source : str
+        Label for the data source (``"GitHub"`` or ``"Local"``).
+
+    Returns
+    -------
+    str
+        Human-readable chart title.
+    """
     if custom_title:
         return custom_title
 
@@ -43,7 +58,30 @@ def generate_charts(
     top_n: int = style_constants.TOP_N,
     save_json: bool = False,
 ) -> None:
-    """Load colors and generate a chart in the requested style"""
+    """Load language colors and render a chart in the requested style.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    cfg : Config
+        Active configuration (provides output_dir and theme).
+    title : str | None
+        Chart title. Auto-generated when *None*.
+    output : Path | None
+        Custom output filename or path.
+    style : str
+        Chart style name (pixel, pie, bar).
+    top_n : int
+        Maximum number of languages shown before grouping into "Other".
+    save_json : bool
+        Also persist the GitHub color map as JSON.
+
+    Raises
+    ------
+    typer.Exit
+        If the requested style is unknown.
+    """
     from ghlang import colors as colors_mod  # noqa: PLC0415
 
     style_fn = styles.get_style_registry().get(style)
@@ -84,7 +122,15 @@ def generate_charts(
 
 
 def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
-    """Save language stats as JSON file"""
+    """Write language stats to ``language_stats.json`` in *output_dir*.
+
+    Parameters
+    ----------
+    language_stats : dict[str, int]
+        Language name to count mapping.
+    output_dir : Path
+        Directory to write the JSON file into.
+    """
     stats_file = output_dir / "language_stats.json"
 
     with stats_file.open("w") as f:
@@ -94,7 +140,24 @@ def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
 
 
 def get_output_path(output_dir: Path, filename: str, save_json: bool, stdout: bool) -> Path | None:
-    """Get output path for JSON files or None if not saving"""
+    """Return a JSON output path, or None when saving is disabled.
+
+    Parameters
+    ----------
+    output_dir : Path
+        Base directory for output files.
+    filename : str
+        JSON filename to use.
+    save_json : bool
+        Whether JSON saving is enabled.
+    stdout : bool
+        Whether output is going to stdout (suppresses file writes).
+
+    Returns
+    -------
+    Path | None
+        Full path when saving is enabled, otherwise *None*.
+    """
     if not save_json or stdout:
         return None
     return output_dir / filename
