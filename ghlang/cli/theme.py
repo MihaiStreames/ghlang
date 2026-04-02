@@ -1,11 +1,12 @@
 from rich.console import Console
-from rich.table import Table
 import typer
 
 from ghlang.cli.utils import get_active_theme
 from ghlang.cli.utils import get_config_dir
 from ghlang.cli.utils import handle_cli_errors
 from ghlang.cli.utils import load_themes_by_source
+from ghlang.display.themes import print_theme_info
+from ghlang.display.themes import print_theme_list
 from ghlang.static.themes import THEMES
 from ghlang.themes import load_all_themes
 
@@ -58,36 +59,7 @@ def theme(
             else:
                 source = "built-in"
 
-            active_tag = "  [green]*active[/green]" if info == active else ""
-            console.print(f"\n[bold cyan]{info}[/bold cyan]  [dim]({source})[/dim]{active_tag}\n")
-
-            table = Table(show_header=False, box=None, padding=(0, 2))
-            table.add_column("Key", style="cyan")
-            table.add_column("Hex")
-            table.add_column("Swatch")
-
-            for key, hex_val in colors.items():
-                swatch = f"[on {hex_val}]   [/on {hex_val}]"
-                table.add_row(key, hex_val, swatch)
-
-            console.print(table)
-            console.print()
+            print_theme_info(info, colors, source, is_active=info == active)
             return
 
-        table = Table(show_header=True, header_style="bold", box=None, padding=(0, 2))
-        table.add_column("Theme", style="cyan")
-        table.add_column("Source")
-        table.add_column("")
-
-        for source_label, themes_dict in [
-            ("built-in", built_in),
-            ("remote", remote),
-            ("custom", custom),
-        ]:
-            for theme_name in sorted(themes_dict):
-                marker = "[green]*[/green]" if theme_name == active else ""
-                table.add_row(theme_name, source_label, marker)
-
-        console.print()
-        console.print(table)
-        console.print(f"\n  [dim]* = active theme ({active})[/dim]\n")
+        print_theme_list(built_in, remote, custom, active)

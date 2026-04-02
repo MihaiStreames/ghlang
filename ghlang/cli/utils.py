@@ -11,10 +11,10 @@ import typer
 
 from ghlang.config import get_config_path
 from ghlang.config import load_config
-from ghlang.display import STYLES
-from ghlang.display.constants import TOP_N
 from ghlang.logging import logger
 from ghlang.static.themes import THEMES
+from ghlang.styles import STYLES
+from ghlang.styles.constants import TOP_N
 
 
 if TYPE_CHECKING:
@@ -112,8 +112,8 @@ def generate_charts(
     save_json: bool = False,
 ) -> None:
     """Load colors and generate a chart in the requested style"""
-    from ghlang.display import get_style_registry  # noqa: PLC0415
-    from ghlang.display.utils import load_github_colors  # noqa: PLC0415
+    from ghlang.styles import get_style_registry  # noqa: PLC0415
+    from ghlang.styles.utils import load_github_colors  # noqa: PLC0415
 
     style_fn = get_style_registry().get(style)
     if style_fn is None:

@@ -130,7 +130,7 @@ def local(
     ),
 ) -> None:
     """Analyze local files with tokount"""
-    from ghlang.display.utils import normalize_language_stats  # noqa: PLC0415
+    from ghlang.styles.utils import normalize_language_stats  # noqa: PLC0415
 
     if paths is None:
         paths = [Path()]

@@ -3,14 +3,13 @@ from pathlib import Path
 import platform
 import subprocess
 
-from rich.console import Console
-from rich.syntax import Syntax
-from rich.table import Table
 import typer
 
 from ghlang.config import create_default_config
 from ghlang.config import get_config_path
 from ghlang.config import load_config
+from ghlang.display.config import print_config
+from ghlang.display.config import print_raw_config
 
 
 def _open_in_editor(path: Path) -> None:
@@ -25,81 +24,6 @@ def _open_in_editor(path: Path) -> None:
         os.startfile(str(path))  # type: ignore[attr-defined]
     else:
         subprocess.run(["xdg-open", str(path)], check=False)
-
-
-def _format_value(value: object) -> str:
-    """Format a config value for display"""
-    if isinstance(value, bool):
-        return "[green]true[/green]" if value else "[red]false[/red]"
-
-    if isinstance(value, list):
-        if not value:
-            return "[dim][][/dim]"
-
-        return ", ".join(str(v) for v in value)
-
-    if isinstance(value, Path):
-        return str(value)
-
-    return str(value)
-
-
-def _print_config_table(config_path: Path) -> None:
-    """Print config as a formatted table"""
-    console = Console()
-
-    try:
-        cfg = load_config(config_path=config_path, require_token=False)
-
-    except Exception as e:
-        console.print(f"[red]Error loading config:[/red] {e}")
-        raise typer.Exit(1)
-
-    console.print(f"\n[bold]Config:[/bold] {config_path}\n")
-
-    # GitHub section
-    table = Table(show_header=False, box=None, padding=(0, 2))
-    table.add_column("Key", style="cyan")
-    table.add_column("Value")
-
-    console.print("[bold yellow]GitHub[/bold yellow]")
-    table.add_row("token", cfg.token if cfg.token else "[dim]not set[/dim]")
-    table.add_row("affiliation", cfg.affiliation)
-    table.add_row("visibility", cfg.visibility)
-    table.add_row("ignored_repos", _format_value(cfg.ignored_repos))
-    console.print(table)
-    console.print()
-
-    # Tokount section
-    table = Table(show_header=False, box=None, padding=(0, 2))
-    table.add_column("Key", style="cyan")
-    table.add_column("Value")
-
-    console.print("[bold yellow]Tokount[/bold yellow]")
-    table.add_row("ignored_dirs", _format_value(cfg.ignored_dirs))
-    console.print(table)
-    console.print()
-
-    # Output section
-    table = Table(show_header=False, box=None, padding=(0, 2))
-    table.add_column("Key", style="cyan")
-    table.add_column("Value")
-
-    console.print("[bold yellow]Output[/bold yellow]")
-    table.add_row("directory", str(cfg.output_dir))
-    console.print(table)
-    console.print()
-
-    # Preferences section
-    table = Table(show_header=False, box=None, padding=(0, 2))
-    table.add_column("Key", style="cyan")
-    table.add_column("Value")
-
-    console.print("[bold yellow]Preferences[/bold yellow]")
-    table.add_row("verbose", _format_value(cfg.verbose))
-    table.add_row("theme", cfg.theme)
-    console.print(table)
-    console.print()
 
 
 def config(
@@ -131,9 +55,7 @@ def config(
             typer.echo(f"Config file doesn't exist yet: {config_path}")
             raise typer.Exit(1)
 
-        console = Console()
-        syntax = Syntax(config_path.read_text(), "toml", theme="ansi_dark", line_numbers=True)
-        console.print(syntax)
+        print_raw_config(config_path)
         return
 
     if show:
@@ -141,7 +63,13 @@ def config(
             typer.echo(f"Config file doesn't exist yet: {config_path}")
             raise typer.Exit(1)
 
-        _print_config_table(config_path)
+        try:
+            cfg = load_config(config_path=config_path, require_token=False)
+        except Exception as e:
+            typer.echo(f"Error loading config: {e}")
+            raise typer.Exit(1)
+
+        print_config(cfg, config_path)
         return
 
     if not config_path.exists():
