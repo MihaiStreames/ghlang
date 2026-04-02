@@ -11,7 +11,6 @@ from .logging import logger
 
 
 def _find_tokount() -> Path:
-    """Find tokount binary in PATH"""
     tokount_path = shutil.which("tokount")
     if tokount_path is None:
         raise TokountNotFoundError()
@@ -27,7 +26,6 @@ class TokountClient:
         self._tokount_path = _find_tokount()
 
     def _build_tokount_command(self, tokount_path: Path, path: Path) -> list[str]:
-        """Build tokount command with optional excluded dirs"""
         cmd = [str(tokount_path), str(path.resolve()), "-o", "json"]
 
         if self._follow_symlinks:
@@ -39,10 +37,8 @@ class TokountClient:
         return cmd
 
     def _parse_tokount_error(self, stderr: str) -> TokountError | None:
-        """Parse tokount's structured JSON error output"""
         try:
             data = json.loads(stderr)
-
         except json.JSONDecodeError:
             return None
 

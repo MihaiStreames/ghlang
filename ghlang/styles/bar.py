@@ -4,6 +4,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 from ..logging import logger
+from ..themes import get_theme
 from .constants import BAR_FIGSIZE
 from .constants import BAR_HEIGHT
 from .constants import BAR_LABEL_FONTSIZE
@@ -13,7 +14,6 @@ from .constants import BAR_TITLE_FONTSIZE
 from .constants import BAR_TITLE_PAD
 from .constants import TOP_N
 from .utils import build_display_segments
-from .utils import get_theme
 from .utils import save_matplotlib_chart
 
 

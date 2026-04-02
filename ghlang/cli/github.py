@@ -7,11 +7,11 @@ from ghlang.exceptions import ConfigError
 from ghlang.github_client import GitHubClient
 from ghlang.logging import logger
 
-from .utils import generate_charts
-from .utils import get_chart_title
-from .utils import get_output_path
+from .charts import generate_charts
+from .charts import get_chart_title
+from .charts import get_output_path
+from .charts import save_json_stats
 from .utils import handle_cli_errors
-from .utils import save_json_stats
 from .utils import setup_cli_environment
 from .utils import styles_autocomplete
 from .utils import themes_autocomplete

@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from ..logging import logger
+from ..themes import get_theme
 from .constants import HIDE_THRESHOLD
 from .constants import PIE_FIGSIZE
 from .constants import PIE_LEGEND_FONTSIZE
@@ -10,7 +11,6 @@ from .constants import PIE_LEGEND_TITLE_FONTSIZE
 from .constants import PIE_PCT_FONTSIZE
 from .constants import PIE_TITLE_FONTSIZE
 from .constants import PIE_TITLE_PAD
-from .utils import get_theme
 from .utils import save_matplotlib_chart
 
 

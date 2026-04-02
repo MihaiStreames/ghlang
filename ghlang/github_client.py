@@ -45,7 +45,6 @@ class GitHubClient:
         self._base_delay = API_BASE_DELAY
 
     def _log_rate_limit(self, response: requests.Response) -> None:
-        """Log rate limit info"""
         remaining = response.headers.get("X-RateLimit-Remaining")
         limit = response.headers.get("X-RateLimit-Limit")
 
@@ -53,7 +52,6 @@ class GitHubClient:
             logger.debug(f"Rate limit: {remaining}/{limit} remaining")
 
     def _get(self, url: str, params: dict | None = None) -> requests.Response:
-        """Make a GET request with rate limit handling and exponential backoff"""
         r = None
         for attempt in range(self._max_retries):
             r = self._session.get(url, params=params)
@@ -83,7 +81,6 @@ class GitHubClient:
         return r  # type: ignore[return-value]
 
     def _normalize_repo_pattern(self, pattern: str) -> str:
-        """Strip GitHub URL prefix from pattern if present"""
         prefixes = ["https://github.com/", "http://github.com/", "github.com/"]
 
         for prefix in prefixes:
@@ -93,12 +90,10 @@ class GitHubClient:
         return pattern
 
     def _validate_repo_name(self, repo_name: str) -> bool:
-        """Validate repo name follows owner/repo format"""
         pattern = r"^[\w\-\.]+/[\w\-\.]+$"
         return bool(re.match(pattern, repo_name)) and len(repo_name) <= 100
 
     def _should_ignore_repo(self, full_name: str) -> bool:
-        """Check if a repo should be ignored based on ignore patterns"""
         for pattern in self._ignored_repos:
             normalized = self._normalize_repo_pattern(pattern)
 
@@ -110,14 +105,12 @@ class GitHubClient:
         return False
 
     def _get_repo_info(self, full_name: str) -> dict:
-        """Get repo info for a specific repo by full name (owner/repo)"""
         if not self._validate_repo_name(full_name):
             raise ValueError(f"Invalid repository name format: {full_name}")
         r = self._get(f"{self._api}/repos/{full_name}")
         return dict(r.json())
 
     def _list_repos(self, output_file: Path | None = None) -> list[dict]:
-        """List all repos accessible to the authenticated user"""
         logger.info("Fetching repos")
         repos = []
         page = 1
@@ -179,14 +172,11 @@ class GitHubClient:
         return unique_repos
 
     def _get_repo_languages(self, full_name: str) -> dict[str, int]:
-        """Get language breakdown for a specific repo"""
         r = self._get(f"{self._api}/repos/{full_name}/languages")
         return dict(r.json())
 
     def _fetch_specific_repos(self, specific_repos: list[str]) -> list[dict]:
-        """Fetch repo info for a list of specific repo names"""
         repos = []
-
         for repo_name in specific_repos:
             normalized = self._normalize_repo_pattern(repo_name)
 
@@ -206,7 +196,6 @@ class GitHubClient:
                     logger.warning(f"Access denied to {normalized} (check permissions)")
                 else:
                     logger.warning(f"Failed to fetch {normalized}: {e}")
-
             except requests.RequestException as e:
                 logger.warning(f"Network error fetching {normalized}: {e}")
 

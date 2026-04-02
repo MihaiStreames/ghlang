@@ -7,6 +7,7 @@ from ..logging import logger
 from ..static.fonts import render_text
 from ..static.fonts import text_height
 from ..static.fonts import text_width
+from ..themes import get_theme
 from .constants import PIXEL_FONTSIZE
 from .constants import PIXEL_LABEL_DOT
 from .constants import PIXEL_LABEL_GAP
@@ -22,7 +23,6 @@ from .constants import ROUNDED_CORNER_RADIUS
 from .constants import TOP_N
 from .utils import add_rounded_corners
 from .utils import build_display_segments
-from .utils import get_theme
 from .utils import hex_to_rgb
 
 
@@ -37,7 +37,6 @@ def _build_segments(
     top_n: int,
     fallback: tuple[int, int, int],
 ) -> list[tuple[str, float, tuple[int, int, int], int, int]]:
-    """Build colored + positioned tower segments"""
     display = build_display_segments(language_stats, top_n)
 
     colored = [
@@ -71,7 +70,6 @@ def _draw_iso_block(
     h_real: int,
     color: tuple[int, int, int],
 ) -> None:
-    """Draw one isometric block using coords in real pixels"""
     hw = w_real // 2
     qw = w_real // 4
     top_y = base_y - h_real - qw * 2

@@ -9,18 +9,17 @@ from ghlang.exceptions import TokountNotFoundError
 from ghlang.logging import logger
 from ghlang.tokount_client import TokountClient
 
-from .utils import generate_charts
-from .utils import get_chart_title
-from .utils import get_output_path
+from .charts import generate_charts
+from .charts import get_chart_title
+from .charts import get_output_path
+from .charts import save_json_stats
 from .utils import handle_cli_errors
-from .utils import save_json_stats
 from .utils import setup_cli_environment
 from .utils import styles_autocomplete
 from .utils import themes_autocomplete
 
 
 def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
-    """Merge multiple stats dictionaries into one"""
     merged: dict[str, dict] = {}
 
     for stats in all_stats:
@@ -130,7 +129,7 @@ def local(
     ),
 ) -> None:
     """Analyze local files with tokount"""
-    from ghlang.styles.utils import normalize_language_stats  # noqa: PLC0415
+    from ghlang.languages import normalize_language_stats  # noqa: PLC0415
 
     if paths is None:
         paths = [Path()]
@@ -156,7 +155,6 @@ def local(
 
     try:
         tokount = TokountClient(ignored_dirs=cfg.ignored_dirs, follow_symlinks=follow_links)
-
     except TokountNotFoundError as e:
         logger.error(str(e))
         raise typer.Exit(1)

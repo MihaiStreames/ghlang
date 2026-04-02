@@ -14,7 +14,6 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def _load_language_fixture(filename: str) -> dict[str, int]:
-    """Load language fixture"""
     with (FIXTURES_DIR / filename).open() as f:
         return cast(dict[str, int], json.load(f))
 

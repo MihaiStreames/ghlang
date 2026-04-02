@@ -5,6 +5,7 @@ from typing import cast
 
 import requests
 
+from .config import get_config_path
 from .constants import MANIFEST_URL
 from .constants import REQUEST_TIMEOUT
 from .constants import THEME_CACHE_TTL
@@ -13,7 +14,6 @@ from .static.themes import THEMES
 
 
 def _fetch_remote_themes(cache_path: Path, force: bool = False) -> dict[str, dict[str, str]]:
-    """Fetch community themes from manifest"""
     cache_meta = cache_path.with_suffix(".json.meta")
 
     if not force and cache_path.exists() and cache_meta.exists():
@@ -67,3 +67,15 @@ def load_all_themes(config_dir: Path, force_refresh: bool = False) -> dict[str, 
             logger.warning(f"Couldn't load custom themes: {e}")
 
     return themes
+
+
+def get_theme(theme: str) -> dict[str, str]:
+    """Get theme colors (built-in + remote + custom), defaulting to light if invalid"""
+    config_dir = get_config_path().parent
+
+    all_themes = load_all_themes(config_dir)
+    if theme not in all_themes:
+        logger.warning(f"No '{theme}' theme exists, using light instead")
+        return THEMES["light"]
+
+    return all_themes[theme]

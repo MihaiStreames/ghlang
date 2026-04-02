@@ -48,7 +48,6 @@ class Config:
 
 
 def _validate_config(data: dict) -> None:
-    """Warn about unknown config keys with fuzzy suggestions"""
     for section, keys in data.items():
         section_name = section
         if section == "cloc":
