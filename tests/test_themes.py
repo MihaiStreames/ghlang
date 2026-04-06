@@ -7,9 +7,9 @@ import pytest
 import typer
 
 from ghlang.cli.theme import theme
-from ghlang.cli.utils import load_themes_by_source
 from ghlang.static.themes import THEMES
 from ghlang.themes import load_all_themes
+from ghlang.utils import load_themes_by_source
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -41,31 +41,31 @@ def config_dir_with_custom(tmp_path: Path) -> Path:
 @pytest.fixture
 def theme_env(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> None:
     """Patch theme module to use test config dir with 'light' active"""
-    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
-    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "light")
-    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.utils.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.utils.get_active_theme", lambda: "light")
+    monkeypatch.setattr("ghlang.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_dark(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> None:
     """Patch theme module to use test config dir with 'dark' active"""
-    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
-    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "dark")
-    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.utils.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.utils.get_active_theme", lambda: "dark")
+    monkeypatch.setattr("ghlang.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_remote(monkeypatch: pytest.MonkeyPatch, config_dir_with_remote: Path) -> None:
     """Patch theme module to use config dir with remote themes"""
-    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir_with_remote)
-    monkeypatch.setattr("ghlang.cli.utils.get_active_theme", lambda: "light")
-    monkeypatch.setattr("ghlang.cli.utils.load_themes_by_source", load_themes_by_source)
+    monkeypatch.setattr("ghlang.utils.get_config_dir", lambda: config_dir_with_remote)
+    monkeypatch.setattr("ghlang.utils.get_active_theme", lambda: "light")
+    monkeypatch.setattr("ghlang.utils.load_themes_by_source", load_themes_by_source)
 
 
 @pytest.fixture
 def theme_env_refresh(monkeypatch: pytest.MonkeyPatch, config_dir: Path) -> list[bool]:
     """Patch theme module for refresh test with fake load_all_themes"""
-    monkeypatch.setattr("ghlang.cli.utils.get_config_dir", lambda: config_dir)
+    monkeypatch.setattr("ghlang.utils.get_config_dir", lambda: config_dir)
     calls: list[bool] = []
 
     def fake_load(_d: Path, force_refresh: bool = False) -> dict:
@@ -125,14 +125,14 @@ class TestLoadAllThemes:
         mock_response.json.return_value = {"dracula": {"background": "#282a36"}}
         mock_response.raise_for_status = MagicMock()
 
-        with patch("requests.get", return_value=mock_response):
+        with patch("ghlang.net.client.get", return_value=mock_response):
             themes = load_all_themes(config_dir, force_refresh=True)
 
         assert "dracula" in themes
 
     def test_network_error_returns_builtin_only(self, config_dir: Path) -> None:
         """Should return built-in themes when remote fetch fails"""
-        with patch("requests.get", side_effect=Exception("network error")):
+        with patch("ghlang.net.client.get", side_effect=Exception("network error")):
             themes = load_all_themes(config_dir, force_refresh=True)
 
         assert set(themes.keys()) == set(THEMES.keys())

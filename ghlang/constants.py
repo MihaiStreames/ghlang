@@ -17,8 +17,6 @@ DEFAULT_OUTPUT_DIR: Final = "~/Documents/ghlang-stats"
 API_URL: Final = "https://api.github.com"
 API_VERSION: Final = "2022-11-28"
 API_PER_PAGE: Final = 100
-API_MAX_RETRIES: Final = 5
-API_BASE_DELAY: Final = 1
 API_MAX_WORKERS: Final = 10
 REQUEST_TIMEOUT: Final = 10
 

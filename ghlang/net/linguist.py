@@ -3,8 +3,10 @@ from pathlib import Path
 
 import yaml
 
-from . import constants
-from . import log
+from ghlang import constants
+from ghlang import log
+
+from . import client
 
 
 def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
@@ -21,12 +23,10 @@ def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
         Mapping of language name to hex color string (e.g. ``"#3572A5"``).
         Empty dict on network failure.
     """
-    import requests
-
     log.logger.info("Grabbing language colors from GitHub")
 
     try:
-        r = requests.get(constants.LINGUIST_URL, timeout=constants.REQUEST_TIMEOUT)
+        r = client.get(constants.LINGUIST_URL, timeout=constants.REQUEST_TIMEOUT)
         r.raise_for_status()
 
         data = yaml.safe_load(r.text)

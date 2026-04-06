@@ -1,14 +1,95 @@
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 import json
 from pathlib import Path
 
 import typer
 
+from ghlang import constants
 from ghlang import exceptions
-from ghlang import github_client
 from ghlang import log
+from ghlang import utils
+from ghlang.net import github as github_client
 
 from . import charts
-from . import utils
+from . import utils as cli_utils
+
+
+def _fetch_repos(
+    client: github_client.GitHubClient,
+    specific_repos: list[str] | None,
+    repos_output: Path | None,
+) -> list[dict]:
+    """Fetch repos from GitHub with progress display"""
+    if specific_repos:
+        log.logger.info(f"Fetching {len(specific_repos)} specific repos")
+        repos = client.fetch_specific_repos(specific_repos)
+    else:
+        log.logger.info("Fetching repos")
+
+        with log.logger.spinner() as progress:
+            progress.add_task("Fetching repos...", total=None)
+            repos = client.list_repos()
+
+        log.logger.info(f"Found {len(repos)} repos")
+
+    if repos_output and repos:
+        utils.save_json(repos, repos_output)
+
+    return repos
+
+
+def _aggregate_languages(
+    client: github_client.GitHubClient,
+    repos: list[dict],
+    stats_output: Path | None,
+) -> dict[str, int]:
+    """Fetch and aggregate language stats across repos concurrently"""
+    totals: defaultdict[str, int] = defaultdict(int)
+    processed = 0
+    skipped = 0
+
+    num_workers = min(constants.API_MAX_WORKERS, len(repos))
+    log.logger.debug(f"Using {num_workers} concurrent workers for {len(repos)} repos")
+
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        future_to_repo = {
+            executor.submit(client.get_repo_languages, repo["full_name"]): repo for repo in repos
+        }
+
+        with log.logger.progress() as progress:
+            task = progress.add_task("Processing repos", total=len(repos))
+
+            for future in as_completed(future_to_repo):
+                repo = future_to_repo[future]
+                full_name = repo["full_name"]
+
+                try:
+                    langs = future.result()
+
+                    for lang, bytes_count in langs.items():
+                        totals[lang] += int(bytes_count)
+
+                    processed += 1
+                    log.logger.debug(f"Processed {full_name}")
+
+                except exceptions.HTTPError as e:
+                    skipped += 1
+                    log.logger.warning(f"Skipped {full_name}: {e}")
+                except Exception as e:
+                    skipped += 1
+                    log.logger.warning(f"Skipped {full_name}: {e}")
+
+                progress.advance(task)
+
+    log.logger.success(f"Processed {processed} repositories ({skipped} skipped)")
+
+    result = dict(totals)
+    if stats_output:
+        utils.save_json(result, stats_output)
+
+    return result
 
 
 def github(
@@ -81,19 +162,19 @@ def github(
         None,
         "--theme",
         help="Chart theme (default: light)",
-        autocompletion=utils.themes_autocomplete,
+        autocompletion=cli_utils.themes_autocomplete,
     ),
     style: str = typer.Option(
         "pixel",
         "--style",
         "-s",
         help="Chart style (default: pixel)",
-        autocompletion=utils.styles_autocomplete,
+        autocompletion=cli_utils.styles_autocomplete,
     ),
 ) -> None:
     """Analyze your GitHub repos"""
     try:
-        cfg, quiet, json_only = utils.setup_cli_environment(
+        cfg, quiet, json_only = cli_utils.setup_cli_environment(
             config_path=config_path,
             output_dir=output_dir,
             verbose=verbose,
@@ -107,7 +188,7 @@ def github(
         log.logger.error(str(e))
         raise typer.Exit(1)
 
-    with utils.handle_cli_errors():
+    with cli_utils.handle_cli_errors():
         client = github_client.GitHubClient(
             token=cfg.token,
             affiliation=cfg.affiliation,
@@ -115,14 +196,24 @@ def github(
             ignored_repos=cfg.ignored_repos,
         )
 
-        language_stats = client.get_all_language_stats(
+        repo_list = _fetch_repos(
+            client,
+            specific_repos=repos,
             repos_output=charts.get_output_path(
                 cfg.output_dir, "repositories.json", save_json, stdout
             ),
+        )
+
+        if not repo_list:
+            log.logger.error("No repositories found, nothing to visualize")
+            raise typer.Exit(1)
+
+        language_stats = _aggregate_languages(
+            client,
+            repo_list,
             stats_output=charts.get_output_path(
                 cfg.output_dir, "language_stats.json", save_json, stdout
             ),
-            specific_repos=repos,
         )
 
         if not language_stats:
@@ -132,7 +223,7 @@ def github(
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            charts.save_json_stats(language_stats, cfg.output_dir)
+            utils.save_json(language_stats, cfg.output_dir / "language_stats.json")
         else:
             charts.generate_charts(
                 language_stats,

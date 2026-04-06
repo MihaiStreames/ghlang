@@ -2,10 +2,11 @@ from rich.console import Console
 import typer
 
 from ghlang import themes
+from ghlang import utils
 from ghlang.display import themes as display_themes
 from ghlang.static import themes as static_themes
 
-from . import utils
+from . import utils as cli_utils
 
 
 def theme(
@@ -26,7 +27,7 @@ def theme(
     ),
 ) -> None:
     """Manage themes"""
-    with utils.handle_cli_errors():
+    with cli_utils.handle_cli_errors():
         console = Console()
         config_dir = utils.get_config_dir()
 

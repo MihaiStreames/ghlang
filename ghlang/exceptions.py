@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class GhlangError(Exception):
     """Base exception for ghlang"""
 
@@ -71,3 +74,21 @@ class TokountNotFoundError(TokountError):
 
 class TokountIoError(TokountError):
     """Raised when tokount encounters an IO error"""
+
+
+class HTTPError(GhlangError):
+    """HTTP error with status code and response access.
+
+    Attributes
+    ----------
+    response : Any
+        The response object that triggered the error. Has ``status_code`` and ``url``.
+    """
+
+    def __init__(self, response: Any) -> None:
+        self.response = response
+        super().__init__(f"{response.status_code} {response.url}")
+
+
+class RequestError(GhlangError):
+    """Network-level error (DNS, connection refused, timeout, etc.)"""

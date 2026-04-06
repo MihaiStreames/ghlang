@@ -1,7 +1,7 @@
 # Maintainer: MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>
 pkgname=python-ghlang
 _pypiname=ghlang
-pkgver=2.5.1
+pkgver=2.5.2
 pkgrel=1
 pkgdesc="Visualize your GitHub language stats, blazingly fast."
 arch=(any)
@@ -9,7 +9,6 @@ url="https://github.com/velox-sh/ghlang"
 license=(MIT)
 depends=(
 	python
-	python-requests
 	python-matplotlib
 	python-pillow
 	python-yaml

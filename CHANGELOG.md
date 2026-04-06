@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v252--drop-requests--restructure">v2.5.2</a></li>
     <li><a href="#v251--startup-optimization">v2.5.1</a></li>
     <li><a href="#v250--chart-styles">v2.5.0</a></li>
     <li><a href="#v246--python-310-support">v2.4.6</a></li>
@@ -35,14 +36,41 @@
   </ol>
 </details>
 
+## v2.5.2 - Drop requests, restructure
+
+**New stuff:**
+
+- `net/` package: `client.py` (HTTP with connection reuse), `github.py` (API client), `linguist.py` (color fetch)
+- `ghlang/utils.py` for shared utilities (`save_json`, `get_config_dir`, `get_active_theme`, `load_themes_by_source`)
+
+**Changed:**
+
+- Replaced `requests` with stdlib `urllib`/`http.client` - one fewer dependency
+- `http.client` connection reuse in Session (2x faster than requests per request)
+- Moved orchestration (threading, progress bars, JSON saving) from network layer to `cli/github.py`
+- Merged `languages.py` + `static/lang_mapping.py` into `static/languages.py`
+- Split `cli/utils.py`: general utilities to `ghlang/utils.py`, CLI-specific helpers stay
+
+**Improved:**
+
+- Stripped retry/rate-limit/backoff from HTTP client (overkill for a CLI tool)
+- Removed `save_json_stats` wrapper - callers use `utils.save_json` directly
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+
 ## v2.5.1 - Startup optimization
+
+**Improved:**
 
 - Lazy `requests` import in `github_client`, `colors`, `themes` (-141ms)
 - Lazy `rich.console` and `rich.progress` in `log.py` (-14ms)
 - Lazy command registration via `LazyGroup` - command modules only imported when invoked
-- Removed redundant `# noqa: PLC0415` inline suppressions (rule already globally disabled)
-- Moved pre-existing in-function imports (`languages`, `colors`) to module-level now that `LazyGroup` defers entire command modules
+- Moved pre-existing in-function imports to module-level (`LazyGroup` defers entire command modules)
 - Startup: **480ms -> 183ms** (`--version`), **103ms** bare import cost
+
+**Fixed:**
+
+- Removed redundant `# noqa: PLC0415` inline suppressions (rule already globally disabled)
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 

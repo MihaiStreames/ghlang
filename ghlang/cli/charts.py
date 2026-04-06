@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import typer
 
-from ghlang import colors as colors_mod
 from ghlang import log
 from ghlang import styles
+from ghlang.net import linguist
 from ghlang.styles import constants as style_constants
 
 
@@ -93,7 +92,7 @@ def generate_charts(
 
         progress.update(task, description="Loading language colors...")
         colors_file = cfg.output_dir / "github_colors.json" if save_json else None
-        colors = colors_mod.load_github_colors(output_file=colors_file)
+        colors = linguist.load_github_colors(output_file=colors_file)
         progress.advance(task)
 
         if not colors:
@@ -118,24 +117,6 @@ def generate_charts(
         progress.update(task, description=f"Generating {style} chart...")
         style_fn(language_stats, colors, chart_output, title, cfg.theme, top_n=top_n)
         progress.advance(task)
-
-
-def save_json_stats(language_stats: dict[str, int], output_dir: Path) -> None:
-    """Write language stats to ``language_stats.json`` in *output_dir*.
-
-    Parameters
-    ----------
-    language_stats : dict[str, int]
-        Language name to count mapping.
-    output_dir : Path
-        Directory to write the JSON file into.
-    """
-    stats_file = output_dir / "language_stats.json"
-
-    with stats_file.open("w") as f:
-        json.dump(language_stats, f, indent=2)
-
-    log.logger.success(f"Saved stats to {stats_file}")
 
 
 def get_output_path(output_dir: Path, filename: str, save_json: bool, stdout: bool) -> Path | None:

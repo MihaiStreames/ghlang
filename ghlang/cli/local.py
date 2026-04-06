@@ -5,12 +5,13 @@ from sys import platform
 import typer
 
 from ghlang import exceptions
-from ghlang import languages
 from ghlang import log
 from ghlang import tokount_client
+from ghlang import utils
+from ghlang.static import languages
 
 from . import charts
-from . import utils
+from . import utils as cli_utils
 
 
 def _merge_stats(all_stats: list[dict[str, dict]]) -> dict[str, dict]:
@@ -113,14 +114,14 @@ def local(
         None,
         "--theme",
         help="Chart theme (default: light)",
-        autocompletion=utils.themes_autocomplete,
+        autocompletion=cli_utils.themes_autocomplete,
     ),
     style: str = typer.Option(
         "pixel",
         "--style",
         "-s",
         help="Chart style (default: pixel)",
-        autocompletion=utils.styles_autocomplete,
+        autocompletion=cli_utils.styles_autocomplete,
     ),
 ) -> None:
     """Analyze local files with tokount"""
@@ -128,7 +129,7 @@ def local(
         paths = [Path()]
 
     try:
-        cfg, quiet, json_only = utils.setup_cli_environment(
+        cfg, quiet, json_only = cli_utils.setup_cli_environment(
             config_path=config_path,
             output_dir=output_dir,
             verbose=verbose,
@@ -154,7 +155,7 @@ def local(
         log.logger.error(str(e))
         raise typer.Exit(1)
 
-    with utils.handle_cli_errors():
+    with cli_utils.handle_cli_errors():
         all_stats: list[dict[str, dict]] = []
 
         for i, path in enumerate(paths, start=1):
@@ -191,7 +192,7 @@ def local(
         if stdout:
             print(json.dumps(language_stats, indent=2))
         elif json_only:
-            charts.save_json_stats(language_stats, cfg.output_dir)
+            utils.save_json(language_stats, cfg.output_dir / "language_stats.json")
         else:
             charts.generate_charts(
                 language_stats,

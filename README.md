@@ -85,7 +85,6 @@ If you want embedded GitHub stats for your README, use github-readme-stats. If y
 - [Typer](https://typer.tiangolo.com/)
 - [Matplotlib](https://matplotlib.org/)
 - [Pillow](https://python-pillow.org/)
-- [Requests](https://requests.readthedocs.io/)
 - [Rich](https://github.com/Textualize/rich)
 - [tokount](https://github.com/velox-sh/tokount) (for local analysis)
 

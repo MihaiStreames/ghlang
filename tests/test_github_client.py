@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-import requests
 
-from ghlang.github_client import GitHubClient
+from ghlang import exceptions
+from ghlang.net.github import GitHubClient
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -148,123 +148,50 @@ class TestMockedAPIRequests:
         mock_response.headers = {"X-RateLimit-Remaining": "4999", "X-RateLimit-Limit": "5000"}
 
         with patch.object(client._session, "get", return_value=mock_response):
-            result = client._get_repo_languages("torvalds/linux")
+            result = client.get_repo_languages("torvalds/linux")
 
         assert result == linux_languages
         assert result["C"] == linux_languages["C"]
 
-    def test_get_repo_languages_rate_limit_recovery(self, client: GitHubClient) -> None:
-        """Should recover from rate limit"""
-        rate_limited_response = MagicMock()
-        rate_limited_response.status_code = 403
-        rate_limited_response.headers = {
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": "0",
-        }
-
-        success_response = MagicMock()
-        success_response.status_code = 200
-        success_response.json.return_value = {"Python": 1000}
-        success_response.headers = {"X-RateLimit-Remaining": "4999", "X-RateLimit-Limit": "5000"}
-
-        with (
-            patch.object(
-                client._session, "get", side_effect=[rate_limited_response, success_response]
-            ),
-            patch("time.sleep"),
-        ):
-            result = client._get_repo_languages("user/repo")
-
-        assert result == {"Python": 1000}
-
-    def test_get_repo_languages_retry_on_500(self, client: GitHubClient) -> None:
-        """Should retry on server errors"""
-        error_response = MagicMock()
-        error_response.status_code = 500
-        error_response.headers = {}
-
-        success_response = MagicMock()
-        success_response.status_code = 200
-        success_response.json.return_value = {"JavaScript": 5000}
-        success_response.headers = {"X-RateLimit-Remaining": "4999", "X-RateLimit-Limit": "5000"}
-
-        with (
-            patch.object(client._session, "get", side_effect=[error_response, success_response]),
-            patch("time.sleep"),
-        ):
-            result = client._get_repo_languages("user/repo")
-
-        assert result == {"JavaScript": 5000}
-
-
-class TestStatsAggregation:
-    """Tests for aggregating stats from multiple repos"""
-
-    def test_aggregate_multiple_repos(
-        self,
-        client: GitHubClient,
-        linux_languages: dict[str, int],
-        rust_languages: dict[str, int],
-        cpython_languages: dict[str, int],
-    ) -> None:
-        """Should correctly aggregate language bytes across repos"""
-        repos = [
-            {"full_name": "torvalds/linux"},
-            {"full_name": "rust-lang/rust"},
-            {"full_name": "python/cpython"},
+    def test_list_repos_filters_ignored(self, client_with_ignores: GitHubClient) -> None:
+        """Should filter ignored repos from the list"""
+        page_1 = [
+            {"full_name": "user/good-repo"},
+            {"full_name": "user/ignored-repo"},
+            {"full_name": "org/something-private"},
         ]
 
-        def mock_get_languages(full_name: str) -> dict[str, int]:
-            if full_name == "torvalds/linux":
-                return linux_languages
-            if full_name == "rust-lang/rust":
-                return rust_languages
-            if full_name == "python/cpython":
-                return cpython_languages
-            return {}
+        mock_response_1 = MagicMock()
+        mock_response_1.status_code = 200
+        mock_response_1.json.return_value = page_1
+        mock_response_1.headers = {"X-RateLimit-Remaining": "4999", "X-RateLimit-Limit": "5000"}
 
-        with (
-            patch.object(client, "_list_repos", return_value=repos),
-            patch.object(client, "_get_repo_languages", side_effect=mock_get_languages),
+        mock_response_2 = MagicMock()
+        mock_response_2.status_code = 200
+        mock_response_2.json.return_value = []
+        mock_response_2.headers = {"X-RateLimit-Remaining": "4998", "X-RateLimit-Limit": "5000"}
+
+        with patch.object(
+            client_with_ignores._session,
+            "get",
+            side_effect=[mock_response_1, mock_response_2],
         ):
-            result = client.get_all_language_stats()
+            repos = client_with_ignores.list_repos()
 
-        expected_c = linux_languages["C"] + rust_languages["C"] + cpython_languages["C"]
-        assert result["C"] == expected_c
+        assert len(repos) == 1
+        assert repos[0]["full_name"] == "user/good-repo"
 
-        expected_rust = linux_languages["Rust"] + rust_languages["Rust"]
-        assert result["Rust"] == expected_rust
+    def test_fetch_specific_repos_skips_not_found(self, client: GitHubClient) -> None:
+        """Should skip repos that return 404"""
+        good_response = MagicMock()
+        good_response.status_code = 200
+        good_response.json.return_value = {"full_name": "user/good"}
+        good_response.headers = {"X-RateLimit-Remaining": "4999", "X-RateLimit-Limit": "5000"}
 
-        expected_python = (
-            linux_languages["Python"] + rust_languages["Python"] + cpython_languages["Python"]
-        )
-        assert result["Python"] == expected_python
+        not_found = exceptions.HTTPError(MagicMock(status_code=404, url="user/gone"))
 
-    def test_aggregate_empty_repos(self, client: GitHubClient) -> None:
-        """Should return empty dict when no repos found"""
-        with patch.object(client, "_list_repos", return_value=[]):
-            result = client.get_all_language_stats()
+        with patch.object(client._session, "get", side_effect=[good_response, not_found]):
+            repos = client.fetch_specific_repos(["user/good", "user/gone"])
 
-        assert result == {}
-
-    def test_aggregate_skips_failed_repos(
-        self, client: GitHubClient, linux_languages: dict[str, int]
-    ) -> None:
-        """Should skip repos that fail and continue with others"""
-        repos = [
-            {"full_name": "torvalds/linux"},
-            {"full_name": "private/repo"},
-        ]
-
-        def mock_get_languages(full_name: str) -> dict[str, int]:
-            if full_name == "torvalds/linux":
-                return linux_languages
-            raise requests.HTTPError("Access denied")
-
-        with (
-            patch.object(client, "_list_repos", return_value=repos),
-            patch.object(client, "_get_repo_languages", side_effect=mock_get_languages),
-        ):
-            result = client.get_all_language_stats()
-
-        assert result["C"] == linux_languages["C"]
+        assert len(repos) == 1
+        assert repos[0]["full_name"] == "user/good"
