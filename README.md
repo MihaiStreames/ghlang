@@ -19,7 +19,7 @@
 
   <h1>ghlang</h1>
 
-  <h3 align="center">Visualize your GitHub language stats, blazingly fast. </h3>
+  <h3 align="center">Visualize your GitHub language stats, blazingly fast.</h3>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -172,22 +172,22 @@ paru -S tokount
 
 Both `github` and `local` commands share the same options:
 
-| Flag           | Short | What it does                                                |
-| -------------- | ----- | ----------------------------------------------------------- |
-| `--config`     |       | use a different config file                                 |
-| `--output-dir` |       | where to save the charts (directory)                        |
-| `--output`     | `-o`  | custom output filename (creates `_<style>` variant)         |
-| `--title`      | `-t`  | custom chart title                                          |
-| `--style`      | `-s`  | chart style: (default: `pixel`)                             |
-| `--top-n`      |       | how many languages to show (default: 6)                     |
-| `--save-json`  |       | save raw stats as JSON files                                |
-| `--theme`      |       | chart color theme (default: `light`)                        |
-| `--json-only`  |       | output JSON only, skip chart generation                     |
-| `--stdout`     |       | output stats to stdout (implies `--json-only --quiet`)      |
-| `--quiet`      | `-q`  | suppress log output (only show errors)                      |
-| `--verbose`    | `-v`  | show more details                                           |
+| Flag           | Short | What it does                                           |
+| -------------- | ----- | ------------------------------------------------------ |
+| `--config`     |       | use a different config file                            |
+| `--output-dir` |       | where to save the charts (directory)                   |
+| `--output`     | `-o`  | custom output filename (creates `_<style>` variant)    |
+| `--title`      | `-t`  | custom chart title                                     |
+| `--style`      | `-s`  | chart style: (default: `pixel`)                        |
+| `--top-n`      |       | how many languages to show (default: 6)                |
+| `--save-json`  |       | save raw stats as JSON files                           |
+| `--theme`      |       | chart color theme (default: `light`)                   |
+| `--json-only`  |       | output JSON only, skip chart generation                |
+| `--stdout`     |       | output stats to stdout (implies `--json-only --quiet`) |
+| `--quiet`      | `-q`  | suppress log output (only show errors)                 |
+| `--verbose`    | `-v`  | show more details                                      |
 
-> *Note:* The pre-v2.5.0 styles (classic styles) are still there! Use them via `--style bar` or `--style pie`.
+> **Note:** The pre-v2.5.0 styles (classic styles) are still there! Use them via `--style bar` or `--style pie`.
 
 The `local` command also takes an optional `[PATH]` argument (defaults to `.`) and has one extra flag:
 
@@ -203,7 +203,7 @@ The `config` command manages your config file:
 | `--path` | print config file path          |
 | `--raw`  | print raw TOML contents         |
 
-> *Note:* Running `ghlang config` without flags opens the config file in your default editor.
+> **Note:** Running `ghlang config` without flags opens the config file in your default editor.
 
 The `theme` command manages chart themes:
 
@@ -239,15 +239,15 @@ After installing, restart your shell or source your config file.
 
 Charts end up in your output directory as `.png`:
 
-| File                    | What it is                                               |
-| ----------------------- | -------------------------------------------------------- |
-| `language_pixel.png`    | pixel tower chart (default style)                        |
-| `language_pie.png`      | pie chart with all languages (`--style pie`)             |
-| `language_bar.png`      | bar chart with top N languages (`--style bar`)           |
-| `language_stats.json`   | raw stats (with `--save-json`)                           |
-| `tokount_stats.json`    | detailed tokount output (local mode, with `--save-json`) |
-| `repositories.json`     | list of repos analyzed (GitHub mode, with `--save-json`) |
-| `github_colors.json`    | language colors from GitHub (with `--save-json`)         |
+| File                  | What it is                                               |
+| --------------------- | -------------------------------------------------------- |
+| `language_pixel.png`  | pixel tower chart (default style)                        |
+| `language_pie.png`    | pie chart with all languages (`--style pie`)             |
+| `language_bar.png`    | bar chart with top N languages (`--style bar`)           |
+| `language_stats.json` | raw stats (with `--save-json`)                           |
+| `tokount_stats.json`  | detailed tokount output (local mode, with `--save-json`) |
+| `repositories.json`   | list of repos analyzed (GitHub mode, with `--save-json`) |
+| `github_colors.json`  | language colors from GitHub (with `--save-json`)         |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -293,11 +293,11 @@ Everything lives in `config.toml`:
 
 ghlang comes with built-in themes and supports community themes:
 
-| Theme     | Preview                                                                                             | Source    |
-| --------- | --------------------------------------------------------------------------------------------------- | --------- |
-| `light`   | ![light](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/light.png)          | built-in  |
-| `dark`    | ![dark](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/dark.png)            | built-in  |
-| `monokai` | ![monokai](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/monokai.png)      | community |
+| Theme     | Preview                                                                                        | Source    |
+| --------- | ---------------------------------------------------------------------------------------------- | --------- |
+| `light`   | ![light](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/light.png)     | built-in  |
+| `dark`    | ![dark](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/dark.png)       | built-in  |
+| `monokai` | ![monokai](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/monokai.png) | community |
 
 **Using themes:**
 

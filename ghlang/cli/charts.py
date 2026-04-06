@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import typer
 
+from ghlang import colors as colors_mod
 from ghlang import log
 from ghlang import styles
 from ghlang.styles import constants as style_constants
@@ -82,8 +83,6 @@ def generate_charts(
     typer.Exit
         If the requested style is unknown.
     """
-    from ghlang import colors as colors_mod  # noqa: PLC0415
-
     style_fn = styles.get_style_registry().get(style)
     if style_fn is None:
         log.logger.error(f"Unknown style '{style}', available: {', '.join(styles.STYLES)}")

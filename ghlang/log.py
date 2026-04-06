@@ -1,9 +1,11 @@
-from rich.console import Console
-from rich.progress import BarColumn
-from rich.progress import Progress
-from rich.progress import SpinnerColumn
-from rich.progress import TaskProgressColumn
-from rich.progress import TextColumn
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from rich.console import Console
+    from rich.progress import Progress
 
 
 class Logger:
@@ -16,9 +18,17 @@ class Logger:
     """
 
     def __init__(self) -> None:
-        self.console = Console()
+        self._console: Console | None = None
         self._verbose = False
         self._quiet = False
+
+    @property
+    def console(self) -> Console:
+        if self._console is None:
+            from rich.console import Console
+
+            self._console = Console()
+        return self._console
 
     def configure(self, verbose: bool = False, quiet: bool = False) -> None:
         """Configure verbosity level"""
@@ -56,6 +66,12 @@ class Logger:
 
     def progress(self) -> Progress:
         """Create a progress bar for long-running operations"""
+        from rich.progress import BarColumn
+        from rich.progress import Progress
+        from rich.progress import SpinnerColumn
+        from rich.progress import TaskProgressColumn
+        from rich.progress import TextColumn
+
         return Progress(
             SpinnerColumn(),
             TextColumn("[bold]{task.description}"),
@@ -68,6 +84,10 @@ class Logger:
 
     def spinner(self) -> Progress:
         """Create a spinner for indeterminate operations"""
+        from rich.progress import Progress
+        from rich.progress import SpinnerColumn
+        from rich.progress import TextColumn
+
         return Progress(
             SpinnerColumn(),
             TextColumn("[bold]{task.description}"),

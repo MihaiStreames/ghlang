@@ -5,6 +5,7 @@ from sys import platform
 import typer
 
 from ghlang import exceptions
+from ghlang import languages
 from ghlang import log
 from ghlang import tokount_client
 
@@ -123,8 +124,6 @@ def local(
     ),
 ) -> None:
     """Analyze local files with tokount"""
-    from ghlang import languages  # noqa: PLC0415
-
     if paths is None:
         paths = [Path()]
 

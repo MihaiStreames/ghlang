@@ -125,14 +125,14 @@ class TestLoadAllThemes:
         mock_response.json.return_value = {"dracula": {"background": "#282a36"}}
         mock_response.raise_for_status = MagicMock()
 
-        with patch("ghlang.themes.requests.get", return_value=mock_response):
+        with patch("requests.get", return_value=mock_response):
             themes = load_all_themes(config_dir, force_refresh=True)
 
         assert "dracula" in themes
 
     def test_network_error_returns_builtin_only(self, config_dir: Path) -> None:
         """Should return built-in themes when remote fetch fails"""
-        with patch("ghlang.themes.requests.get", side_effect=Exception("network error")):
+        with patch("requests.get", side_effect=Exception("network error")):
             themes = load_all_themes(config_dir, force_refresh=True)
 
         assert set(themes.keys()) == set(THEMES.keys())

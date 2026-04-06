@@ -1,20 +1,59 @@
 """CLI entry point and command registration"""
 
+import importlib
+
+import click
 import typer
+from typer.core import TyperGroup
+from typer.main import CommandInfo
+from typer.main import get_command_from_info
 
 from ghlang import __version__
 
-from . import config as config_mod
-from . import github as github_mod
-from . import local as local_mod
-from . import theme as theme_mod
+
+_LAZY_COMMANDS = {
+    "config": ("ghlang.cli.config", "config"),
+    "github": ("ghlang.cli.github", "github"),
+    "local": ("ghlang.cli.local", "local"),
+    "theme": ("ghlang.cli.theme", "theme"),
+}
 
 
-app = typer.Typer(help="See what languages you've been coding in", add_completion=True)
-app.command()(config_mod.config)
-app.command()(github_mod.github)
-app.command()(local_mod.local)
-app.command()(theme_mod.theme)
+class _LazyGroup(TyperGroup):
+    """TyperGroup that defers command module imports until invoked"""
+
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:  # noqa: ARG002
+        if cmd_name in self.commands:
+            return self.commands[cmd_name]
+
+        if cmd_name in _LAZY_COMMANDS:
+            mod_path, func_name = _LAZY_COMMANDS[cmd_name]
+
+            mod = importlib.import_module(mod_path)
+            func = getattr(mod, func_name)
+
+            cmd = get_command_from_info(
+                command_info=CommandInfo(name=cmd_name, callback=func),
+                pretty_exceptions_short=True,
+                rich_markup_mode=None,
+            )
+
+            self.commands[cmd_name] = cmd
+            return cmd
+
+        return None
+
+    def list_commands(self, ctx: click.Context) -> list[str]:  # noqa: ARG002
+        regular = list(self.commands.keys())
+        lazy = [k for k in _LAZY_COMMANDS if k not in self.commands]
+        return regular + lazy
+
+
+app = typer.Typer(
+    help="Visualize your GitHub language stats, blazingly fast.",
+    add_completion=True,
+    cls=_LazyGroup,
+)
 
 
 def _version_callback(value: bool) -> None:

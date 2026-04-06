@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-import requests
 import yaml
 
 from . import constants
@@ -22,6 +21,8 @@ def load_github_colors(output_file: Path | None = None) -> dict[str, str]:
         Mapping of language name to hex color string (e.g. ``"#3572A5"``).
         Empty dict on network failure.
     """
+    import requests
+
     log.logger.info("Grabbing language colors from GitHub")
 
     try:

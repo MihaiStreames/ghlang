@@ -17,9 +17,9 @@ def get_style_registry() -> dict[str, Callable[..., None]]:
     dict[str, Callable[..., None]]
         Style name to chart generator callable.
     """
-    from .bar import generate_bar  # noqa: PLC0415
-    from .pie import generate_pie  # noqa: PLC0415
-    from .pixel import generate_pixel  # noqa: PLC0415
+    from .bar import generate_bar
+    from .pie import generate_pie
+    from .pixel import generate_pixel
 
     return {
         "pixel": generate_pixel,

@@ -1,8 +1,8 @@
 # Maintainer: MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>
 pkgname=python-ghlang
 _pypiname=ghlang
-pkgver=2.5.0
-pkgrel=2
+pkgver=2.5.1
+pkgrel=1
 pkgdesc="Visualize your GitHub language stats, blazingly fast."
 arch=(any)
 url="https://github.com/velox-sh/ghlang"

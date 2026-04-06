@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
@@ -6,11 +8,14 @@ import json
 from pathlib import Path
 import re
 import time
-
-import requests
+from typing import TYPE_CHECKING
 
 from . import constants
 from . import log
+
+
+if TYPE_CHECKING:
+    import requests
 
 
 class GitHubClient:
@@ -37,6 +42,8 @@ class GitHubClient:
         visibility: str,
         ignored_repos: list[str],
     ):
+        import requests
+
         self._api = constants.API_URL
         self._session = requests.Session()
         self._session.headers.update(
@@ -194,6 +201,8 @@ class GitHubClient:
 
     def _fetch_specific_repos(self, specific_repos: list[str]) -> list[dict]:
         """Resolve a list of owner/repo strings to repo dicts"""
+        import requests
+
         repos = []
         for repo_name in specific_repos:
             normalized = self._normalize_repo_pattern(repo_name)
@@ -242,6 +251,8 @@ class GitHubClient:
         dict[str, int]
             Language name to total byte count. Empty dict when no repos found.
         """
+        import requests
+
         if specific_repos:
             log.logger.info(f"Fetching {len(specific_repos)} specific repos")
             repos = self._fetch_specific_repos(specific_repos)
