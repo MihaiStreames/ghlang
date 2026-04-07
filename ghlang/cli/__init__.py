@@ -1,4 +1,4 @@
-"""CLI entry point and command registration"""
+"""CLI entry point and command registration."""
 
 import importlib
 

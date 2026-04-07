@@ -1,6 +1,6 @@
 [project]
 name = "ghlang"
-version = "2.5.2"
+version = "2.5.3"
 description = "Generate pretty charts for your GitHub language stats."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -95,7 +95,6 @@ select = [
     "PL",   # pylint
     "PERF", # perflint
 ]
-
 ignore = [
     "E501",    # line too long (formatter handles this)
     "PLR0913", # too many arguments
@@ -110,14 +109,10 @@ ignore = [
     "PLR0915", # too many statements
 ]
 
-fixable = ["ALL"]
-unfixable = []
-
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
+line-ending = "lf"
 docstring-code-format = true
 docstring-code-line-length = 80
 
@@ -161,10 +156,6 @@ strict_equality = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["ghlang"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
-python_classes = ["Test*"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
