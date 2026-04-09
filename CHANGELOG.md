@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v254--fix-github-403">v2.5.4</a></li>
     <li><a href="#v253--drop-pyyaml--security-fix">v2.5.3</a></li>
     <li><a href="#v252--drop-requests--restructure">v2.5.2</a></li>
     <li><a href="#v251--startup-optimization">v2.5.1</a></li>
@@ -36,6 +37,14 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.5.4 - Fix GitHub 403
+
+**Fixed:**
+
+- `ghlang github` returning 403 - missing `User-Agent` header after switching from `requests` to `http.client` in v2.5.2
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.5.3 - Drop PyYAML, security fix
 

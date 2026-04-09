@@ -96,7 +96,8 @@ class Session:
     """
 
     def __init__(self) -> None:
-        self.headers: dict[str, str] = {}
+        # github rejects requests without user-agent
+        self.headers: dict[str, str] = {"User-Agent": "ghlang"}
         self._conns: dict[str, HTTPSConnection] = {}
 
     def update_headers(self, headers: dict[str, str]) -> None:
