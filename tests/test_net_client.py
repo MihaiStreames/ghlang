@@ -42,13 +42,18 @@ class TestGet:
 
 
 class TestSession:
-    """Tests for Session with connection reuse"""
+    """Tests for Session with per-thread connection reuse"""
 
     def test_headers_persist(self) -> None:
         """Should send persistent headers with every request."""
         session = Session()
         session.update_headers({"X-Custom": "test"})
         assert session.headers["X-Custom"] == "test"
+
+    def test_default_user_agent(self) -> None:
+        """Should set User-Agent by default."""
+        session = Session()
+        assert session.headers["User-Agent"] == "ghlang"
 
     def test_stale_connection_reconnects(self) -> None:
         """Should reconnect on stale connection error."""

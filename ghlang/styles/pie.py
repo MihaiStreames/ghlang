@@ -53,7 +53,7 @@ def generate_pie(
     wedges, _, autotexts = ax.pie(  # type: ignore[misc]
         sizes,
         colors=chart_colors,
-        autopct=lambda p: f"{p:.1f}%" if p >= constants.HIDE_THRESHOLD else "",
+        autopct=lambda p: f"{p:.1f}%" if p >= constants.PIE_THRESHOLD else "",
         startangle=90,
         pctdistance=0.85,
     )

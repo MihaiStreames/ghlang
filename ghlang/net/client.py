@@ -4,6 +4,7 @@ from http.client import HTTPMessage
 from http.client import HTTPResponse
 from http.client import HTTPSConnection
 import json
+import threading
 from typing import Any
 from urllib.error import HTTPError as _UrllibHTTPError
 from urllib.error import URLError
@@ -12,6 +13,7 @@ from urllib.parse import urlparse
 from urllib.request import Request
 from urllib.request import urlopen
 
+from ghlang import constants
 from ghlang import exceptions
 from ghlang import log
 
@@ -58,7 +60,7 @@ class Response:
 
 
 def get(url: str, *, timeout: int = 10, headers: dict[str, str] | None = None) -> Response:
-    """Send a simple GET request with no connection reuse.
+    """Send a simple GET request.
 
     Parameters
     ----------
@@ -87,7 +89,7 @@ def get(url: str, *, timeout: int = 10, headers: dict[str, str] | None = None) -
 
 
 class Session:
-    """HTTP session with persistent headers and connection reuse.
+    """HTTP session with persistent headers and per-thread connection reuse.
 
     Attributes
     ----------
@@ -98,17 +100,28 @@ class Session:
     def __init__(self) -> None:
         # github rejects requests without user-agent
         self.headers: dict[str, str] = {"User-Agent": "ghlang"}
-        self._conns: dict[str, HTTPSConnection] = {}
+        # each thread gets its own connection (HTTPSConnection is not thread-safe)
+        self._local = threading.local()
 
     def update_headers(self, headers: dict[str, str]) -> None:
         """Merge headers into the session defaults."""
         self.headers.update(headers)
 
     def _get_conn(self, host: str) -> HTTPSConnection:
-        """Get or create a persistent connection for a host"""
-        if host not in self._conns:
-            self._conns[host] = HTTPSConnection(host, timeout=30)
-        return self._conns[host]
+        """Get or create a persistent connection"""
+        if not hasattr(self._local, "conns"):
+            self._local.conns = {}
+
+        conns: dict[str, HTTPSConnection] = self._local.conns
+        if host not in conns:
+            conns[host] = HTTPSConnection(host, timeout=constants.REQUEST_TIMEOUT)
+
+        return conns[host]
+
+    def _drop_conn(self, host: str) -> None:
+        """Close and discard a stale connection"""
+        if hasattr(self._local, "conns"):
+            self._local.conns.pop(host, None)
 
     def _do_get(self, conn: HTTPSConnection, path: str, url: str) -> Response:
         """Execute a GET on an existing connection"""
@@ -145,17 +158,17 @@ class Session:
 
         parsed = urlparse(url)
         host = parsed.hostname or ""
-        conn = self._get_conn(host)
         path = parsed.path
-
         if parsed.query:
             path = f"{path}?{parsed.query}"
+
+        conn = self._get_conn(host)
 
         try:
             r = self._do_get(conn, path, url)
         except (OSError, ConnectionError):
             # stale connection, reconnect once
-            self._conns.pop(host, None)
+            self._drop_conn(host)
             conn = self._get_conn(host)
             try:
                 r = self._do_get(conn, path, url)

@@ -9,6 +9,7 @@ HIDE_THRESHOLD: Final = 5.0
 
 # pie chart
 PIE_FIGSIZE: Final[tuple[int, int]] = (14, 10)
+PIE_THRESHOLD: Final = 2.0
 PIE_TITLE_FONTSIZE: Final = 24
 PIE_TITLE_PAD: Final = 20
 PIE_PCT_FONTSIZE: Final = 9
