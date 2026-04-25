@@ -23,4 +23,4 @@ jobs:
           pr_message: |
             Hey, thanks for your first PR!
 
-            I'll review it soon. Just make sure you've run `uv run ruff check` and `uv run mypy`.
+            I'll review it soon. Just make sure you've run `uv run ruff check` and `uv run ty check`.

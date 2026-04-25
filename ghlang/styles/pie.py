@@ -1,6 +1,9 @@
 from pathlib import Path
+from typing import cast
 
+from matplotlib.patches import Wedge
 import matplotlib.pyplot as plt
+from matplotlib.text import Text
 
 from ghlang import log
 from ghlang import themes
@@ -50,18 +53,24 @@ def generate_pie(
     fig.patch.set_facecolor(theme_colors["background"])
     ax.set_facecolor(theme_colors["background"])
 
-    wedges, _, autotexts = ax.pie(  # type: ignore[misc]
-        sizes,
-        colors=chart_colors,
-        autopct=lambda p: f"{p:.1f}%" if p >= constants.PIE_THRESHOLD else "",
-        startangle=90,
-        pctdistance=0.85,
+    # autopct triggers 3-tuple return
+    # stubs pick the 2-tuple overload
+    pie_result = cast(
+        tuple[list[Wedge], list[Text], list[Text]],
+        ax.pie(
+            sizes,
+            colors=chart_colors,
+            autopct=lambda p: f"{p:.1f}%" if p >= constants.PIE_THRESHOLD else "",
+            startangle=90,
+            pctdistance=0.85,
+        ),
     )
+    wedges, _, autotexts = pie_result
 
     for autotext in autotexts:
         autotext.set_color("white")
         autotext.set_fontsize(constants.PIE_PCT_FONTSIZE)
-        autotext.set_weight("bold")  # type: ignore[union-attr]
+        autotext.set_fontweight("bold")
 
     legend_labels = [f"{lang} ({count / total * 100:.1f}%)" for lang, count in items]
     legend = ax.legend(

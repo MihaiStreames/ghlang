@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from http.client import HTTPMessage
+from email.message import Message
 from http.client import HTTPResponse
 from http.client import HTTPSConnection
 import json
@@ -29,7 +29,7 @@ class Response:
         The request URL.
     """
 
-    def __init__(self, status_code: int, headers: HTTPMessage, body: str, url: str) -> None:
+    def __init__(self, status_code: int, headers: Message[str, str], body: str, url: str) -> None:
         self.status_code = status_code
         self.url = url
         self._headers = headers
@@ -39,10 +39,10 @@ class Response:
     def from_urllib(cls, raw: HTTPResponse | _UrllibHTTPError, url: str) -> Response:
         """Build from a urllib HTTPResponse or HTTPError."""
         status = raw.code if isinstance(raw, _UrllibHTTPError) else raw.status
-        return cls(status, raw.headers, raw.read().decode("utf-8"), url)  # type: ignore[arg-type]
+        return cls(status, raw.headers, raw.read().decode("utf-8"), url)
 
     @property
-    def headers(self) -> HTTPMessage:
+    def headers(self) -> Message[str, str]:
         return self._headers
 
     @property
@@ -59,7 +59,7 @@ class Response:
             raise exceptions.HTTPError(self)
 
 
-def get(url: str, *, timeout: int = 10, headers: dict[str, str] | None = None) -> Response:
+def get(url: str, *, timeout: int, headers: dict[str, str] | None = None) -> Response:
     """Send a simple GET request.
 
     Parameters
@@ -170,6 +170,7 @@ class Session:
             # stale connection, reconnect once
             self._drop_conn(host)
             conn = self._get_conn(host)
+
             try:
                 r = self._do_get(conn, path, url)
             except (OSError, ConnectionError) as e:

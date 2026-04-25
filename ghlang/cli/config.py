@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import platform
 import subprocess
+import sys
 
 import typer
 
@@ -18,8 +19,8 @@ def _open_in_editor(path: Path) -> None:
         subprocess.run([editor, str(path)], check=False)
     elif platform.system() == "Darwin":
         subprocess.run(["open", str(path)], check=False)
-    elif platform.system() == "Windows":
-        os.startfile(str(path))  # type: ignore[attr-defined]
+    elif sys.platform == "win32":
+        os.startfile(str(path))
     else:
         subprocess.run(["xdg-open", str(path)], check=False)
 

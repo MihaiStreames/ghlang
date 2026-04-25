@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from pathlib import Path
+from typing import cast
 
 from bdfparser import Font  # type: ignore[import-untyped]
 from PIL import Image
@@ -55,7 +56,8 @@ def render_text(text: str, color: tuple[int, int, int], scale: int = 1) -> Image
 
     for py in range(h):
         for px in range(w):
-            *_, a = pixels[px, py]  # type: ignore[misc]
+            px_value = cast(tuple[int, int, int, int], pixels[px, py])
+            a = px_value[-1]
             if a > 0:
                 pixels[px, py] = (*color, a)
 
