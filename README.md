@@ -1,296 +1,208 @@
-<a id="readme-top"></a>
+# ghlang
 
-<!-- PROJECT SHIELDS -->
-<div align="center">
+ghlang generates pretty charts for your GitHub language stats from either the GitHub API (bytes) or local files via [`tokount`](https://github.com/velox-sh/tokount) (lines). Ships as a Python CLI with a few chart styles (`pixel`, `pie`, `bar`), community themes, PNG/SVG output, and raw JSON export.
 
-[![Stars](https://img.shields.io/github/stars/velox-sh/ghlang?style=social)](https://github.com/velox-sh/ghlang/stargazers)
-[![PyPI](https://img.shields.io/pypi/v/ghlang?label=PyPI)](https://pypi.org/project/ghlang/)
-[![AUR Version](https://img.shields.io/aur/version/python-ghlang?label=AUR)](https://aur.archlinux.org/packages/python-ghlang)
-[![Python Version](https://img.shields.io/pypi/pyversions/ghlang?label=Python)](https://pypi.org/project/ghlang/)
-[![codecov](https://codecov.io/gh/velox-sh/ghlang/graph/badge.svg)](https://codecov.io/gh/velox-sh/ghlang)
-[![Downloads](https://img.shields.io/pypi/dm/ghlang?label=Downloads)](https://pypi.org/project/ghlang/)
-[![License](https://img.shields.io/github/license/velox-sh/ghlang?label=License)](LICENSE)
+[![ghlang](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/badge.json)](https://github.com/velox-sh/ghlang)
+[![PyPI](https://img.shields.io/pypi/v/ghlang?label=pypi)](https://pypi.org/project/ghlang/)
+[![AUR](https://img.shields.io/aur/version/python-ghlang?label=AUR)](https://aur.archlinux.org/packages/python-ghlang)
+[![CI](https://github.com/velox-sh/ghlang/actions/workflows/ci.yml/badge.svg)](https://github.com/velox-sh/ghlang/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/velox-sh/ghlang)](LICENSE)
 
-</div>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_pixel.png" height="360" alt="pixel style" />
+  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_pie.png" height="360" alt="pie style" />
+</p>
 
-<!-- PROJECT LOGO -->
-<div align="center">
-  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/ghlang-icon.svg" alt="ghlang logo" width="120" />
+<p align="center">
+  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_bar.png" width="75%" alt="bar style" />
+</p>
 
-  <h1>ghlang</h1>
+<p align="center">
+  <i>My language stats across all my repos.</i>
+</p>
 
-  <h3 align="center">Generate pretty charts for your GitHub language stats.</h3>
-</div>
+## About
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#shell-completion">Shell Completion</a></li>
-    <li><a href="#configuration">Configuration</a></li>
-    <li><a href="#output">Output</a></li>
-    <li><a href="#themes">Themes</a></li>
-    <li><a href="#license">License</a></li>
-  </ol>
-</details>
+Originally a small `matplotlib` script to learn how [`github-readme-stats`](https://github.com/anuraghazra/github-readme-stats) worked. A friend asked for local mode, so I added it (first with `cloc`, then with my own line counter, [`tokount`](https://github.com/velox-sh/tokount)). (`tokount` ended up taking over most of my time, and now ghlang is back on the bench haha)
 
-<!-- ABOUT THE PROJECT -->
+Unlike github-readme-stats (serverless SVG cards) or [`github-stats`](https://github.com/jstrieb/github-stats) (Actions-generated SVGs), ghlang runs locally and gives you both: downloadable PNGs you can save/share, and `--format svg` for embedding. See [Embedding in a README](#embedding-in-a-readme) for the GitHub Actions recipe.
 
-## About The Project
+## Table of contents
 
-Ever wondered what languages you actually use? **ghlang** makes pretty charts to show you:
+- [Install](#install)
+- [Setup](#setup)
+- [Embedding in a README](#embedding-in-a-readme)
+- [Usage](#usage)
+- [Shell completion](#shell-completion)
+- [Output](#output)
+- [Config](#config)
+- [Themes](#themes)
+- [License](#license)
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/example_pixel.png" alt="Pixel chart example" width="50%" />
-  <p><i>my actual language stats across all repos</i></p>
-</div>
+## Install
 
-- **GitHub mode**: Pulls stats from all your repos via the API (counts bytes)
-- **Local mode**: Analyzes files on your machine using [tokount](https://github.com/velox-sh/tokount) (counts lines)
+### pipx (recommended)
 
-### Why ghlang?
-
-Unlike tools like [github-readme-stats](https://github.com/anuraghazra/github-readme-stats) (which generate SVG cards for your README), ghlang is a **CLI tool** that:
-
-- Runs locally on your machine (Python-based)
-- Analyzes local files, not just GitHub repos
-- Generates downloadable charts (PNG/SVG) you can use anywhere
-- Exports raw JSON data for further analysis
-- Works offline for local analysis
-- Gives you full control over the data
-
-If you want embedded GitHub stats for your README, use github-readme-stats. If you want to analyze your actual codebase and generate charts you can save, share, or customize, use ghlang.
-
-(that said, ghlang does support SVG output with `--format svg`, so you can totally embed your charts in READMEs too - would be cool to see people do that!)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Built With
-
-- [Python](https://www.python.org/)
-- [Typer](https://typer.tiangolo.com/)
-- [Matplotlib](https://matplotlib.org/)
-- [Pillow](https://python-pillow.org/)
-- [Rich](https://github.com/Textualize/rich)
-- [tokount](https://github.com/velox-sh/tokount) (for local analysis)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- GETTING STARTED -->
-
-## Getting Started
-
-Getting this running is pretty straightforward.
-
-### Prerequisites
-
-- Python 3.10+
-- For GitHub mode: a GitHub token
-- For local mode: [`tokount`](https://github.com/velox-sh/tokount)
-
-### Installation
-
-```bash
-# with pipx (recommended)
+```sh
 pipx install ghlang
+```
 
-# or with pip
+### pip
+
+```sh
 pip install ghlang
+```
 
-# or with yay (AUR)
+### AUR
+
+```sh
 yay -S python-ghlang
-
-# or with paru (AUR)
 paru -S python-ghlang
+```
 
-# or install from source
+### From source
+
+```sh
 pip install git+https://github.com/velox-sh/ghlang.git
 ```
 
-For local mode, you'll also need [`tokount`](https://github.com/velox-sh/tokount):
+For `ghlang local`, install [tokount](https://github.com/velox-sh/tokount):
 
-```bash
-# with cargo
+```sh
 cargo install tokount
-
-# or with yay (AUR)
 yay -S tokount
-
-# or with paru (AUR)
-paru -S tokount
 ```
 
-### Setting Up GitHub Mode
+## Setup
 
-1. **Get a token** from [GitHub Settings](https://github.com/settings/tokens)
+GitHub mode needs a token. Get one from [GitHub Settings](https://github.com/settings/tokens) with `repo` (private) or `public_repo` (public only).
 
-   - Pick `repo` for private repos, or just `public_repo` for public only
+Run `ghlang github` once to create the config at `~/.config/ghlang/config.toml` (or `%LOCALAPPDATA%\ghlang\config.toml` on Windows), then add your token:
 
-2. **Run it once** to create the config file:
+```toml
+[github]
+token = "ghp_your_token_here"
+```
 
-   ```bash
-   ghlang github
-   ```
+Run `ghlang github` again. That's it.
 
-   Config lives at `~/.config/ghlang/config.toml` (or `%LOCALAPPDATA%\ghlang\config.toml` on Windows)
+## Embedding in a README
 
-3. **Add your token** to the config:
+ghlang runs locally. For embedding in a README, the plan is [`ghlang-action`](https://github.com/velox-sh/ghlang-action): a scheduled GitHub Action that runs ghlang and commits the chart to a branch.
 
-   ```toml
-   [github]
-   token = "ghp_your_token_here"
-   ```
-
-4. **Run it again** and you're good:
-
-   ```bash
-   ghlang github
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- USAGE EXAMPLES -->
+> Not shipped yet. See the action repo for status.
 
 ## Usage
 
-### All the Flags
+```sh
+ghlang github                         # chart from GitHub API
+ghlang local                          # chart from current directory
+ghlang local src/ tests/              # multiple paths
+ghlang github --style pie             # pie chart
+ghlang local --theme dark             # dark theme
+ghlang github --save-json             # also dump raw JSON
+ghlang github --stdout                # pipe JSON to jq
+ghlang config                         # open config in $EDITOR
+ghlang theme --list                   # list themes
+```
 
-Both `github` and `local` commands share the same options:
+Both `github` and `local` share the same flags:
 
-| Flag           | Short | What it does                                           |
+| Flag           | Short | Description                                            |
 | -------------- | ----- | ------------------------------------------------------ |
 | `--config`     |       | use a different config file                            |
-| `--output-dir` |       | where to save the charts (directory)                   |
-| `--output`     | `-o`  | custom output filename (creates `_<style>` variant)    |
+| `--output-dir` |       | where to save charts                                   |
+| `--output`     | `-o`  | custom output filename (adds `_<style>` suffix)        |
 | `--title`      | `-t`  | custom chart title                                     |
-| `--style`      | `-s`  | chart style: (default: `pixel`)                        |
-| `--top-n`      |       | how many languages to show (default: 6)                |
-| `--save-json`  |       | save raw stats as JSON files                           |
+| `--style`      | `-s`  | `pixel` (default), `pie`, `bar`                        |
+| `--top-n`      |       | languages to show (default: 6)                         |
+| `--save-json`  |       | save raw stats as JSON                                 |
 | `--theme`      |       | chart color theme (default: `light`)                   |
-| `--json-only`  |       | output JSON only, skip chart generation                |
-| `--stdout`     |       | output stats to stdout (implies `--json-only --quiet`) |
-| `--quiet`      | `-q`  | suppress log output (only show errors)                 |
-| `--verbose`    | `-v`  | show more details                                      |
+| `--json-only`  |       | output JSON only, skip charts                          |
+| `--stdout`     |       | JSON to stdout (implies `--json-only --quiet`)         |
+| `--quiet`      | `-q`  | suppress log output                                    |
+| `--verbose`    | `-v`  | show debug details                                     |
 
-> **Note:** The pre-v2.5.0 styles (classic styles) are still there! Use them via `--style bar` or `--style pie`.
+`local` also accepts a `[PATH]` argument (default `.`) and:
 
-The `local` command also takes an optional `[PATH]` argument (defaults to `.`) and has one extra flag:
+| Flag             | Short | Description                      |
+| ---------------- | ----- | -------------------------------- |
+| `--follow-links` | `-L`  | follow symlinks (unix only)      |
 
-| Flag             | Short | What it does                               |
-| ---------------- | ----- | ------------------------------------------ |
-| `--follow-links` | `-L`  | follow symlinks when analyzing (unix only) |
+`config` subcommand:
 
-The `config` command manages your config file:
+| Flag     | Description                         |
+| -------- | ----------------------------------- |
+| `--show` | print config as table               |
+| `--path` | print config file path              |
+| `--raw`  | print raw TOML contents             |
 
-| Flag     | What it does                    |
-| -------- | ------------------------------- |
-| `--show` | print config as formatted table |
-| `--path` | print config file path          |
-| `--raw`  | print raw TOML contents         |
+Running `ghlang config` with no flags opens the file in `$EDITOR`.
 
-> **Note:** Running `ghlang config` without flags opens the config file in your default editor.
+`theme` subcommand:
 
-The `theme` command manages chart themes:
-
-| Flag        | What it does                                |
+| Flag        | Description                                 |
 | ----------- | ------------------------------------------- |
-| `--list`    | list all available themes                   |
+| `--list`    | list available themes                       |
 | `--info`    | show details for a specific theme           |
 | `--refresh` | force-refresh remote themes (bypass cache)  |
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## Shell completion
 
-<!-- SHELL COMPLETION -->
-
-## Shell Completion
-
-ghlang has built-in shell completion. To enable it:
-
-```bash
-# install completion for your shell
-ghlang --install-completion
-
-# or just view the completion script
-ghlang --show-completion
+```sh
+ghlang --install-completion     # install for current shell
+ghlang --show-completion        # print completion script
 ```
 
-After installing, restart your shell or source your config file.
+## Output
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Charts land in `output-dir` as `.png` (or `.svg`):
 
-<!-- OUTPUT -->
+| File                  | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `language_pixel.png`  | isometric pixel-tower chart (default style)                 |
+| `language_pie.png`    | pie chart (`--style pie`)                                   |
+| `language_bar.png`    | bar chart, top N (`--style bar`)                            |
+| `language_stats.json` | raw stats (with `--save-json`)                              |
+| `tokount_stats.json`  | detailed tokount output (local mode, `--save-json`)         |
+| `repositories.json`   | list of repos analyzed (GitHub mode, `--save-json`)         |
+| `github_colors.json`  | language colors from GitHub linguist (`--save-json`)        |
 
-## What You Get
-
-Charts end up in your output directory as `.png`:
-
-| File                  | What it is                                               |
-| --------------------- | -------------------------------------------------------- |
-| `language_pixel.png`  | pixel tower chart (default style)                        |
-| `language_pie.png`    | pie chart with all languages (`--style pie`)             |
-| `language_bar.png`    | bar chart with top N languages (`--style bar`)           |
-| `language_stats.json` | raw stats (with `--save-json`)                           |
-| `tokount_stats.json`  | detailed tokount output (local mode, with `--save-json`) |
-| `repositories.json`   | list of repos analyzed (GitHub mode, with `--save-json`) |
-| `github_colors.json`  | language colors from GitHub (with `--save-json`)         |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONFIGURATION -->
-
-## Config Options
+## Config
 
 Everything lives in `config.toml`:
 
 ### `[github]`
 
-| Option          | Default                                    | What it does                                                     |
-| --------------- | ------------------------------------------ | ---------------------------------------------------------------- |
-| `token`         | -                                          | your GitHub token                                                |
-| `affiliation`   | `"owner,collaborator,organization_member"` | which repos to include                                           |
-| `visibility`    | `"all"`                                    | `all`, `public`, or `private`                                    |
-| `ignored_repos` | `[]`                                       | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`) |
+| Option          | Default                                    | Description                                                       |
+| --------------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| `token`         | -                                          | GitHub token                                                      |
+| `affiliation`   | `"owner,collaborator,organization_member"` | which repos to include                                            |
+| `visibility`    | `"all"`                                    | `all`, `public`, `private`                                        |
+| `ignored_repos` | `[]`                                       | repos to skip (e.g. `"org/*"`, `"https://github.com/user/repo"`)  |
 
 ### `[tokount]`
 
-| Option         | Default                           | What it does        |
-| -------------- | --------------------------------- | ------------------- |
-| `ignored_dirs` | `["node_modules", "vendor", ...]` | directories to skip |
+| Option         | Default                           | Description          |
+| -------------- | --------------------------------- | -------------------- |
+| `ignored_dirs` | `["node_modules", "vendor", ...]` | directories to skip  |
 
 ### `[output]`
 
-| Option      | Default                      | What it does         |
+| Option      | Default                      | Description          |
 | ----------- | ---------------------------- | -------------------- |
 | `directory` | `"~/Documents/ghlang-stats"` | where to save charts |
 
 ### `[preferences]`
 
-| Option    | Default   | What it does      |
+| Option    | Default   | Description       |
 | --------- | --------- | ----------------- |
 | `verbose` | `false`   | more logging      |
 | `theme`   | `"light"` | chart color theme |
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- THEMES -->
-
 ## Themes
 
-ghlang comes with built-in themes and supports community themes:
+Built-in: `light`, `dark`. Community themes auto-fetch from `themes/manifest.json` (1-day cache). Custom themes via `~/.config/ghlang/custom_themes.json`.
 
 | Theme     | Preview                                                                                        | Source    |
 | --------- | ---------------------------------------------------------------------------------------------- | --------- |
@@ -298,37 +210,12 @@ ghlang comes with built-in themes and supports community themes:
 | `dark`    | ![dark](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/dark.png)       | built-in  |
 | `monokai` | ![monokai](https://raw.githubusercontent.com/velox-sh/ghlang/master/assets/themes/monokai.png) | community |
 
-**Using themes:**
-
-```bash
-# use a theme
-ghlang github --theme dark
-
-# combine with a style
-ghlang github --theme dark --style pie
-```
-
-**Set default in `config.toml`:**
-
-```toml
-[preferences]
-theme = "dark"
-```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- LICENSE -->
+Contributing a theme: see [`themes/README.md`](themes/README.md).
 
 ## License
 
-MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
+MIT. See [LICENSE](LICENSE).
 
 <div align="center">
-
-Made with ❤️
-
+  Made with ❤️
 </div>
